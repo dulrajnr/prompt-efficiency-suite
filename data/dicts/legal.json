@@ -1,0 +1,22 @@
+{
+    "contract": 0.9,
+    "agreement": 0.9,
+    "party": 0.8,
+    "clause": 0.8,
+    "obligation": 0.9,
+    "liability": 0.9,
+    "indemnify": 0.8,
+    "warranty": 0.8,
+    "breach": 0.9,
+    "termination": 0.8,
+    "jurisdiction": 0.7,
+    "arbitration": 0.7,
+    "confidentiality": 0.8,
+    "intellectual property": 0.9,
+    "copyright": 0.8,
+    "trademark": 0.8,
+    "patent": 0.8,
+    "infringement": 0.9,
+    "damages": 0.8,
+    "remedy": 0.7
+} 

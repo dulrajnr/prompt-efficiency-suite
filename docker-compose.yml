@@ -1,0 +1,18 @@
+version: '3.8'
+
+services:
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./data:/data
+      - ./config.yaml:/app/config.yaml
+    environment:
+      - DICTIONARY_PATH=/data/dicts
+      - MAX_DEFAULT_TOKENS=1800
+      - BUILD_FAILURE=true
+      - LOG_LEVEL=INFO
+    restart: unless-stopped 

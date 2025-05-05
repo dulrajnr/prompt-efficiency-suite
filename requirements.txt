@@ -1,0 +1,16 @@
+fastapi>=0.68.0
+uvicorn>=0.15.0
+pydantic>=1.8.2
+python-dotenv>=0.19.0
+tiktoken>=0.3.0
+numpy>=1.21.0
+scikit-learn>=0.24.2
+pytest>=6.2.5
+black>=21.7b0
+isort>=5.9.3
+mypy>=0.910
+click>=8.0.0
+pyyaml>=6.0.0
+spacy>=3.7.0
+markdown>=3.5.0
+Pillow>=10.0.0 

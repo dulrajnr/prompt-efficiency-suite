@@ -1,0 +1,16 @@
+# API Configuration
+api:
+  max_default_tokens: 1800
+  build_failure: true
+
+# Paths
+paths:
+  dictionary_path: /data/dicts
+
+# Logging
+logging:
+  level: INFO
+
+# Optional: API Keys
+# api_keys:
+#   openai: your_api_key_here 

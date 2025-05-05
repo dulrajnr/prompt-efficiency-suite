@@ -1,0 +1,52 @@
+{
+  "api": {
+    "name": "User Management API",
+    "version": "1.0.0",
+    "description": "REST API for managing user accounts and permissions",
+    "endpoints": [
+      {
+        "path": "/users",
+        "method": "GET",
+        "description": "List all users",
+        "parameters": {
+          "page": {
+            "type": "integer",
+            "description": "Page number for pagination",
+            "required": false,
+            "default": 1
+          },
+          "limit": {
+            "type": "integer",
+            "description": "Number of items per page",
+            "required": false,
+            "default": 10
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "id": "string",
+                  "username": "string",
+                  "email": "string",
+                  "role": "string"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized access"
+          }
+        }
+      }
+    ],
+    "authentication": {
+      "type": "JWT",
+      "description": "Bearer token authentication required for all endpoints"
+    }
+  }
+} 
