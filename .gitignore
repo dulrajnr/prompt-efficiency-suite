@@ -8,3 +8,4 @@ ENV/
 .coverage
 htmlcov/
 .DS_Store
+vscode-extension/.vscode-test/
