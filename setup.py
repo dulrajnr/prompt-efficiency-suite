@@ -1,29 +1,27 @@
+"""
+Setup configuration for the Prompt Efficiency Suite.
+"""
+
 from setuptools import setup, find_packages
 
+with open("README.md", "r", encoding="utf-8") as fh:
+    long_description = fh.read()
+
+with open("requirements.txt", "r", encoding="utf-8") as fh:
+    requirements = [line.strip() for line in fh if line.strip() and not line.startswith("#")]
+
 setup(
-    name="prompt_efficiency_suite",
+    name="prompt-efficiency-suite",
     version="1.0.0",
-    description="A comprehensive toolkit for optimizing and managing prompts",
-    author="Prompt Efficiency Suite Team",
-    author_email="support@promptefficiencysuite.com",
+    author="Prompt Efficiency Team",
+    author_email="support@prompt.com",
+    description="A comprehensive toolkit for optimizing and managing prompts in AI applications",
+    long_description=long_description,
+    long_description_content_type="text/markdown",
+    url="https://github.com/yourusername/prompt-efficiency-suite",
     packages=find_packages(),
-    install_requires=[
-        "spacy>=3.7.0",
-        "tiktoken>=0.3.0",
-        "numpy>=1.21.0",
-        "Pillow>=10.0.0",
-        "scikit-learn>=0.24.2",
-        "pytest>=6.2.5",
-        "black>=21.7b0",
-        "isort>=5.9.3",
-        "mypy>=0.910",
-        "click>=8.0.0",
-        "pyyaml>=6.0.0",
-        "markdown>=3.5.0"
-    ],
-    python_requires=">=3.8",
     classifiers=[
-        "Development Status :: 4 - Beta",
+        "Development Status :: 5 - Production/Stable",
         "Intended Audience :: Developers",
         "License :: OSI Approved :: MIT License",
         "Programming Language :: Python :: 3",
@@ -31,6 +29,27 @@ setup(
         "Programming Language :: Python :: 3.9",
         "Programming Language :: Python :: 3.10",
         "Programming Language :: Python :: 3.11",
-        "Programming Language :: Python :: 3.12",
+        "Topic :: Software Development :: Libraries :: Python Modules",
+        "Topic :: Software Development :: Quality Assurance",
+        "Topic :: Text Processing :: General"
     ],
+    python_requires=">=3.8",
+    install_requires=requirements,
+    extras_require={
+        "dev": [
+            "pytest>=7.4.0",
+            "pytest-cov>=4.1.0",
+            "black>=23.7.0",
+            "isort>=5.12.0",
+            "mypy>=1.5.1",
+            "flake8>=6.1.0"
+        ]
+    },
+    entry_points={
+        "console_scripts": [
+            "prompt-efficiency=prompt_efficiency_suite.cli:main"
+        ]
+    },
+    include_package_data=True,
+    zip_safe=False,
 ) 

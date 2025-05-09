@@ -1,0 +1,42 @@
+{
+    "test_args": [
+        "-v",
+        "--tb=short",
+        "--cov=prompt_efficiency_suite",
+        "--cov-report=term-missing",
+        "--cov-report=html"
+    ],
+    "coverage": true,
+    "deployment": {
+        "pypi": {
+            "enabled": true,
+            "require_tests": true,
+            "min_coverage": 80.0
+        },
+        "github": {
+            "enabled": true,
+            "require_tests": true,
+            "min_coverage": 80.0,
+            "create_release": true,
+            "generate_changelog": true
+        }
+    },
+    "notifications": {
+        "slack": {
+            "enabled": true,
+            "channel": "#prompt-efficiency",
+            "events": ["test_failure", "deployment_success", "deployment_failure"]
+        },
+        "email": {
+            "enabled": true,
+            "recipients": ["team@example.com"],
+            "events": ["test_failure", "deployment_failure"]
+        }
+    },
+    "artifacts": {
+        "test_reports": true,
+        "coverage_reports": true,
+        "build_artifacts": true,
+        "retention_days": 30
+    }
+} 

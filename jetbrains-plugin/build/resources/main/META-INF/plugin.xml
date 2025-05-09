@@ -1,0 +1,64 @@
+<idea-plugin>
+  <version>0.0.1</version>
+  <idea-version since-build="231" until-build="241.*" />
+  <id>com.prompt.efficiency</id>
+  <name>Prompt Efficiency</name>
+  <vendor>Prompt Efficiency Team</vendor>
+  <description><![CDATA[A powerful plugin that helps developers analyze, optimize, and manage prompts for large language models.
+        <br>
+        <br>
+        Features:
+        <ul>
+            <li>Analyze prompt clarity, structure, and complexity</li>
+            <li>Optimize prompts for better results</li>
+            <li>Estimate token usage and costs</li>
+            <li>Scan repository for prompts</li>
+            <li>Translate prompts between languages</li>
+        </ul>
+        <br>
+        <a href="https://github.com/your-repo">GitHub</a> |
+        <a href="https://github.com/your-repo/issues">Issues</a> |
+        <a href="https://github.com/your-repo/wiki">Documentation</a>]]></description>
+  <depends>com.intellij.modules.platform</depends>
+  <depends>com.intellij.modules.lang</depends>
+  <extensions defaultExtensionNs="com.intellij">
+    <toolWindow id="Prompt Efficiency" secondary="true" icon="AllIcons.General.Modified" anchor="bottom" factoryClass="com.prompt.efficiency.toolwindow.PromptEfficiencyToolWindowFactory" />
+    <applicationService serviceImplementation="com.prompt.efficiency.settings.PromptEfficiencySettings" />
+    <applicationConfigurable parentId="tools" instance="com.prompt.efficiency.settings.PromptEfficiencyConfigurable" id="com.prompt.efficiency.settings.PromptEfficiencyConfigurable" displayName="Prompt Efficiency" />
+  </extensions>
+  <actions>
+    <action id="PromptEfficiency.AnalyzeAction" class="com.prompt.efficiency.actions.AnalyzeAction" text="Analyze Prompt" description="Analyze the selected prompt for efficiency">
+      <keyboard-shortcut keymap="$default" first-keystroke="ctrl alt A" />
+    </action>
+    <action id="PromptEfficiency.OptimizeAction" class="com.prompt.efficiency.actions.OptimizeAction" text="Optimize Prompt" description="Optimize the selected prompt">
+      <keyboard-shortcut keymap="$default" first-keystroke="ctrl alt O" />
+    </action>
+    <action id="PromptEfficiency.EstimateCostAction" class="com.prompt.efficiency.actions.EstimateCostAction" text="Estimate Cost" description="Estimate the cost of the selected prompt">
+      <keyboard-shortcut keymap="$default" first-keystroke="ctrl alt E" />
+    </action>
+    <action id="PromptEfficiency.ScanRepositoryAction" class="com.prompt.efficiency.actions.ScanRepositoryAction" text="Scan Repository" description="Scan the repository for prompts">
+      <keyboard-shortcut keymap="$default" first-keystroke="ctrl alt S" />
+    </action>
+    <action id="PromptEfficiency.TranslateAction" class="com.prompt.efficiency.actions.TranslateAction" text="Translate Prompt" description="Translate the selected prompt">
+      <keyboard-shortcut keymap="$default" first-keystroke="ctrl alt T" />
+    </action>
+    <action id="PromptEfficiency.ManageTemplatesAction" class="com.prompt.efficiency.actions.ManageTemplatesAction" text="Manage Templates" description="Manage prompt templates">
+      <keyboard-shortcut keymap="$default" first-keystroke="ctrl alt M" />
+    </action>
+    <action id="PromptEfficiency.OpenConfig" class="com.prompt.efficiency.actions.OpenConfigAction" text="Open Settings" description="Open Prompt Efficiency settings">
+      <keyboard-shortcut keymap="$default" first-keystroke="ctrl alt ," />
+      <keyboard-shortcut keymap="Mac OS X" first-keystroke="cmd alt ," />
+    </action>
+    <group id="PromptEfficiency.Group" text="Prompt Efficiency" description="Prompt Efficiency actions">
+      <add-to-group group-id="EditorPopupMenu" anchor="last" />
+      <action id="PromptEfficiency.AnalyzeAction" />
+      <action id="PromptEfficiency.OptimizeAction" />
+      <action id="PromptEfficiency.EstimateCostAction" />
+      <action id="PromptEfficiency.TranslateAction" />
+      <separator />
+      <action id="PromptEfficiency.ScanRepositoryAction" />
+      <action id="PromptEfficiency.ManageTemplatesAction" />
+      <action id="PromptEfficiency.OpenConfig" />
+    </group>
+  </actions>
+</idea-plugin>

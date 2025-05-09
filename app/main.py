@@ -17,12 +17,14 @@ app = FastAPI(
 )
 
 # Initialize services
+dictionary_path = os.getenv("DICTIONARY_PATH", "data/dicts")
 trimmer = DomainAwareTrimmer(
-    dictionary_path=os.getenv("DICTIONARY_PATH", "/data/dicts")
+    dictionary_path=dictionary_path
 )
 cicd = CICDIntegration(
     max_tokens=int(os.getenv("MAX_DEFAULT_TOKENS", "1800")),
-    build_failure=os.getenv("BUILD_FAILURE", "true").lower() == "true"
+    build_failure=os.getenv("BUILD_FAILURE", "true").lower() == "true",
+    dictionary_path=dictionary_path
 )
 
 class TrimRequest(BaseModel):

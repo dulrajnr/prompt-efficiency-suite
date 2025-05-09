@@ -1,0 +1,15 @@
+{
+    "important": 0.9,
+    "critical": 0.9,
+    "essential": 0.9,
+    "necessary": 0.8,
+    "required": 0.8,
+    "optional": 0.6,
+    "consider": 0.7,
+    "recommend": 0.8,
+    "suggest": 0.7,
+    "must": 0.9,
+    "should": 0.8,
+    "could": 0.6,
+    "may": 0.5
+} 

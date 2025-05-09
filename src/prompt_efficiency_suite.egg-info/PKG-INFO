@@ -1,0 +1,24 @@
+Metadata-Version: 2.4
+Name: prompt-efficiency-suite
+Version: 1.0.0
+Summary: A comprehensive toolkit for optimizing and managing prompts
+Author: Prompt Efficiency Suite Team
+Author-email: Prompt Efficiency Suite Team <support@promptefficiencysuite.com>
+Requires-Python: >=3.8
+License-File: LICENSE
+Requires-Dist: spacy>=3.0.0
+Requires-Dist: numpy>=1.20.0
+Requires-Dist: pillow>=8.0.0
+Requires-Dist: pyyaml>=5.4.0
+Requires-Dist: httpx>=0.24.0
+Requires-Dist: fastapi>=0.100.0
+Provides-Extra: dev
+Requires-Dist: pytest>=6.0.0; extra == "dev"
+Requires-Dist: black>=21.0.0; extra == "dev"
+Requires-Dist: flake8>=3.9.0; extra == "dev"
+Requires-Dist: mypy>=0.900; extra == "dev"
+Requires-Dist: pytest-cov>=4.0.0; extra == "dev"
+Requires-Dist: pytest-asyncio>=0.21.0; extra == "dev"
+Dynamic: author
+Dynamic: license-file
+Dynamic: requires-python

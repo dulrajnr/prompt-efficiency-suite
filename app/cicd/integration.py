@@ -1,13 +1,13 @@
 from typing import Dict, List, Optional
 import json
 from pathlib import Path
-from app.trimmer.domain_aware import DomainAwareTrimmer
+from ..trimmer.domain_aware import DomainAwareTrimmer
 
 class CICDIntegration:
-    def __init__(self, max_tokens: int = 1800, build_failure: bool = True):
+    def __init__(self, max_tokens: int = 1800, build_failure: bool = True, dictionary_path: str = "data/dicts"):
         self.max_tokens = max_tokens
         self.build_failure = build_failure
-        self.trimmer = DomainAwareTrimmer()
+        self.trimmer = DomainAwareTrimmer(dictionary_path=dictionary_path)
         
     def check_prompt_budget(self, prompt: str) -> Dict:
         """Check if a prompt exceeds the token budget."""

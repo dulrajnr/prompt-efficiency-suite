@@ -1,0 +1,415 @@
+openapi: 3.0.0
+info:
+  title: Prompt Efficiency Suite API
+  description: API for analyzing, optimizing, and managing prompts for large language models
+  version: 1.0.0
+  contact:
+    email: api-support@prompt-efficiency.com
+    url: https://docs.prompt-efficiency.com
+
+servers:
+  - url: http://localhost:8000/api/v1
+    description: Local development server
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    Error:
+      type: object
+      properties:
+        error:
+          type: object
+          properties:
+            code:
+              type: string
+              example: INVALID_REQUEST
+            message:
+              type: string
+              example: Detailed error message
+            details:
+              type: object
+              properties:
+                field:
+                  type: string
+                  example: prompt
+                issue:
+                  type: string
+                  example: required field missing
+
+    AnalysisRequest:
+      type: object
+      required:
+        - prompt
+      properties:
+        prompt:
+          type: string
+          description: The prompt to analyze
+        options:
+          type: object
+          properties:
+            include_patterns:
+              type: boolean
+              default: true
+            include_suggestions:
+              type: boolean
+              default: true
+
+    AnalysisResponse:
+      type: object
+      properties:
+        clarity_score:
+          type: number
+          format: float
+          minimum: 0
+          maximum: 1
+        structure_score:
+          type: number
+          format: float
+          minimum: 0
+          maximum: 1
+        complexity_score:
+          type: number
+          format: float
+          minimum: 0
+          maximum: 1
+        quality_score:
+          type: number
+          format: float
+          minimum: 0
+          maximum: 1
+        patterns:
+          type: array
+          items:
+            type: string
+        suggestions:
+          type: array
+          items:
+            type: string
+
+    OptimizationRequest:
+      type: object
+      required:
+        - prompt
+        - method
+      properties:
+        prompt:
+          type: string
+        method:
+          type: string
+          enum: [trim, compress, enhance]
+        options:
+          type: object
+          properties:
+            preserve_ratio:
+              type: number
+              format: float
+              minimum: 0
+              maximum: 1
+            domain_terms:
+              type: array
+              items:
+                type: string
+
+    OptimizationResponse:
+      type: object
+      properties:
+        optimized_prompt:
+          type: string
+        savings:
+          type: object
+          properties:
+            tokens:
+              type: integer
+            percentage:
+              type: number
+              format: float
+        quality_score:
+          type: number
+          format: float
+          minimum: 0
+          maximum: 1
+
+    CostEstimationRequest:
+      type: object
+      required:
+        - prompt
+        - model
+      properties:
+        prompt:
+          type: string
+        model:
+          type: string
+          enum: [gpt-4, gpt-3.5-turbo, claude-2, palm-2]
+        currency:
+          type: string
+          default: USD
+
+    CostEstimationResponse:
+      type: object
+      properties:
+        input_tokens:
+          type: integer
+        estimated_output_tokens:
+          type: integer
+        total_cost:
+          type: number
+          format: float
+        currency:
+          type: string
+
+    RepositoryScanRequest:
+      type: object
+      required:
+        - directory
+      properties:
+        directory:
+          type: string
+        include_patterns:
+          type: array
+          items:
+            type: string
+        exclude_patterns:
+          type: array
+          items:
+            type: string
+
+    RepositoryScanResponse:
+      type: object
+      properties:
+        total_files:
+          type: integer
+        prompts_found:
+          type: integer
+        average_quality:
+          type: number
+          format: float
+        estimated_cost:
+          type: number
+          format: float
+        currency:
+          type: string
+        details:
+          type: array
+          items:
+            type: object
+            properties:
+              file:
+                type: string
+              quality_score:
+                type: number
+                format: float
+              estimated_cost:
+                type: number
+                format: float
+
+    TranslationRequest:
+      type: object
+      required:
+        - prompt
+        - source_model
+        - target_model
+      properties:
+        prompt:
+          type: string
+        source_model:
+          type: string
+          enum: [gpt-4, gpt-3.5-turbo, claude-2, palm-2]
+        target_model:
+          type: string
+          enum: [gpt-4, gpt-3.5-turbo, claude-2, palm-2]
+
+    TranslationResponse:
+      type: object
+      properties:
+        translated_prompt:
+          type: string
+        warnings:
+          type: array
+          items:
+            type: string
+
+paths:
+  /analyze:
+    post:
+      summary: Analyze a prompt
+      description: Analyzes a prompt for quality and provides suggestions
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AnalysisRequest'
+      responses:
+        '200':
+          description: Successful analysis
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AnalysisResponse'
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /optimize:
+    post:
+      summary: Optimize a prompt
+      description: Optimizes a prompt for better performance
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OptimizationRequest'
+      responses:
+        '200':
+          description: Successful optimization
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OptimizationResponse'
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /estimate-cost:
+    post:
+      summary: Estimate prompt cost
+      description: Estimates the cost of using a prompt with a specific model
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CostEstimationRequest'
+      responses:
+        '200':
+          description: Successful cost estimation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CostEstimationResponse'
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /scan-repository:
+    post:
+      summary: Scan repository
+      description: Scans a repository for prompts and analyzes them
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RepositoryScanRequest'
+      responses:
+        '200':
+          description: Successful scan
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RepositoryScanResponse'
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /translate:
+    post:
+      summary: Translate prompt
+      description: Translates a prompt optimized for one model to work with another model
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TranslationRequest'
+      responses:
+        '200':
+          description: Successful translation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TranslationResponse'
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /metrics:
+    get:
+      summary: Get metrics
+      description: Returns Prometheus metrics
+      responses:
+        '200':
+          description: Metrics in Prometheus format
+          content:
+            text/plain:
+              schema:
+                type: string
+
+  /ws:
+    get:
+      summary: WebSocket endpoint
+      description: WebSocket endpoint for real-time prompt analysis and optimization
+      responses:
+        '101':
+          description: Switching to WebSocket protocol 

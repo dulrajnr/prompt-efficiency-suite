@@ -2,6 +2,37 @@
 requires = ["setuptools>=42", "wheel"]
 build-backend = "setuptools.build_meta"
 
+[project]
+name = "prompt-efficiency-suite"
+version = "1.0.0"
+description = "A comprehensive toolkit for optimizing and managing prompts"
+authors = [
+    {name = "Prompt Efficiency Suite Team", email = "support@promptefficiencysuite.com"}
+]
+requires-python = ">=3.13,<3.14"
+dependencies = [
+    "spacy>=3.0.0",
+    "numpy>=1.20.0",
+    "pillow>=8.0.0",
+    "pyyaml>=5.4.0",
+    "httpx>=0.24.0",
+    "fastapi>=0.100.0"
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=6.0.0",
+    "black>=21.0.0",
+    "flake8>=3.9.0",
+    "mypy>=0.900",
+    "pytest-cov>=4.0.0",
+    "pytest-asyncio>=0.21.0"
+]
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+packages = ["prompt_efficiency_suite"]
+
 [tool.black]
 line-length = 88
 target-version = ['py38']
@@ -28,6 +59,11 @@ warn_redundant_casts = true
 warn_unused_ignores = true
 warn_no_return = true
 warn_unreachable = true
+
+[[tool.mypy.overrides]]
+module = "tests.*"
+disallow_untyped_defs = false
+disallow_incomplete_defs = false
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

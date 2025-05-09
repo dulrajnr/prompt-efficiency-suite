@@ -1,0 +1,2 @@
+[console_scripts]
+prompt-efficiency = prompt_efficiency_suite.cli:cli

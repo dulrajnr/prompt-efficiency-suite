@@ -1,0 +1,63 @@
+{
+    "monitoring_interval": 60,
+    "thresholds": {
+        "gpt-4": {
+            "max_tokens": 1000000,
+            "max_cost": 100.0,
+            "warning_threshold": 0.8
+        },
+        "gpt-3.5-turbo": {
+            "max_tokens": 2000000,
+            "max_cost": 50.0,
+            "warning_threshold": 0.8
+        },
+        "claude-2": {
+            "max_tokens": 1500000,
+            "max_cost": 75.0,
+            "warning_threshold": 0.8
+        }
+    },
+    "notifications": {
+        "enabled": true,
+        "channels": {
+            "email": {
+                "enabled": true,
+                "recipients": ["team@example.com"],
+                "events": ["threshold_exceeded", "warning_threshold"]
+            },
+            "slack": {
+                "enabled": true,
+                "channel": "#prompt-efficiency",
+                "events": ["threshold_exceeded", "warning_threshold"]
+            }
+        }
+    },
+    "optimization": {
+        "enabled": true,
+        "strategies": {
+            "token_reduction": {
+                "enabled": true,
+                "target_reduction": 0.2,
+                "methods": ["compression", "truncation"]
+            },
+            "cost_optimization": {
+                "enabled": true,
+                "target_reduction": 0.15,
+                "methods": ["model_switching", "batch_processing"]
+            }
+        }
+    },
+    "reporting": {
+        "enabled": true,
+        "interval": "daily",
+        "format": "json",
+        "include_metrics": [
+            "total_tokens",
+            "total_cost",
+            "average_tokens_per_request",
+            "average_cost_per_request",
+            "peak_tokens",
+            "peak_cost"
+        ]
+    }
+} 

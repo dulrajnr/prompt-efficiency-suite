@@ -1,0 +1,119 @@
+groups:
+  - name: prompt_efficiency_suite
+    rules:
+      # High error rate alerts
+      - alert: HighPromptAnalysisErrorRate
+        expr: rate(prompt_analysis_total{status="error"}[5m]) / rate(prompt_analysis_total[5m]) > 0.1
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: High prompt analysis error rate
+          description: "Error rate for prompt analysis is above 10% for the last 5 minutes"
+
+      - alert: HighPromptOptimizationErrorRate
+        expr: rate(prompt_optimization_total{status="error"}[5m]) / rate(prompt_optimization_total[5m]) > 0.1
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: High prompt optimization error rate
+          description: "Error rate for prompt optimization is above 10% for the last 5 minutes"
+
+      # Performance alerts
+      - alert: HighAnalysisDuration
+        expr: rate(analysis_duration_seconds_sum[5m]) / rate(analysis_duration_seconds_count[5m]) > 5
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: High prompt analysis duration
+          description: "Average prompt analysis duration is above 5 seconds for the last 5 minutes"
+
+      - alert: HighOptimizationDuration
+        expr: rate(optimization_duration_seconds_sum[5m]) / rate(optimization_duration_seconds_count[5m]) > 10
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: High prompt optimization duration
+          description: "Average prompt optimization duration is above 10 seconds for the last 5 minutes"
+
+      # Resource usage alerts
+      - alert: HighActiveOperations
+        expr: active_analyses + active_optimizations > 100
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: High number of active operations
+          description: "More than 100 active operations for the last 5 minutes"
+
+      # Cost estimation alerts
+      - alert: HighCostEstimationRate
+        expr: rate(cost_estimation_total[5m]) > 100
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: High cost estimation rate
+          description: "More than 100 cost estimations per minute for the last 5 minutes"
+
+      # Service health alerts
+      - alert: ServiceDown
+        expr: up == 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: Service is down
+          description: "The Prompt Efficiency Suite service has been down for more than 1 minute"
+
+      # API endpoint health alerts
+      - alert: HighAPIErrorRate
+        expr: rate(http_requests_total{status=~"5.."}[5m]) / rate(http_requests_total[5m]) > 0.05
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: High API error rate
+          description: "API error rate is above 5% for the last 5 minutes"
+
+      # Budget alerts
+      - alert: ApproachingDailyBudget
+        expr: cost_estimation_total{model="gpt-4"} > 80
+        for: 1h
+        labels:
+          severity: warning
+        annotations:
+          summary: Approaching daily budget
+          description: "Cost estimation for GPT-4 is approaching the daily budget limit"
+
+      - alert: ExceededDailyBudget
+        expr: cost_estimation_total{model="gpt-4"} > 100
+        for: 1h
+        labels:
+          severity: critical
+        annotations:
+          summary: Exceeded daily budget
+          description: "Cost estimation for GPT-4 has exceeded the daily budget limit"
+
+      # Quality alerts
+      - alert: LowPromptQuality
+        expr: prompt_quality_score < 0.6
+        for: 1h
+        labels:
+          severity: warning
+        annotations:
+          summary: Low prompt quality
+          description: "Average prompt quality score is below 0.6 for the last hour"
+
+      # Token usage alerts
+      - alert: HighTokenUsage
+        expr: token_usage_total > 1000000
+        for: 1h
+        labels:
+          severity: warning
+        annotations:
+          summary: High token usage
+          description: "Token usage has exceeded 1 million in the last hour" 

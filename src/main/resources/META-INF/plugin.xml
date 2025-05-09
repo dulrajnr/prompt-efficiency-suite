@@ -1,0 +1,89 @@
+<idea-plugin>
+    <id>com.prompt.efficiency</id>
+    <name>Prompt Efficiency</name>
+    <vendor>Prompt Efficiency Team</vendor>
+    <description><![CDATA[
+        A powerful plugin for JetBrains IDEs that helps developers write, manage, and optimize their AI prompts.
+        Features include:
+        <ul>
+            <li>Real-time prompt analysis and validation</li>
+            <li>Pattern management and templates</li>
+            <li>Cost tracking and analytics</li>
+            <li>Team collaboration tools</li>
+            <li>Code completion and quick fixes</li>
+        </ul>
+    ]]></description>
+
+    <depends>com.intellij.modules.platform</depends>
+    <depends>com.intellij.modules.java</depends>
+
+    <extensions defaultExtensionNs="com.intellij">
+        <!-- Services -->
+        <projectService
+            serviceImplementation="com.prompt.efficiency.analytics.CostAnalytics"/>
+        <projectService
+            serviceImplementation="com.prompt.efficiency.collab.TeamPatternManager"/>
+        <projectService
+            serviceImplementation="com.prompt.efficiency.patterns.PromptPatternLibrary"/>
+        <projectService
+            serviceImplementation="com.prompt.efficiency.settings.PromptEfficiencySettings"/>
+
+        <!-- Actions -->
+        <action id="PromptEfficiency.ManagePatterns"
+                class="com.prompt.efficiency.collab.ui.TeamPatternManagementDialog"
+                text="Manage Patterns"
+                description="Open the pattern management dialog">
+            <add-to-group group-id="ToolsMenu" anchor="last"/>
+        </action>
+        <action id="PromptEfficiency.CostAnalytics"
+                class="com.prompt.efficiency.analytics.ui.CostAnalyticsPanel"
+                text="Cost Analytics"
+                description="Open the cost analytics panel">
+            <add-to-group group-id="ToolsMenu" anchor="last"/>
+        </action>
+
+        <!-- Settings -->
+        <projectConfigurable
+            parentId="tools"
+            instance="com.prompt.efficiency.settings.PromptEfficiencyConfigurable"
+            id="com.prompt.efficiency.settings.PromptEfficiencyConfigurable"
+            displayName="Prompt Efficiency"/>
+
+        <!-- Code Completion -->
+        <completion.contributor
+            language="any"
+            implementationClass="com.prompt.efficiency.completion.CompletionProvider"/>
+
+        <!-- Quick Fixes -->
+        <localInspection
+            language="any"
+            displayName="Prompt Quality"
+            groupName="Prompt Efficiency"
+            enabledByDefault="true"
+            level="WARNING"
+            implementationClass="com.prompt.efficiency.inspection.PromptEfficiencyInspection"/>
+
+        <!-- File Types -->
+        <fileType
+            name="Prompt"
+            language="Prompt"
+            fieldName="PROMPT"
+            extensions="prompt"
+            implementationClass="com.prompt.efficiency.file.PromptFileType"/>
+    </extensions>
+
+    <actions>
+        <action id="PromptEfficiency.ManagePatterns"
+                class="com.prompt.efficiency.collab.ui.TeamPatternManagementDialog"
+                text="Manage Patterns"
+                description="Open the pattern management dialog">
+            <add-to-group group-id="ToolsMenu" anchor="last"/>
+        </action>
+        <action id="PromptEfficiency.CostAnalytics"
+                class="com.prompt.efficiency.analytics.ui.CostAnalyticsPanel"
+                text="Cost Analytics"
+                description="Open the cost analytics panel">
+            <add-to-group group-id="ToolsMenu" anchor="last"/>
+        </action>
+    </actions>
+</idea-plugin> 

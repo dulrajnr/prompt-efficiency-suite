@@ -1,0 +1,174 @@
+{
+  "name": "prompt-efficiency-suite",
+  "displayName": "Prompt Efficiency Suite",
+  "description": "VS Code extension for the Prompt Efficiency Suite",
+  "version": "0.0.1",
+  "publisher": "prompt-efficiency",
+  "engines": {
+    "vscode": "^1.60.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "activationEvents": [
+    "onCommand:prompt-efficiency.analyze",
+    "onCommand:prompt-efficiency.optimize",
+    "onCommand:prompt-efficiency.estimate-cost",
+    "onCommand:prompt-efficiency.scan-repository",
+    "onCommand:prompt-efficiency.translate-model",
+    "onCommand:prompt-efficiency.checkConnection",
+    "onCommand:prompt-efficiency.openConfig"
+  ],
+  "main": "./out/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "prompt-efficiency.analyze",
+        "title": "Analyze Prompt"
+      },
+      {
+        "command": "prompt-efficiency.optimize",
+        "title": "Optimize Prompt"
+      },
+      {
+        "command": "prompt-efficiency.estimate-cost",
+        "title": "Estimate Cost"
+      },
+      {
+        "command": "prompt-efficiency.scan-repository",
+        "title": "Scan Repository for Prompts"
+      },
+      {
+        "command": "prompt-efficiency.translate-model",
+        "title": "Translate Prompt to Another Model"
+      },
+      {
+        "command": "prompt-efficiency.checkConnection",
+        "title": "Check API Connection"
+      },
+      {
+        "command": "prompt-efficiency.openConfig",
+        "title": "Open Prompt Efficiency Settings"
+      }
+    ],
+    "keybindings": [
+      {
+        "command": "prompt-efficiency.analyze",
+        "key": "ctrl+shift+a",
+        "mac": "cmd+shift+a",
+        "when": "editorHasSelection"
+      },
+      {
+        "command": "prompt-efficiency.optimize",
+        "key": "ctrl+shift+o",
+        "mac": "cmd+shift+o",
+        "when": "editorHasSelection"
+      },
+      {
+        "command": "prompt-efficiency.estimate-cost",
+        "key": "ctrl+shift+c",
+        "mac": "cmd+shift+c",
+        "when": "editorHasSelection"
+      },
+      {
+        "command": "prompt-efficiency.scan-repository",
+        "key": "ctrl+shift+s",
+        "mac": "cmd+shift+s"
+      },
+      {
+        "command": "prompt-efficiency.translate-model",
+        "key": "ctrl+shift+t",
+        "mac": "cmd+shift+t",
+        "when": "editorHasSelection"
+      },
+      {
+        "command": "prompt-efficiency.openConfig",
+        "key": "ctrl+shift+,",
+        "mac": "cmd+shift+,"
+      }
+    ],
+    "configuration": {
+      "title": "Prompt Efficiency Suite",
+      "properties": {
+        "promptEfficiency.apiKey": {
+          "type": "string",
+          "default": "",
+          "description": "API key for the Prompt Efficiency Suite"
+        },
+        "promptEfficiency.serverUrl": {
+          "type": "string",
+          "default": "http://localhost:8000",
+          "description": "Server URL for the Prompt Efficiency Suite"
+        },
+        "promptEfficiency.defaultModel": {
+          "type": "string",
+          "default": "gpt-4",
+          "enum": [
+            "gpt-4",
+            "gpt-3.5-turbo",
+            "claude-2",
+            "claude-instant"
+          ],
+          "description": "Default model to use for analysis and optimization"
+        },
+        "promptEfficiency.defaultCurrency": {
+          "type": "string",
+          "default": "USD",
+          "enum": [
+            "USD",
+            "EUR",
+            "GBP"
+          ],
+          "description": "Default currency for cost estimation"
+        },
+        "promptEfficiency.autoCheckConnection": {
+          "type": "boolean",
+          "default": true,
+          "description": "Automatically check API connection status"
+        },
+        "promptEfficiency.connectionCheckInterval": {
+          "type": "number",
+          "default": 30000,
+          "description": "Interval in milliseconds to check API connection status"
+        }
+      }
+    },
+    "statusBar": {
+      "items": [
+        {
+          "id": "prompt-efficiency.status",
+          "alignment": "right",
+          "priority": 100
+        }
+      ]
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "pretest": "npm run compile && npm run lint",
+    "lint": "eslint src --ext ts",
+    "test": "node ./out/test/runTest.js"
+  },
+  "devDependencies": {
+    "@types/axios": "^0.14.4",
+    "@types/glob": "^8.1.0",
+    "@types/mocha": "^10.0.6",
+    "@types/node": "^20.11.24",
+    "@types/sinon": "^17.0.3",
+    "@types/vscode": "^1.87.0",
+    "@typescript-eslint/eslint-plugin": "^7.18.0",
+    "@typescript-eslint/parser": "^7.18.0",
+    "@vscode/test-electron": "^2.3.9",
+    "eslint": "^8.57.1",
+    "glob": "^10.3.10",
+    "mocha": "^10.3.0",
+    "sinon": "^17.0.1",
+    "typescript": "^5.3.3",
+    "vscode-test": "^1.5.2"
+  },
+  "dependencies": {
+    "axios": "^0.21.1"
+  }
+}
