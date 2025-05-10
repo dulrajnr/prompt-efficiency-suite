@@ -5,10 +5,15 @@ Prompt Efficiency Suite - A toolkit for optimizing and managing prompts.
 from .adaptive_budgeting import AdaptiveBudgetManager, BudgetAllocation
 from .analyzer import PromptAnalysis, PromptAnalyzer
 from .base_compressor import BaseCompressor, CompressionResult
+from .batch_optimizer import BatchOptimizer
 from .bulk_optimizer import BulkOptimizer
+from .code_aware_compressor import CodeAwareCompressor
+from .domain_aware_trimmer import DomainAwareTrimmer
 from .macro_manager import MacroDefinition, MacroManager
 from .macro_suggester import MacroSuggester
 from .metrics import EfficiencyMetrics, MetricsTracker
+from .optimizer import Optimizer, PromptOptimizer
+from .prompt_optimizer import PromptOptimizer as SinglePromptOptimizer
 from .repository_scanner import PromptLocation, RepositoryScanner
 from .utils import (
     calculate_token_estimate,
@@ -33,6 +38,9 @@ __all__ = [
     "MetricsTracker",
     "EfficiencyMetrics",
     "BulkOptimizer",
+    "BatchOptimizer",
+    "CodeAwareCompressor",
+    "DomainAwareTrimmer",
     "MacroManager",
     "MacroDefinition",
     "MacroSuggester",
@@ -40,6 +48,9 @@ __all__ = [
     "PromptLocation",
     "AdaptiveBudgetManager",
     "BudgetAllocation",
+    "Optimizer",
+    "PromptOptimizer",
+    "SinglePromptOptimizer",
     # Utility functions
     "load_config",
     "save_config",
