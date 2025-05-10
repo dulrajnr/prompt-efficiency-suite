@@ -54,7 +54,7 @@ jobs:
             ${{ steps.find-prompts.outputs.prompts }}
 
       - name: Upload report
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v2
         with:
           name: prompt-analysis-report
           path: report.html
