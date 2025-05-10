@@ -384,4 +384,4 @@ class PromptTemplate : PersistentStateComponent<PromptTemplate> {
             return com.intellij.openapi.components.ServiceManager.getService(PromptTemplate::class.java)
         }
     }
-} 
+}

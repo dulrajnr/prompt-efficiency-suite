@@ -14,7 +14,7 @@ This document outlines best practices for using the Prompt Efficiency Suite effe
      ```python
      # Good
      "Summarize the key points from the following text in 3 bullet points"
-     
+
      # Bad
      "Please take the following text and create a summary that includes the most important information, making sure to highlight the key points in a bulleted list format with exactly 3 items"
      ```
@@ -28,10 +28,10 @@ This document outlines best practices for using the Prompt Efficiency Suite effe
      prompt = """
      CONTEXT:
      {context}
-     
+
      TASK:
      {task}
-     
+
      CONSTRAINTS:
      {constraints}
      """
@@ -170,7 +170,7 @@ This document outlines best practices for using the Prompt Efficiency Suite effe
      # Batch read prompts
      with open('prompts.txt', 'r') as f:
          prompts = f.readlines()
-     
+
      # Process in batches
      for batch in chunks(prompts, 100):
          results = await optimizer.optimize_batch(batch)
@@ -331,13 +331,13 @@ This document outlines best practices for using the Prompt Efficiency Suite effe
      ```python
      def process_prompt(prompt: str) -> str:
          """Process a prompt with the latest optimizations.
-         
+
          Args:
              prompt: The input prompt to process
-             
+
          Returns:
              The processed prompt
-             
+
          Note:
              Updated in v0.1.0 to include new compression algorithm
          """
@@ -353,4 +353,4 @@ This document outlines best practices for using the Prompt Efficiency Suite effe
      prompt-efficiency-suite==0.1.0
      numpy==1.21.0
      scikit-learn==0.24.2
-     ``` 
+     ```

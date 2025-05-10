@@ -22,11 +22,11 @@ class CompletionProvider : CompletionContributor() {
                     val project = parameters.editor.project ?: return
                     val settings = PromptEfficiencySettings.getInstance(project)
                     val patternManager = TeamPatternManager.getInstance(project)
-                    
+
                     // Get patterns based on current context
                     val patterns = patternManager.getPatterns()
                         .filter { it.model == settings.selectedModel }
-                    
+
                     // Add pattern completions
                     patterns.forEach { pattern ->
                         val element = LookupElementBuilder.create(pattern.name)
@@ -36,20 +36,20 @@ class CompletionProvider : CompletionContributor() {
                                 val editor = context.editor
                                 val document = editor.document
                                 val caretOffset = editor.caretModel.offset
-                                
+
                                 // Insert pattern template
                                 document.insertString(caretOffset, pattern.template)
-                                
+
                                 // Move caret to end of inserted text
                                 editor.caretModel.moveToOffset(caretOffset + pattern.template.length)
                             }
-                        
+
                         result.addElement(element)
                     }
 
                     // Add best practices completions
                     addBestPracticesCompletions(result, project)
-                    
+
                     // Add model-specific completions
                     addModelSpecificCompletions(result, settings.selectedModel)
                 }
@@ -76,7 +76,7 @@ class CompletionProvider : CompletionContributor() {
                     val editor = context.editor
                     val document = editor.document
                     val caretOffset = editor.caretModel.offset
-                    
+
                     // Insert best practice template
                     val template = when (practice) {
                         "Add examples to improve clarity" -> "\n\nExample:\nInput: <example_input>\nOutput: <example_output>"
@@ -88,11 +88,11 @@ class CompletionProvider : CompletionContributor() {
                         "Add fallback options" -> "\n\nFallback Options:\n- Primary approach: <approach>\n- Alternative approach: <approach>\n- Emergency fallback: <fallback>"
                         else -> "\n\n$practice: <details>"
                     }
-                    
+
                     document.insertString(caretOffset, template)
                     editor.caretModel.moveToOffset(caretOffset + template.length)
                 }
-            
+
             result.addElement(element)
         }
     }
@@ -122,7 +122,7 @@ class CompletionProvider : CompletionContributor() {
                     val editor = context.editor
                     val document = editor.document
                     val caretOffset = editor.caretModel.offset
-                    
+
                     // Insert model-specific template
                     val template = when (completion) {
                         "Use system message for context" -> "\n\nSystem: <system_message>"
@@ -135,12 +135,12 @@ class CompletionProvider : CompletionContributor() {
                         "Set presence penalty" -> "\n\nPresence Penalty: <value>"
                         else -> "\n\n$completion: <details>"
                     }
-                    
+
                     document.insertString(caretOffset, template)
                     editor.caretModel.moveToOffset(caretOffset + template.length)
                 }
-            
+
             result.addElement(element)
         }
     }
-} 
+}

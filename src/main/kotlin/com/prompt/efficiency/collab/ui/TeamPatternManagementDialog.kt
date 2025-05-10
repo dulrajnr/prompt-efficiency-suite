@@ -31,7 +31,7 @@ class TeamPatternManagementDialog(
 
     override fun createCenterPanel(): JComponent {
         val panel = JPanel(BorderLayout())
-        
+
         // Table setup
         table.selectionModel.addListSelectionListener {
             if (!it.valueIsAdjusting) {
@@ -44,30 +44,30 @@ class TeamPatternManagementDialog(
                 }
             }
         }
-        
+
         val scrollPane = JBScrollPane(table)
         scrollPane.preferredSize = Dimension(800, 400)
-        
+
         // Button panel
         val buttonPanel = JPanel()
         val addButton = JButton("Add")
         val editButton = JButton("Edit")
         val deleteButton = JButton("Delete")
         val reviewButton = JButton("Review")
-        
+
         addButton.addActionListener { addPattern() }
         editButton.addActionListener { editPattern() }
         deleteButton.addActionListener { deletePattern() }
         reviewButton.addActionListener { reviewPattern() }
-        
+
         buttonPanel.add(addButton)
         buttonPanel.add(editButton)
         buttonPanel.add(deleteButton)
         buttonPanel.add(reviewButton)
-        
+
         panel.add(scrollPane, BorderLayout.CENTER)
         panel.add(buttonPanel, BorderLayout.SOUTH)
-        
+
         return panel
     }
 
@@ -136,4 +136,4 @@ class TeamPatternManagementDialog(
             patternManager.addReview(review)
         }
     }
-} 
+}

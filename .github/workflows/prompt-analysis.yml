@@ -16,45 +16,45 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      
+
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
           python-version: '3.10'
-          
+
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
           pip install prompt-efficiency-suite[dev]
-          
+
       - name: Find prompts
         id: find-prompts
         run: |
           echo "prompts=$(find . -type f \( -name "*.txt" -o -name "*.md" -o -name "*.py" -o -name "*.js" -o -name "*.ts" -o -name "*.jsx" -o -name "*.tsx" \) -exec grep -l "prompt" {} \; | tr '\n' ' ')" >> $GITHUB_OUTPUT
-          
+
       - name: Analyze prompts
         run: |
           for file in ${{ steps.find-prompts.outputs.prompts }}; do
             echo "Analyzing $file..."
             prompt-efficiency analyze "$file" || exit 1
           done
-          
+
       - name: Check budget
         run: |
           for file in ${{ steps.find-prompts.outputs.prompts }}; do
             echo "Checking budget for $file..."
             prompt-efficiency check-budget "$file" || exit 1
           done
-          
+
       - name: Generate report
         run: |
           prompt-efficiency generate-report \
             --output report.html \
             --format html \
             ${{ steps.find-prompts.outputs.prompts }}
-            
+
       - name: Upload report
         uses: actions/upload-artifact@v3
         with:
           name: prompt-analysis-report
-          path: report.html 
+          path: report.html

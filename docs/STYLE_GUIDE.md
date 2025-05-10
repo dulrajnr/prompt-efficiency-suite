@@ -180,4 +180,4 @@ Brief description of the endpoint
 
 ## Examples
 Practical usage examples
-``` 
+```

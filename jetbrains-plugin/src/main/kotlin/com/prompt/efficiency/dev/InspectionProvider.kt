@@ -101,4 +101,4 @@ class PromptInspectionProvider : LocalInspectionTool() {
         // Check if file is a prompt file based on extension or content
         return file.name.endsWith(".prompt") || file.name.endsWith(".txt")
     }
-} 
+}

@@ -25,7 +25,7 @@ class ApiClientIntegrationTest {
     fun setup() {
         server = MockWebServer()
         server.start()
-        
+
         project = mock(Project::class.java)
         settings = PromptEfficiencySettings().apply {
             serverUrl = server.url("/").toString()
@@ -33,7 +33,7 @@ class ApiClientIntegrationTest {
             defaultModel = "gpt-4"
             defaultCurrency = "USD"
         }
-        
+
         apiClient = ApiClient(settings)
     }
 
@@ -51,7 +51,7 @@ class ApiClientIntegrationTest {
             put("structure", 0.7)
             put("complexity", 0.6)
         }
-        
+
         server.enqueue(MockResponse()
             .setResponseCode(200)
             .setBody(responseJson.toString())
@@ -65,7 +65,7 @@ class ApiClientIntegrationTest {
         assertEquals(0.8, result.getDouble("clarity"))
         assertEquals(0.7, result.getDouble("structure"))
         assertEquals(0.6, result.getDouble("complexity"))
-        
+
         val request = server.takeRequest()
         assertEquals("POST", request.method)
         assertTrue(request.path?.contains("/analyze") ?: false)
@@ -83,7 +83,7 @@ class ApiClientIntegrationTest {
                 put("structure", "Better structure")
             })
         }
-        
+
         server.enqueue(MockResponse()
             .setResponseCode(200)
             .setBody(responseJson.toString())
@@ -109,7 +109,7 @@ class ApiClientIntegrationTest {
             put("token_count", 100)
             put("cost_per_token", 0.005)
         }
-        
+
         server.enqueue(MockResponse()
             .setResponseCode(200)
             .setBody(responseJson.toString())
@@ -143,7 +143,7 @@ class ApiClientIntegrationTest {
                 })
             })
         }
-        
+
         server.enqueue(MockResponse()
             .setResponseCode(200)
             .setBody(responseJson.toString())
@@ -169,7 +169,7 @@ class ApiClientIntegrationTest {
             put("source_language", "en")
             put("target_language", "es")
         }
-        
+
         server.enqueue(MockResponse()
             .setResponseCode(200)
             .setBody(responseJson.toString())
@@ -208,7 +208,7 @@ class ApiClientIntegrationTest {
             put("structure", 0.7)
             put("complexity", 0.6)
         }
-        
+
         server.enqueue(MockResponse()
             .setResponseCode(200)
             .setBody(responseJson.toString())
@@ -678,4 +678,4 @@ class ApiClientIntegrationTest {
         assertTrue(exceptions[0] is IOException)
         assertTrue(exceptions[0].message?.contains("429") ?: false)
     }
-} 
+}

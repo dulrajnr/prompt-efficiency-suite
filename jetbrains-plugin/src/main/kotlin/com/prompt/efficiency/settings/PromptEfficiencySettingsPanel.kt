@@ -27,7 +27,7 @@ class PromptEfficiencySettingsPanel(private val project: Project) : Configurable
 
     override fun createComponent(): JComponent {
         val settings = PromptEfficiencySettings.getInstance()
-        
+
         // Initialize fields with current settings
         serverUrlField.text = settings.serverUrl
         apiKeyField.text = settings.apiKey
@@ -78,10 +78,10 @@ class PromptEfficiencySettingsPanel(private val project: Project) : Configurable
     @Throws(ConfigurationException::class)
     override fun apply() {
         val settings = PromptEfficiencySettings.getInstance()
-        
+
         // Validate fields
         validateFields()
-        
+
         // Update settings
         settings.serverUrl = serverUrlField.text
         settings.apiKey = apiKeyField.text
@@ -92,13 +92,13 @@ class PromptEfficiencySettingsPanel(private val project: Project) : Configurable
         settings.autoAnalyze = autoAnalyzeCheckbox.isSelected
         settings.showSuggestions = showSuggestionsCheckbox.isSelected
         settings.enableTemplates = enableTemplatesCheckbox.isSelected
-        
+
         modified = false
     }
 
     override fun reset() {
         val settings = PromptEfficiencySettings.getInstance()
-        
+
         serverUrlField.text = settings.serverUrl
         apiKeyField.text = settings.apiKey
         defaultModelCombo.selectedItem = settings.defaultModel
@@ -108,7 +108,7 @@ class PromptEfficiencySettingsPanel(private val project: Project) : Configurable
         autoAnalyzeCheckbox.isSelected = settings.autoAnalyze
         showSuggestionsCheckbox.isSelected = settings.showSuggestions
         enableTemplatesCheckbox.isSelected = settings.enableTemplates
-        
+
         modified = false
     }
 
@@ -127,4 +127,4 @@ class PromptEfficiencySettingsPanel(private val project: Project) : Configurable
             throw ConfigurationException("Max Tokens must be a positive number")
         }
     }
-} 
+}

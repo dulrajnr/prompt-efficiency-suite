@@ -49,4 +49,4 @@
       "description": "Bearer token authentication required for all endpoints"
     }
   }
-} 
+}

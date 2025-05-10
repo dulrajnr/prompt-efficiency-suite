@@ -240,4 +240,4 @@ class TeamPatternManagementDialog(
             // TODO: Add icons
         }
     }
-} 
+}

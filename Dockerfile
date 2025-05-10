@@ -49,4 +49,4 @@ USER appuser
 ENTRYPOINT ["python", "-m", "prompt_efficiency_suite.main"]
 
 # Default command
-CMD ["--host", "0.0.0.0", "--port", "8000"] 
+CMD ["--host", "0.0.0.0", "--port", "8000"]

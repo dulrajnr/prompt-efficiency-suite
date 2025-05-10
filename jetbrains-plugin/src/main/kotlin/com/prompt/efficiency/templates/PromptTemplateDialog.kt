@@ -528,4 +528,4 @@ class PromptTemplateDialog(
         }
         super.doOKAction()
     }
-} 
+}

@@ -80,8 +80,8 @@ class CostAnalytics(private val project: Project) {
     fun getCostLimit(model: String): Double? = state.costLimits[model]
 
     fun getAlerts(timeRange: TimeRange): List<CostAlert> {
-        return state.alerts.filter { 
-            it.timestamp.isAfter(timeRange.start) && 
+        return state.alerts.filter {
+            it.timestamp.isAfter(timeRange.start) &&
             it.timestamp.isBefore(timeRange.end)
         }
     }
@@ -163,4 +163,4 @@ class CostAnalytics(private val project: Project) {
             return project.getService(CostAnalytics::class.java)
         }
     }
-} 
+}

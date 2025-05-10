@@ -2,4 +2,4 @@
 
 from .optimizer import BatchOptimizer
 
-__all__ = ['BatchOptimizer'] 
+__all__ = ["BatchOptimizer"]

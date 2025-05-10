@@ -152,4 +152,4 @@ class TeamCollaboration(private val project: Project) {
     private fun updatePatternAnalytics(pattern: TeamPattern) {
         // TODO: Implement pattern analytics update
     }
-} 
+}

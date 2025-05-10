@@ -252,4 +252,4 @@ prompt-efficiency macro apply community-patterns prompts/*.txt
 For additional help:
 - Documentation: [docs/](docs/)
 - Issues: [GitHub Issues](https://github.com/prompt-efficiency/prompt-efficiency-suite/issues)
-- Discussions: [GitHub Discussions](https://github.com/prompt-efficiency/prompt-efficiency-suite/discussions) 
+- Discussions: [GitHub Discussions](https://github.com/prompt-efficiency/prompt-efficiency-suite/discussions)

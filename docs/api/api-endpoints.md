@@ -386,13 +386,13 @@ def analyze_prompt(prompt: str, api_key: str) -> dict:
         "Authorization": f"Bearer {api_key}",
         "Content-Type": "application/json"
     }
-    
+
     response = requests.post(
         "http://localhost:8000/api/v1/analyze",
         headers=headers,
         json={"prompt": prompt}
     )
-    
+
     return response.json()
 ```
 
@@ -407,7 +407,7 @@ async function optimizePrompt(prompt, apiKey) {
         },
         body: JSON.stringify({ prompt })
     });
-    
+
     return await response.json();
 }
 ```
@@ -417,4 +417,4 @@ async function optimizePrompt(prompt, apiKey) {
 For API support:
 1. Check the [API Status Page](https://status.prompt.com)
 2. Review the [API Documentation](https://docs.prompt.com/api)
-3. Contact [API Support](mailto:api-support@prompt.com) 
+3. Contact [API Support](mailto:api-support@prompt.com)

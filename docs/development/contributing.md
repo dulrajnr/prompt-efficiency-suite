@@ -138,10 +138,10 @@ pytest --cov=prompt_efficiency_suite
       # Arrange
       compressor = BaseCompressor()
       text = "Test prompt"
-      
+
       # Act
       result = await compressor.compress(text)
-      
+
       # Assert
       assert result.compression_ratio > 0
       assert result.compressed_text != ""
@@ -159,13 +159,13 @@ pytest --cov=prompt_efficiency_suite
   ```python
   def compress(text: str) -> str:
       """Compress the input text.
-      
+
       Args:
           text: The text to compress
-          
+
       Returns:
           The compressed text
-          
+
       Example:
           >>> compress("This is a test")
           "Test"
@@ -200,11 +200,11 @@ make html
       target_ratio: Optional[float] = None
   ) -> List[str]:
       """Process a list of prompts.
-      
+
       Args:
           prompts: List of prompts to process
           target_ratio: Optional target compression ratio
-          
+
       Returns:
           List of processed prompts
       """
@@ -306,4 +306,4 @@ prompt-efficiency-suite/
 
 ## License
 
-By contributing, you agree that your contributions will be licensed under the project's license. 
+By contributing, you agree that your contributions will be licensed under the project's license.

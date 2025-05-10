@@ -4,13 +4,12 @@ End-to-end tests for the Prompt Efficiency Suite.
 
 import json
 import os
-import pytest
 from pathlib import Path
-from prompt_efficiency_suite import (
-    DomainAwareTrimmer,
-    AdaptiveBudgeting,
-    CICDIntegration
-)
+
+import pytest
+
+from prompt_efficiency_suite import AdaptiveBudgeting, CICDIntegration, DomainAwareTrimmer
+
 
 class TestEndToEnd:
     """End-to-end test scenarios."""
@@ -22,7 +21,7 @@ class TestEndToEnd:
             "terms": ["API", "token", "model", "GPT", "prompt"],
             "compound_terms": ["machine learning", "natural language"],
             "preserve_patterns": [r"\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}\b"],
-            "remove_patterns": [r"\s+"]
+            "remove_patterns": [r"\s+"],
         }
         path = tmp_path / "domain.json"
         with open(path, "w") as f:
@@ -105,4 +104,4 @@ class TestEndToEnd:
         assert "version" in deploy_results
         assert "duration" in deploy_results
         assert "artifacts" in deploy_results
-        assert "logs" in deploy_results 
+        assert "logs" in deploy_results

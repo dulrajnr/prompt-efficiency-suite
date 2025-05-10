@@ -43,7 +43,7 @@ class PromptPatternLibrary(private val project: Project) : PersistentStateCompon
 
     fun findPatterns(prompt: String, category: String, model: String): List<PromptPattern> {
         return state.patterns.filter { pattern ->
-            pattern.category == category && 
+            pattern.category == category &&
             (pattern.model == model || pattern.model == "general") &&
             matchesPattern(prompt, pattern)
         }.sortedByDescending { it.successRate }
@@ -84,7 +84,7 @@ class PromptPatternLibrary(private val project: Project) : PersistentStateCompon
     fun updatePatternStats(patternId: String, success: Boolean) {
         state.patterns.find { it.id == patternId }?.let { pattern ->
             pattern.usageCount++
-            pattern.successRate = ((pattern.successRate * (pattern.usageCount - 1) + 
+            pattern.successRate = ((pattern.successRate * (pattern.usageCount - 1) +
                 if (success) 1.0 else 0.0) / pattern.usageCount)
             pattern.lastUsed = System.currentTimeMillis()
         }
@@ -96,7 +96,7 @@ class PromptPatternLibrary(private val project: Project) : PersistentStateCompon
             .replace("{", "(?<")
             .replace("}", ">[^}]+)")
             .replace(" ", "\\s+")
-        
+
         return try {
             val matcher = Pattern.compile(regexPattern, Pattern.CASE_INSENSITIVE).matcher(prompt)
             matcher.matches()
@@ -110,7 +110,7 @@ class PromptPatternLibrary(private val project: Project) : PersistentStateCompon
             .replace("{", "(?<")
             .replace("}", ">[^}]+)")
             .replace(" ", "\\s+")
-        
+
         return try {
             val matcher = Pattern.compile(regexPattern, Pattern.CASE_INSENSITIVE).matcher(prompt)
             if (matcher.matches()) {
@@ -144,13 +144,13 @@ class PromptPatternLibrary(private val project: Project) : PersistentStateCompon
     private fun calculatePatternConfidence(prompt: String, pattern: PromptPattern): Double {
         val templateWords = pattern.template.split("\\s+".toRegex())
         val promptWords = prompt.split("\\s+".toRegex())
-        
+
         val matchingWords = templateWords.count { templateWord ->
             promptWords.any { promptWord ->
                 promptWord.contains(templateWord, ignoreCase = true)
             }
         }
-        
+
         return (matchingWords.toDouble() / templateWords.size).coerceIn(0.0, 1.0)
     }
 
@@ -165,4 +165,4 @@ class PromptPatternLibrary(private val project: Project) : PersistentStateCompon
             return project.getService(PromptPatternLibrary::class.java)
         }
     }
-} 
+}

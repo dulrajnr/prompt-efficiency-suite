@@ -180,4 +180,4 @@ prompt-efficiency budget config.yaml --initial-budget 10000 --period 7
 - Check the [FAQ](faq.md)
 - Search [existing issues](https://github.com/yourusername/prompt-efficiency-suite/issues)
 - Create a new issue if needed
-- Contact support@promptefficiencysuite.com 
+- Contact support@promptefficiencysuite.com

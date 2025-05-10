@@ -40,7 +40,7 @@ class PromptEfficiencyConfigurableTest : BasePlatformTestCase() {
     @Test
     fun `test is modified when values change`() {
         val component = configurable.createComponent()
-        
+
         // Get references to the UI components
         val apiKeyField = findComponent<JTextField>(component, "apiKeyField")
         val serverUrlField = findComponent<JTextField>(component, "serverUrlField")
@@ -63,7 +63,7 @@ class PromptEfficiencyConfigurableTest : BasePlatformTestCase() {
     @Test
     fun `test apply changes`() {
         val component = configurable.createComponent()
-        
+
         // Get references to the UI components
         val apiKeyField = findComponent<JTextField>(component, "apiKeyField")
         val serverUrlField = findComponent<JTextField>(component, "serverUrlField")
@@ -94,7 +94,7 @@ class PromptEfficiencyConfigurableTest : BasePlatformTestCase() {
     @Test
     fun `test reset`() {
         val component = configurable.createComponent()
-        
+
         // Get references to the UI components
         val apiKeyField = findComponent<JTextField>(component, "apiKeyField")
         val serverUrlField = findComponent<JTextField>(component, "serverUrlField")
@@ -126,4 +126,4 @@ class PromptEfficiencyConfigurableTest : BasePlatformTestCase() {
             .filterIsInstance<JComponent>()
             .find { it.name == name } as T
     }
-} 
+}

@@ -15,4 +15,4 @@ class PromptEfficiencyToolWindowFactory : ToolWindowFactory {
         )
         toolWindow.contentManager.addContent(content)
     }
-} 
+}

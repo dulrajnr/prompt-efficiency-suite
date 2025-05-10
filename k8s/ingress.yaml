@@ -20,4 +20,4 @@ spec:
   tls:
   - hosts:
     - api.prompt-efficiency.example.com
-    secretName: prompt-efficiency-tls 
+    secretName: prompt-efficiency-tls

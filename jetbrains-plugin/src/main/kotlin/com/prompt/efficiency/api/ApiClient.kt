@@ -107,4 +107,4 @@ class ApiClient(private val settings: PromptEfficiencySettings) {
             return JSONObject(responseBody)
         }
     }
-} 
+}

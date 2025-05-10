@@ -29,4 +29,4 @@ pip install flake8 pre-commit twine build
 # Initialize pre-commit hooks
 pre-commit install
 
-echo "Dependencies installed successfully!" 
+echo "Dependencies installed successfully!"

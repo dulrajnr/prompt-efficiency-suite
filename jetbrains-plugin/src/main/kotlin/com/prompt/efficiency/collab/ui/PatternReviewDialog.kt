@@ -110,4 +110,4 @@ class PatternReviewDialog(
         }
         return null
     }
-} 
+}

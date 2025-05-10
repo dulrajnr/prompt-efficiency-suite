@@ -116,4 +116,4 @@ groups:
           severity: warning
         annotations:
           summary: High token usage
-          description: "Token usage has exceeded 1 million in the last hour" 
+          description: "Token usage has exceeded 1 million in the last hour"

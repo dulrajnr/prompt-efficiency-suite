@@ -264,4 +264,4 @@ class PromptTemplateDialogTest : BasePlatformTestCase() {
         assertEquals(1, model.rowCount)
         assertEquals("Template 1", model.getValueAt(0, 0))
     }
-} 
+}

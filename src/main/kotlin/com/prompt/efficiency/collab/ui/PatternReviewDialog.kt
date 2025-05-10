@@ -37,10 +37,10 @@ class PatternReviewDialog(
     private fun createPatternInfoPanel(): JComponent {
         val pattern = patternManager.getPattern(patternId) ?: return JPanel()
         val panel = JPanel(BorderLayout())
-        
+
         val infoPanel = JPanel()
         infoPanel.layout = BoxLayout(infoPanel, BoxLayout.Y_AXIS)
-        
+
         infoPanel.add(JLabel("Name: ${pattern.name}"))
         infoPanel.add(JLabel("Category: ${pattern.category}"))
         infoPanel.add(JLabel("Model: ${pattern.model}"))
@@ -48,43 +48,43 @@ class PatternReviewDialog(
         infoPanel.add(JLabel("Version: ${pattern.version}"))
         infoPanel.add(JLabel("Usage Count: ${pattern.usageCount}"))
         infoPanel.add(JLabel("Success Rate: ${pattern.successRate}%"))
-        
+
         val templateArea = JTextArea(pattern.template)
         templateArea.isEditable = false
         templateArea.lineWrap = true
         templateArea.wrapStyleWord = true
-        
+
         val scrollPane = JBScrollPane(templateArea)
         scrollPane.preferredSize = Dimension(400, 200)
-        
+
         panel.add(infoPanel, BorderLayout.NORTH)
         panel.add(scrollPane, BorderLayout.CENTER)
-        
+
         return panel
     }
 
     private fun createReviewPanel(): JComponent {
         val panel = JPanel(BorderLayout())
-        
+
         val formPanel = JPanel()
         formPanel.layout = BoxLayout(formPanel, BoxLayout.Y_AXIS)
-        
+
         val statusLabel = JLabel("Review Status:")
         statusCombo.selectedItem = ReviewStatus.PENDING
-        
+
         val commentsLabel = JLabel("Comments:")
         commentsField.lineWrap = true
         commentsField.wrapStyleWord = true
-        
+
         val commentsScroll = JBScrollPane(commentsField)
         commentsScroll.preferredSize = Dimension(400, 100)
-        
+
         formPanel.add(statusLabel)
         formPanel.add(statusCombo)
         formPanel.add(Box.createVerticalStrut(10))
         formPanel.add(commentsLabel)
         formPanel.add(commentsScroll)
-        
+
         panel.add(formPanel, BorderLayout.CENTER)
         return panel
     }
@@ -106,4 +106,4 @@ class PatternReviewDialog(
         }
         return null
     }
-} 
+}

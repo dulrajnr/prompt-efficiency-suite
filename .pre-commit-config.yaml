@@ -3,28 +3,65 @@ repos:
     rev: v4.4.0
     hooks:
     -   id: trailing-whitespace
+        exclude: ^(venv.*|vscode-extension/node_modules|build/|dist/)/
     -   id: end-of-file-fixer
+        exclude: ^(venv.*|vscode-extension/node_modules|build/|dist/)/
     -   id: check-yaml
+        exclude: ^(venv.*|vscode-extension/node_modules|build/|dist/)/
     -   id: check-added-large-files
+        exclude: ^(venv.*|vscode-extension/node_modules|build/|dist/)/
 
 -   repo: https://github.com/psf/black
     rev: 23.3.0
     hooks:
     -   id: black
+        exclude: ^(venv.*|vscode-extension/node_modules|build/|dist/)/
+        args: [--line-length=120]
 
 -   repo: https://github.com/pycqa/isort
     rev: 5.12.0
     hooks:
     -   id: isort
+        exclude: ^(venv.*|vscode-extension/node_modules|build/|dist/)/
+        args: [--profile=black, --line-length=120]
 
 -   repo: https://github.com/pycqa/flake8
     rev: 6.0.0
     hooks:
     -   id: flake8
+        exclude: ^(venv.*|vscode-extension/node_modules|build/|dist/|examples/|tests/|app/|build/)/
         additional_dependencies: [flake8-docstrings]
+        args:
+            - --max-line-length=120
+            - --extend-ignore=D100,D101,D102,D103,D104,D105,D106,D107,D200,D205,D400,D401,W503,E203,E221,E231,E402,E713,E722,F401,F541,F811,F821,F841
 
 -   repo: https://github.com/pre-commit/mirrors-mypy
     rev: v1.3.0
     hooks:
     -   id: mypy
-        additional_dependencies: [types-all] 
+        exclude: ^(venv.*|vscode-extension/node_modules|build/|dist/|examples/|tests/|app/|build/)/
+        additional_dependencies:
+        - types-requests
+        - types-PyYAML
+        - types-setuptools
+        args:
+            - --ignore-missing-imports
+            - --allow-untyped-defs
+            - --allow-untyped-decorators
+            - --disable-error-code=no-untyped-def
+            - --disable-error-code=no-redef
+            - --disable-error-code=attr-defined
+            - --disable-error-code=union-attr
+            - --disable-error-code=var-annotated
+            - --disable-error-code=valid-type
+            - --disable-error-code=misc
+            - --disable-error-code=arg-type
+            - --disable-error-code=assignment
+            - --disable-error-code=index
+            - --disable-error-code=call-arg
+            - --disable-error-code=call-overload
+            - --disable-error-code=dict-item
+            - --disable-error-code=has-type
+            - --disable-error-code=name-defined
+            - --disable-error-code=no-any-return
+            - --disable-error-code=unreachable

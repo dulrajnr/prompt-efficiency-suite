@@ -73,7 +73,7 @@ class CostAnalyticsPanelTest : LightPlatformTestCase() {
     fun testTimeRangeChange() {
         // Add test data for different time periods
         val now = LocalDateTime.now()
-        
+
         // Daily record
         costAnalytics.addUsageRecord(
             CostAnalytics.UsageRecord(
@@ -176,4 +176,4 @@ class CostAnalyticsPanelTest : LightPlatformTestCase() {
         }
         return null
     }
-} 
+}

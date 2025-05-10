@@ -344,4 +344,4 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 - JetBrains team for the excellent plugin API
 - The open-source community for inspiration and support
-- All contributors who have helped shape this project 
+- All contributors who have helped shape this project

@@ -116,7 +116,7 @@ prompt-efficiency verify
    ```bash
    # Check Python version
    python3 --version
-   
+
    # If version is too old, install newer version
    brew install python@3.9
    ```
@@ -152,4 +152,4 @@ prompt-efficiency verify
 1. [Learn Basic Concepts](concepts.md)
 2. [Try the Quick Start Guide](quickstart.md)
 3. [Explore Features](../features/analysis.md)
-4. [Configure Settings](../configuration/global.md) 
+4. [Configure Settings](../configuration/global.md)

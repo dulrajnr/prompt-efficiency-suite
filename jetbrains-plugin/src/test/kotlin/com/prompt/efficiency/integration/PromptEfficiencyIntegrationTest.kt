@@ -190,4 +190,4 @@ class PromptEfficiencyIntegrationTest : LightPlatformTestCase() {
         assertEquals(1, updatedMembers.size)
         assertEquals(admin.id, updatedMembers[0].id)
     }
-} 
+}

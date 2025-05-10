@@ -1,33 +1,38 @@
 import pytest
+
 from prompt_efficiency_suite import (
     BatchOptimizer,
+    CostEstimator,
     MultimodalCompressor,
     PromptOptimizer,
-    TokenCounter,
     QualityAnalyzer,
-    CostEstimator
+    TokenCounter,
 )
+
 
 @pytest.fixture
 def sample_prompts():
     return [
         "Explain quantum computing in simple terms",
         "Describe the process of photosynthesis",
-        "What is machine learning and how does it work?"
+        "What is machine learning and how does it work?",
     ]
+
 
 @pytest.fixture
 def sample_image_prompt():
     return {
         "text": "Describe this image of a sunset",
-        "image_path": "tests/data/sample_image.jpg"
+        "image_path": "tests/data/sample_image.jpg",
     }
+
 
 def test_batch_optimizer(sample_prompts):
     optimizer = BatchOptimizer()
     optimized = optimizer.optimize_batch(sample_prompts)
     assert len(optimized) == len(sample_prompts)
     assert all(isinstance(p, str) for p in optimized)
+
 
 def test_multimodal_compressor():
     compressor = MultimodalCompressor()
@@ -36,11 +41,13 @@ def test_multimodal_compressor():
     assert isinstance(compressed, str)
     assert len(compressed) <= len(text)
 
+
 def test_prompt_optimizer(sample_prompts):
     optimizer = PromptOptimizer()
     optimized = optimizer.optimize(sample_prompts[0])
     assert isinstance(optimized, str)
     assert len(optimized) > 0
+
 
 def test_token_counter(sample_prompts):
     counter = TokenCounter()
@@ -48,17 +55,20 @@ def test_token_counter(sample_prompts):
     assert isinstance(count, int)
     assert count > 0
 
+
 def test_quality_analyzer(sample_prompts):
     analyzer = QualityAnalyzer()
     score = analyzer.analyze(sample_prompts[0])
     assert isinstance(score, float)
     assert 0 <= score <= 1
 
+
 def test_cost_estimator(sample_prompts):
     estimator = CostEstimator()
     cost = estimator.estimate_cost(sample_prompts[0])
     assert isinstance(cost, float)
     assert cost >= 0
+
 
 def test_integration(sample_prompts):
     # Test the full pipeline
@@ -86,6 +96,7 @@ def test_integration(sample_prompts):
     assert isinstance(cost, float)
     assert cost >= 0
 
+
 def test_error_handling():
     optimizer = BatchOptimizer()
     with pytest.raises(ValueError):
@@ -101,4 +112,4 @@ def test_error_handling():
 
     estimator = CostEstimator()
     with pytest.raises(ValueError):
-        estimator.estimate_cost("") 
+        estimator.estimate_cost("")

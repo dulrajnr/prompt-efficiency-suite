@@ -182,4 +182,4 @@ The orchestrator service manages:
 
 - [Best Practices Guide](../best-practices/prompt-writing.md)
 - [Troubleshooting Guide](../troubleshooting/common-issues.md)
-- [API Documentation](../api/rest-api.md) 
+- [API Documentation](../api/rest-api.md)

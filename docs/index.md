@@ -63,4 +63,4 @@ For support, please:
 1. Check the [FAQ](faq.md)
 2. Search existing [issues](https://github.com/yourusername/prompt-efficiency-suite/issues)
 3. Create a new issue if needed
-4. Contact support@promptefficiencysuite.com 
+4. Contact support@promptefficiencysuite.com

@@ -46,4 +46,4 @@ mv docs/PATTERNS.md docs/best-practices/
 # Examples
 mv docs/examples.md docs/examples/
 
-# Keep README.md and index.md in the root docs directory 
+# Keep README.md and index.md in the root docs directory

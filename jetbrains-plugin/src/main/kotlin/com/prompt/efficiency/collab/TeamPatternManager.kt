@@ -177,4 +177,4 @@ class TeamPatternManager(private val project: Project) {
             return project.getService(TeamPatternManager::class.java)
         }
     }
-} 
+}

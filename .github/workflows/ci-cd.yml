@@ -143,4 +143,4 @@ jobs:
         SLACK_CHANNEL: deployments
         SLACK_COLOR: danger
         SLACK_TITLE: Deployment Failed
-        SLACK_MESSAGE: 'Prompt Efficiency Suite deployment has failed. Please check the GitHub Actions logs for details.' 
+        SLACK_MESSAGE: 'Prompt Efficiency Suite deployment has failed. Please check the GitHub Actions logs for details.'

@@ -143,4 +143,4 @@ class TeamPatternDialog(
         }
         return null
     }
-} 
+}

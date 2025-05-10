@@ -41,4 +41,4 @@ help:
 	@echo "  make format     - Format code with black and isort"
 	@echo "  make clean      - Clean up build artifacts and caches"
 	@echo "  make run        - Run the FastAPI server in development mode"
-	@echo "  make help       - Show this help message" 
+	@echo "  make help       - Show this help message"

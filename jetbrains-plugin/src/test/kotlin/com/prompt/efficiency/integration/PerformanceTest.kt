@@ -173,4 +173,4 @@ class PerformanceTest : LightPlatformTestCase() {
         println("Pattern search test completed in $time ms")
         assertTrue("Search should complete within 1 second", time < 1000)
     }
-} 
+}

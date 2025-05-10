@@ -239,4 +239,4 @@ class PromptEfficiencyToolWindowPanel(private val project: Project) : JPanel(Bor
             JOptionPane.ERROR_MESSAGE
         )
     }
-} 
+}

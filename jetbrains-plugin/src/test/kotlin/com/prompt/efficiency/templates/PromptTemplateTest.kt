@@ -424,7 +424,7 @@ class PromptTemplateTest {
         )
 
         templateManager.addTemplate(template)
-        
+
         // Update template to create a new version
         val updatedTemplate = template.copy(
             content = "Hello \${name}, how are you?",
@@ -444,4 +444,4 @@ class PromptTemplateTest {
         assertEquals(template.author, importedTemplate?.author)
         assertEquals(template.isPublic, importedTemplate?.isPublic)
     }
-} 
+}

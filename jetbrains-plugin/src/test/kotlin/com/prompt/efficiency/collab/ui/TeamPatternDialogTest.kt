@@ -105,8 +105,8 @@ class TeamPatternDialogTest : LightPlatformTestCase() {
     }
 
     private fun findTextField(dialog: TeamPatternDialog, label: String): JTextField {
-        return dialog.contentPane.findComponent { 
-            it is JTextField && it.parent?.findComponent { it is JLabel && it.text == label } != null 
+        return dialog.contentPane.findComponent {
+            it is JTextField && it.parent?.findComponent { it is JLabel && it.text == label } != null
         } as JTextField
     }
 
@@ -115,8 +115,8 @@ class TeamPatternDialogTest : LightPlatformTestCase() {
     }
 
     private fun findTextArea(dialog: TeamPatternDialog, label: String): JTextArea {
-        return dialog.contentPane.findComponent { 
-            it is JTextArea && it.parent?.parent?.findComponent { it is JLabel && it.text == label } != null 
+        return dialog.contentPane.findComponent {
+            it is JTextArea && it.parent?.parent?.findComponent { it is JLabel && it.text == label } != null
         } as JTextArea
     }
 
@@ -125,8 +125,8 @@ class TeamPatternDialogTest : LightPlatformTestCase() {
     }
 
     private fun findComboBox(dialog: TeamPatternDialog, label: String): JComboBox<*> {
-        return dialog.contentPane.findComponent { 
-            it is JComboBox<*> && it.parent?.findComponent { it is JLabel && it.text == label } != null 
+        return dialog.contentPane.findComponent {
+            it is JComboBox<*> && it.parent?.findComponent { it is JLabel && it.text == label } != null
         } as JComboBox<*>
     }
-} 
+}

@@ -15,7 +15,7 @@ The Cross-Model Prompt Translator is a system that enables seamless translation 
            self.model_type = model_type
            self.conventions = self._load_conventions()
            self.templates = self._load_templates()
-   
+
        def translate(self, prompt: str) -> str:
            # Apply model-specific conventions
            # Use appropriate templates
@@ -28,7 +28,7 @@ The Cross-Model Prompt Translator is a system that enables seamless translation 
    class TokenCostManager:
        def __init__(self):
            self.cost_profiles = self._load_cost_profiles()
-   
+
        def estimate_cost(self, prompt: str, model: ModelType) -> float:
            # Count tokens
            # Apply cost profile
@@ -42,7 +42,7 @@ The Cross-Model Prompt Translator is a system that enables seamless translation 
        def __init__(self):
            self.style_profiles = {}
            self.cost_manager = TokenCostManager()
-   
+
        def translate(self, prompt: str, source_model: ModelType, target_model: ModelType) -> TranslationResult:
            # Get style profiles
            # Apply translation rules
@@ -56,7 +56,7 @@ The Cross-Model Prompt Translator is a system that enables seamless translation 
    class ValidationSystem:
        def __init__(self):
            self.metrics = self._load_metrics()
-   
+
        def validate(self, original: str, translated: str) -> ValidationResult:
            # Compare outputs
            # Check quality metrics
@@ -294,4 +294,4 @@ class Config:
 3. **Extended Support**
    - More model support
    - Custom model profiles
-   - Plugin system 
+   - Plugin system

@@ -20,7 +20,7 @@ This document provides solutions for common issues encountered while using the P
 2. Verify API configuration:
    ```python
    from prompt_efficiency_suite import PromptEfficiencySuite
-   
+
    suite = PromptEfficiencySuite()
    print(suite.config.api_url)  # Should match your API server
    ```
@@ -56,7 +56,7 @@ This document provides solutions for common issues encountered while using the P
 2. Profile code:
    ```python
    import cProfile
-   
+
    profiler = cProfile.Profile()
    profiler.enable()
    # Run your code
@@ -304,7 +304,7 @@ def monitor_resources():
     process = psutil.Process()
     memory_info = process.memory_info()
     cpu_percent = process.cpu_percent()
-    
+
     logger.info(f"Memory usage: {memory_info.rss / 1024 / 1024} MB")
     logger.info(f"CPU usage: {cpu_percent}%")
 ```
@@ -414,4 +414,4 @@ def recover_system():
         repair_system()
         # Verify recovery
         verify_system()
-``` 
+```

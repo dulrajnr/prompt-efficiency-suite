@@ -19,7 +19,7 @@ dependencies {
     implementation("org.json:json:20231013")
     implementation("com.squareup.okhttp3:okhttp:4.11.0")
     implementation("com.opencsv:opencsv:5.7.1")
-    
+
     // Testing
     testImplementation("org.junit.jupiter:junit-jupiter:5.9.2")
     testImplementation("org.mockito:mockito-core:5.3.1")
@@ -40,7 +40,7 @@ tasks {
         sourceCompatibility = "17"
         targetCompatibility = "17"
     }
-    
+
     withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
         kotlinOptions.jvmTarget = "17"
     }
@@ -94,4 +94,4 @@ tasks {
     runPluginVerifier {
         ideVersions.set(listOf("2023.1", "2023.2", "2023.3"))
     }
-} 
+}

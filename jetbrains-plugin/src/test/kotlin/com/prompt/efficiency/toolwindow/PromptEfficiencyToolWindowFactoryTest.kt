@@ -56,4 +56,4 @@ class PromptEfficiencyToolWindowFactoryTest : BasePlatformTestCase() {
             panel.componentCount > 0
         })
     }
-} 
+}

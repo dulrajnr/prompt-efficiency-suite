@@ -292,4 +292,4 @@ client.optimizePrompt('Your prompt text here', {
 For API support:
 - Email: api-support@prompt-efficiency.com
 - Documentation: https://docs.prompt-efficiency.com
-- GitHub Issues: https://github.com/prompt-efficiency/suite/issues 
+- GitHub Issues: https://github.com/prompt-efficiency/suite/issues

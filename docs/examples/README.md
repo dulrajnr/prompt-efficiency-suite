@@ -193,4 +193,4 @@ If you need help with any of these examples or have questions about implementati
 
 1. Check the [documentation](../)
 2. Open an issue on GitHub
-3. Join our community discussions 
+3. Join our community discussions

@@ -2,7 +2,7 @@
 Setup configuration for the Prompt Efficiency Suite.
 """
 
-from setuptools import setup, find_packages
+from setuptools import find_packages, setup
 
 with open("README.md", "r", encoding="utf-8") as fh:
     long_description = fh.read()
@@ -31,7 +31,7 @@ setup(
         "Programming Language :: Python :: 3.11",
         "Topic :: Software Development :: Libraries :: Python Modules",
         "Topic :: Software Development :: Quality Assurance",
-        "Topic :: Text Processing :: General"
+        "Topic :: Text Processing :: General",
     ],
     python_requires=">=3.8",
     install_requires=requirements,
@@ -42,14 +42,10 @@ setup(
             "black>=23.7.0",
             "isort>=5.12.0",
             "mypy>=1.5.1",
-            "flake8>=6.1.0"
+            "flake8>=6.1.0",
         ]
     },
-    entry_points={
-        "console_scripts": [
-            "prompt-efficiency=prompt_efficiency_suite.cli:main"
-        ]
-    },
+    entry_points={"console_scripts": ["prompt-efficiency=prompt_efficiency_suite.cli:main"]},
     include_package_data=True,
     zip_safe=False,
-) 
+)

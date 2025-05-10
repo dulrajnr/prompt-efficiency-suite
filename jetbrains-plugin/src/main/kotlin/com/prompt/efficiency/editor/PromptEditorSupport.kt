@@ -177,4 +177,4 @@ object PromptLanguage : com.intellij.lang.Language("Prompt") {
     companion object {
         val INSTANCE = PromptLanguage()
     }
-} 
+}

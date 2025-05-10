@@ -156,4 +156,4 @@ class DevExperienceTest : LightPlatformCodeInsightFixtureTestCase() {
         val highlights = myFixture.doHighlighting()
         assertTrue(highlights.any { it.description.contains("exceeds model's token limit") })
     }
-} 
+}

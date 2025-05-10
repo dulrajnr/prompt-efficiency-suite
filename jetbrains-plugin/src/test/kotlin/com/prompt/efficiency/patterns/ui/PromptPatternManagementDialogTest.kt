@@ -196,4 +196,4 @@ class PromptPatternManagementDialogTest : LightPlatformTestCase() {
         }
         return null
     }
-} 
+}

@@ -133,4 +133,4 @@ class TeamPatternManager(private val project: Project) {
             return project.service()
         }
     }
-} 
+}

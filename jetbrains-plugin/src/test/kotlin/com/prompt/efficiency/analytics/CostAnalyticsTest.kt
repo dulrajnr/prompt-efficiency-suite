@@ -97,7 +97,7 @@ class CostAnalyticsTest : LightPlatformTestCase() {
     fun testUsageStatsByTimeRange() {
         // Add records for different time periods
         val now = LocalDateTime.now()
-        
+
         // Daily record
         costAnalytics.addUsageRecord(
             CostAnalytics.UsageRecord(
@@ -187,4 +187,4 @@ class CostAnalyticsTest : LightPlatformTestCase() {
         val stats = costAnalytics.getUsageStats(CostAnalytics.TimeRange.ALL)
         assertEquals(mapOf(patternId to 0.09, null to 0.03), stats.usageByPattern)
     }
-} 
+}

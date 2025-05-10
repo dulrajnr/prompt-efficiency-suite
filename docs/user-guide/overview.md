@@ -164,4 +164,4 @@ Features:
 - [FAQ](../support/faq.md)
 - [Troubleshooting Guide](../troubleshooting/common-issues.md)
 - [GitHub Discussions](https://github.com/yourusername/prompt-efficiency-suite/discussions)
-- [Email Support](mailto:support@prompt.com) 
+- [Email Support](mailto:support@prompt.com)

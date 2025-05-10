@@ -1,7 +1,7 @@
 private fun createTeamAnalytics(teamId: String): TeamAnalytics {
     val teamPatterns = teamPatterns[teamId] ?: emptyList()
     val teamMembers = teamMembers.values.filter { it.teamId == teamId }
-    
+
     // Calculate total cost and usage
     val totalCost = teamPatterns.sumOf { it.averageCost * it.usageCount }
     val costByMember = teamMembers.associate { member ->
@@ -9,27 +9,27 @@ private fun createTeamAnalytics(teamId: String): TeamAnalytics {
             .filter { it.createdBy == member.id }
             .sumOf { it.averageCost * it.usageCount }
     }
-    
+
     val costByPattern = teamPatterns.associate { pattern ->
         pattern.id to (pattern.averageCost * pattern.usageCount)
     }
-    
+
     val usageByMember = teamMembers.associate { member ->
         member.id to teamPatterns
             .filter { it.createdBy == member.id }
             .sumOf { it.usageCount }
     }
-    
+
     val usageByPattern = teamPatterns.associate { pattern ->
         pattern.id to pattern.usageCount
     }
-    
+
     // Generate best practices
     val bestPractices = generateBestPractices(teamPatterns)
-    
+
     // Generate trends
     val trends = generateTrends(teamPatterns)
-    
+
     return TeamAnalytics(
         teamId = teamId,
         totalCost = totalCost,
@@ -45,7 +45,7 @@ private fun createTeamAnalytics(teamId: String): TeamAnalytics {
 private fun updatePatternAnalytics(pattern: TeamPattern) {
     val teamPatterns = teamPatterns[pattern.teamId] ?: mutableListOf()
     val existingPattern = teamPatterns.find { it.id == pattern.id }
-    
+
     if (existingPattern != null) {
         // Update existing pattern
         val updatedPattern = existingPattern.copy(
@@ -58,14 +58,14 @@ private fun updatePatternAnalytics(pattern: TeamPattern) {
         // Add new pattern
         teamPatterns.add(pattern)
     }
-    
+
     // Update team analytics
     teamAnalytics[pattern.teamId] = createTeamAnalytics(pattern.teamId)
 }
 
 private fun generateBestPractices(patterns: List<TeamPattern>): List<BestPractice> {
     val bestPractices = mutableListOf<BestPractice>()
-    
+
     // Analyze pattern success rates
     val highSuccessPatterns = patterns.filter { it.successRate >= 0.8 }
     if (highSuccessPatterns.isNotEmpty()) {
@@ -75,7 +75,7 @@ private fun generateBestPractices(patterns: List<TeamPattern>): List<BestPractic
             patterns = highSuccessPatterns.map { it.name }
         ))
     }
-    
+
     // Analyze cost efficiency
     val costEfficientPatterns = patterns.filter { it.averageCost <= 0.01 }
     if (costEfficientPatterns.isNotEmpty()) {
@@ -85,7 +85,7 @@ private fun generateBestPractices(patterns: List<TeamPattern>): List<BestPractic
             patterns = costEfficientPatterns.map { it.name }
         ))
     }
-    
+
     // Analyze usage patterns
     val popularPatterns = patterns.sortedByDescending { it.usageCount }.take(3)
     if (popularPatterns.isNotEmpty()) {
@@ -95,19 +95,19 @@ private fun generateBestPractices(patterns: List<TeamPattern>): List<BestPractic
             patterns = popularPatterns.map { it.name }
         ))
     }
-    
+
     return bestPractices
 }
 
 private fun generateTrends(patterns: List<TeamPattern>): List<TeamTrend> {
     val trends = mutableListOf<TeamTrend>()
-    
+
     // Analyze usage growth
     val usageGrowth = patterns
         .groupBy { it.createdAt.toLocalDate() }
         .mapValues { it.value.sumOf { pattern -> pattern.usageCount } }
         .toSortedMap()
-    
+
     if (usageGrowth.size >= 2) {
         val growthRate = calculateGrowthRate(usageGrowth.values.toList())
         trends.add(TeamTrend(
@@ -116,13 +116,13 @@ private fun generateTrends(patterns: List<TeamPattern>): List<TeamTrend> {
             description = "Pattern usage is ${if (growthRate > 0) "increasing" else "decreasing"} by ${abs(growthRate)}%"
         ))
     }
-    
+
     // Analyze cost trends
     val costTrends = patterns
         .groupBy { it.createdAt.toLocalDate() }
         .mapValues { it.value.sumOf { pattern -> pattern.averageCost * pattern.usageCount } }
         .toSortedMap()
-    
+
     if (costTrends.size >= 2) {
         val costChange = calculateGrowthRate(costTrends.values.toList())
         trends.add(TeamTrend(
@@ -131,13 +131,13 @@ private fun generateTrends(patterns: List<TeamPattern>): List<TeamTrend> {
             description = "Pattern costs are ${if (costChange > 0) "increasing" else "decreasing"} by ${abs(costChange)}%"
         ))
     }
-    
+
     // Analyze success rate trends
     val successTrends = patterns
         .groupBy { it.createdAt.toLocalDate() }
         .mapValues { it.value.map { pattern -> pattern.successRate }.average() }
         .toSortedMap()
-    
+
     if (successTrends.size >= 2) {
         val successChange = calculateGrowthRate(successTrends.values.toList())
         trends.add(TeamTrend(
@@ -146,7 +146,7 @@ private fun generateTrends(patterns: List<TeamPattern>): List<TeamTrend> {
             description = "Pattern success rates are ${if (successChange > 0) "improving" else "declining"} by ${abs(successChange)}%"
         ))
     }
-    
+
     return trends
 }
 
@@ -173,4 +173,4 @@ enum class TrendType {
     USAGE_GROWTH,
     COST_TREND,
     SUCCESS_RATE
-} 
+}

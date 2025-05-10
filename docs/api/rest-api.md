@@ -294,4 +294,4 @@ const optimized = await client.optimizePrompt({
 - API Status: https://status.prompt.com
 - Documentation: https://docs.prompt.com
 - Support Email: api-support@prompt.com
-- GitHub Issues: https://github.com/yourusername/prompt-efficiency-suite/issues 
+- GitHub Issues: https://github.com/yourusername/prompt-efficiency-suite/issues

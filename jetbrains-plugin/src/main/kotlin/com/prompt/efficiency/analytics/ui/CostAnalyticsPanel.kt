@@ -208,4 +208,4 @@ class CostAnalyticsPanel(private val project: Project) : JPanel() {
             // TODO: Add icons
         }
     }
-} 
+}

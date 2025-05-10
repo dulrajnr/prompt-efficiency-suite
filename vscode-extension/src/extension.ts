@@ -104,7 +104,7 @@ export function activate(context: vscode.ExtensionContext) {
 
         try {
             const config = vscode.workspace.getConfiguration('promptEfficiency');
-            const response = await apiClient.post('/api/v1/analyze', { 
+            const response = await apiClient.post('/api/v1/analyze', {
                 prompt: text,
                 model: config.get('defaultModel')
             });
@@ -540,4 +540,4 @@ export function deactivate() {
     if (configPanel) {
         configPanel.dispose();
     }
-} 
+}

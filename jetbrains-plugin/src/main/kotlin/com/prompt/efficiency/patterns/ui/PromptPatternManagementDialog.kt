@@ -241,4 +241,4 @@ class PromptPatternManagementDialog(
             // TODO: Add icons
         }
     }
-} 
+}

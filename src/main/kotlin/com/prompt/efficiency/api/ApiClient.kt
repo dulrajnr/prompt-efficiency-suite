@@ -20,7 +20,7 @@ class ApiClient(
         .readTimeout(timeoutSeconds.toLong(), TimeUnit.SECONDS)
         .writeTimeout(timeoutSeconds.toLong(), TimeUnit.SECONDS)
         .build()
-    
+
     private val gson = Gson()
     private val logger = Logger.getInstance(ApiClient::class.java)
     private val jsonMediaType = "application/json; charset=utf-8".toMediaType()
@@ -99,4 +99,4 @@ class ApiClient(
     )
 
     class ApiException(message: String) : Exception(message)
-} 
+}

@@ -191,4 +191,4 @@ class PromptEfficiencySettingsPanelTest : LightPlatformTestCase() {
         }
         throw NoSuchElementException("Component of type ${T::class.java} with label '$label' not found")
     }
-} 
+}

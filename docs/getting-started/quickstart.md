@@ -121,4 +121,4 @@ prompt-efficiency macro apply summary "Your text here"
 
 - Check the [Troubleshooting Guide](../troubleshooting/common-issues.md)
 - Join our [GitHub Discussions](https://github.com/yourusername/prompt-efficiency-suite/discussions)
-- Contact [support@prompt.com](mailto:support@prompt.com) 
+- Contact [support@prompt.com](mailto:support@prompt.com)

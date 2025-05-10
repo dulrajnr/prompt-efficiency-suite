@@ -1,8 +1,10 @@
 from fastapi.testclient import TestClient
+
 from prompt_efficiency_suite.api.analyzer_api import router
 from prompt_efficiency_suite.model_translator import ModelType
 
 client = TestClient(router)
+
 
 def test_analyze_prompt():
     """Test the /analyze endpoint."""
@@ -15,13 +17,10 @@ def test_analyze_prompt():
             Instruction: Please help me with this task step by step.
             """,
             "model": "gpt-4",
-            "metadata": {
-                "key": "value",
-                "number": 42
-            }
-        }
+            "metadata": {"key": "value", "number": 42},
+        },
     )
-    
+
     assert response.status_code == 200
     data = response.json()
     assert "prompt" in data
@@ -30,7 +29,7 @@ def test_analyze_prompt():
     assert "pattern_analysis" in data
     assert "quality_analysis" in data
     assert "metadata" in data
-    
+
     metrics = data["metrics"]
     assert "clarity_score" in metrics
     assert "structure_score" in metrics
@@ -39,18 +38,14 @@ def test_analyze_prompt():
     assert "quality_score" in metrics
     assert "improvement_suggestions" in metrics
 
+
 def test_analyze_prompt_invalid_model():
     """Test the /analyze endpoint with invalid model."""
-    response = client.post(
-        "/analyze",
-        json={
-            "prompt": "Test prompt",
-            "model": "invalid-model"
-        }
-    )
-    
+    response = client.post("/analyze", json={"prompt": "Test prompt", "model": "invalid-model"})
+
     assert response.status_code == 400
     assert "Invalid model type" in response.json()["detail"]
+
 
 def test_quick_analyze():
     """Test the /analyze/quick endpoint."""
@@ -62,9 +57,9 @@ def test_quick_analyze():
             Context: This is some background information.
             Instruction: Please help me with this task step by step.
             """
-        }
+        },
     )
-    
+
     assert response.status_code == 200
     data = response.json()
     assert "quality_score" in data
@@ -75,6 +70,7 @@ def test_quick_analyze():
     assert "top_suggestions" in data
     assert len(data["top_suggestions"]) <= 3
 
+
 def test_analyze_patterns():
     """Test the /analyze/patterns endpoint."""
     response = client.get(
@@ -84,9 +80,9 @@ def test_analyze_patterns():
             This is really very important.
             Please clearly explain this complex task.
             """
-        }
+        },
     )
-    
+
     assert response.status_code == 200
     data = response.json()
     assert "clarity_patterns" in data
@@ -95,6 +91,7 @@ def test_analyze_patterns():
     assert isinstance(data["clarity_patterns"], list)
     assert isinstance(data["complexity_patterns"], list)
     assert isinstance(data["redundant_patterns"], list)
+
 
 def test_analyze_structure():
     """Test the /analyze/structure endpoint."""
@@ -107,9 +104,9 @@ def test_analyze_structure():
             Instruction: Do something.
             Example: Here's how.
             """
-        }
+        },
     )
-    
+
     assert response.status_code == 200
     data = response.json()
     assert "system_prompt" in data
@@ -121,37 +118,28 @@ def test_analyze_structure():
     assert isinstance(data["instruction_block"], list)
     assert isinstance(data["example_block"], list)
 
+
 def test_analyze_empty_prompt():
     """Test analysis with empty prompt."""
-    response = client.post(
-        "/analyze",
-        json={
-            "prompt": "",
-            "model": "gpt-4"
-        }
-    )
-    
+    response = client.post("/analyze", json={"prompt": "", "model": "gpt-4"})
+
     assert response.status_code == 200
     data = response.json()
     assert data["metrics"]["quality_score"] < 0.5
     assert len(data["metrics"]["improvement_suggestions"]) > 0
 
+
 def test_analyze_long_prompt():
     """Test analysis with long prompt."""
     long_prompt = "This is a test prompt. " * 100
-    
-    response = client.post(
-        "/analyze",
-        json={
-            "prompt": long_prompt,
-            "model": "gpt-4"
-        }
-    )
-    
+
+    response = client.post("/analyze", json={"prompt": long_prompt, "model": "gpt-4"})
+
     assert response.status_code == 200
     data = response.json()
     assert data["metrics"]["token_estimate"] > 100
     assert any("length" in s.lower() for s in data["metrics"]["improvement_suggestions"])
+
 
 def test_analyze_complex_prompt():
     """Test analysis with complex prompt."""
@@ -162,19 +150,14 @@ def test_analyze_complex_prompt():
     2. String theory
     3. General relativity
     """
-    
-    response = client.post(
-        "/analyze",
-        json={
-            "prompt": complex_prompt,
-            "model": "gpt-4"
-        }
-    )
-    
+
+    response = client.post("/analyze", json={"prompt": complex_prompt, "model": "gpt-4"})
+
     assert response.status_code == 200
     data = response.json()
     assert data["metrics"]["complexity_score"] > 0.7
     assert any("simplify" in s.lower() for s in data["metrics"]["improvement_suggestions"])
+
 
 def test_analyze_well_structured_prompt():
     """Test analysis with well-structured prompt."""
@@ -184,40 +167,28 @@ def test_analyze_well_structured_prompt():
     Instruction: Please help me with this task step by step.
     Example: Here's how to do it.
     """
-    
-    response = client.post(
-        "/analyze",
-        json={
-            "prompt": well_structured_prompt,
-            "model": "gpt-4"
-        }
-    )
-    
+
+    response = client.post("/analyze", json={"prompt": well_structured_prompt, "model": "gpt-4"})
+
     assert response.status_code == 200
     data = response.json()
     assert data["metrics"]["structure_score"] > 0.7
     assert len(data["structure_analysis"]) > 0
 
+
 def test_analyze_with_metadata():
     """Test analysis with metadata."""
-    metadata = {
-        "key": "value",
-        "number": 42,
-        "tags": ["test", "analysis"]
-    }
-    
+    metadata = {"key": "value", "number": 42, "tags": ["test", "analysis"]}
+
     response = client.post(
         "/analyze",
-        json={
-            "prompt": "Test prompt",
-            "model": "gpt-4",
-            "metadata": metadata
-        }
+        json={"prompt": "Test prompt", "model": "gpt-4", "metadata": metadata},
     )
-    
+
     assert response.status_code == 200
     data = response.json()
     assert data["metadata"] == metadata
+
 
 def test_analyze_with_special_characters():
     """Test analysis with special characters."""
@@ -226,19 +197,14 @@ def test_analyze_with_special_characters():
     Context: This is some background information...?!?
     Instruction: Please help me with this task!!!
     """
-    
-    response = client.post(
-        "/analyze",
-        json={
-            "prompt": special_prompt,
-            "model": "gpt-4"
-        }
-    )
-    
+
+    response = client.post("/analyze", json={"prompt": special_prompt, "model": "gpt-4"})
+
     assert response.status_code == 200
     data = response.json()
     assert data["metrics"]["quality_score"] >= 0
     assert data["metrics"]["quality_score"] <= 1
+
 
 def test_analyze_endpoint():
     """Test the /analyze endpoint."""
@@ -251,10 +217,10 @@ def test_analyze_endpoint():
             Instruction: Please help me with this task.
             """,
             "model": "gpt-4",
-            "target_complexity": "medium"
-        }
+            "target_complexity": "medium",
+        },
     )
-    
+
     assert response.status_code == 200
     data = response.json()
     assert "metrics" in data
@@ -262,7 +228,7 @@ def test_analyze_endpoint():
     assert "strengths" in data
     assert "weaknesses" in data
     assert "timestamp" in data
-    
+
     metrics = data["metrics"]
     assert "clarity_score" in metrics
     assert "specificity_score" in metrics
@@ -273,35 +239,26 @@ def test_analyze_endpoint():
     assert "token_count" in metrics
     assert "estimated_cost" in metrics
 
+
 def test_analyze_endpoint_invalid_model():
     """Test the /analyze endpoint with invalid model."""
-    response = client.post(
-        "/analyze",
-        json={
-            "prompt": "Test prompt",
-            "model": "invalid-model"
-        }
-    )
-    
+    response = client.post("/analyze", json={"prompt": "Test prompt", "model": "invalid-model"})
+
     assert response.status_code == 400
     assert "Invalid model type" in response.json()["detail"]
 
+
 def test_analyze_endpoint_default_complexity():
     """Test the /analyze endpoint with default complexity."""
-    response = client.post(
-        "/analyze",
-        json={
-            "prompt": "Test prompt",
-            "model": "gpt-4"
-        }
-    )
-    
+    response = client.post("/analyze", json={"prompt": "Test prompt", "model": "gpt-4"})
+
     assert response.status_code == 200
     data = response.json()
     assert "metrics" in data
     assert "suggestions" in data
     assert "strengths" in data
     assert "weaknesses" in data
+
 
 def test_metrics_endpoint():
     """Test the /metrics endpoint."""
@@ -313,14 +270,14 @@ def test_metrics_endpoint():
             Context: This is some background information.
             Instruction: Please help me with this task.
             """,
-            "model": "gpt-4"
-        }
+            "model": "gpt-4",
+        },
     )
-    
+
     assert response.status_code == 200
     data = response.json()
     assert "metrics" in data
-    
+
     metrics = data["metrics"]
     assert "clarity_score" in metrics
     assert "specificity_score" in metrics
@@ -332,18 +289,14 @@ def test_metrics_endpoint():
     assert "estimated_cost" in metrics
     assert "complexity_level" in metrics
 
+
 def test_metrics_endpoint_invalid_model():
     """Test the /metrics endpoint with invalid model."""
-    response = client.get(
-        "/metrics",
-        params={
-            "prompt": "Test prompt",
-            "model": "invalid-model"
-        }
-    )
-    
+    response = client.get("/metrics", params={"prompt": "Test prompt", "model": "invalid-model"})
+
     assert response.status_code == 400
     assert "Invalid model type" in response.json()["detail"]
+
 
 def test_suggestions_endpoint():
     """Test the /suggestions endpoint."""
@@ -352,10 +305,10 @@ def test_suggestions_endpoint():
         params={
             "prompt": "Do something about this.",
             "model": "gpt-4",
-            "target_complexity": "medium"
-        }
+            "target_complexity": "medium",
+        },
     )
-    
+
     assert response.status_code == 200
     data = response.json()
     assert "suggestions" in data
@@ -365,31 +318,21 @@ def test_suggestions_endpoint():
     assert isinstance(data["strengths"], list)
     assert isinstance(data["weaknesses"], list)
 
+
 def test_suggestions_endpoint_invalid_model():
     """Test the /suggestions endpoint with invalid model."""
-    response = client.get(
-        "/suggestions",
-        params={
-            "prompt": "Test prompt",
-            "model": "invalid-model"
-        }
-    )
-    
+    response = client.get("/suggestions", params={"prompt": "Test prompt", "model": "invalid-model"})
+
     assert response.status_code == 400
     assert "Invalid model type" in response.json()["detail"]
 
+
 def test_suggestions_endpoint_default_complexity():
     """Test the /suggestions endpoint with default complexity."""
-    response = client.get(
-        "/suggestions",
-        params={
-            "prompt": "Test prompt",
-            "model": "gpt-4"
-        }
-    )
-    
+    response = client.get("/suggestions", params={"prompt": "Test prompt", "model": "gpt-4"})
+
     assert response.status_code == 200
     data = response.json()
     assert "suggestions" in data
     assert "strengths" in data
-    assert "weaknesses" in data 
+    assert "weaknesses" in data

@@ -295,4 +295,4 @@ class CostAnalyticsPanel(private val project: Project) : JPanel() {
             }
         }
     }
-} 
+}

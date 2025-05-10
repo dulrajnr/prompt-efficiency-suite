@@ -363,4 +363,4 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 - The open-source community for inspiration and support
 - All contributors who have helped shape this project
-- The users who provide valuable feedback and suggestions 
+- The users who provide valuable feedback and suggestions

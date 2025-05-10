@@ -2,4 +2,4 @@
 
 from .multimodal import MultimodalCompressor
 
-__all__ = ['MultimodalCompressor'] 
+__all__ = ["MultimodalCompressor"]

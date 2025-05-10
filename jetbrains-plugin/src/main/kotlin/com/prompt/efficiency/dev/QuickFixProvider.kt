@@ -138,7 +138,7 @@ class PromptQuickFixProvider {
                 val patternLibrary = PromptPatternLibrary.getInstance(project)
                 val pattern = patternLibrary.findPatterns(document.text)
                     .find { it.id == patternId } ?: return@runWriteCommandAction
-                
+
                 document.replaceString(0, document.textLength, pattern.template)
             }
         }
@@ -155,4 +155,4 @@ class PromptQuickFixProvider {
             }
         }
     }
-} 
+}

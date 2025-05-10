@@ -11,10 +11,10 @@ class PromptEfficiencyInspection : LocalInspectionTool() {
             override fun visitFile(file: PsiFile) {
                 try {
                     if (!isPromptFile(file)) return
-                    
+
                     val text = file.text
                     val settings = PromptEfficiencySettings.getInstance(file.project)
-                    
+
                     // Check prompt complexity
                     val complexity = calculateComplexity(text)
                     if (complexity > settings.maxComplexity) {
@@ -24,7 +24,7 @@ class PromptEfficiencyInspection : LocalInspectionTool() {
                             ProblemHighlightType.WEAK_WARNING
                         )
                     }
-                    
+
                     // Check token count
                     val tokenCount = estimateTokenCount(text)
                     if (tokenCount > settings.maxTokens) {
@@ -34,7 +34,7 @@ class PromptEfficiencyInspection : LocalInspectionTool() {
                             ProblemHighlightType.WARNING
                         )
                     }
-                    
+
                     // Check clarity
                     val clarity = analyzeClarity(text)
                     if (clarity < settings.minClarity) {
@@ -44,7 +44,7 @@ class PromptEfficiencyInspection : LocalInspectionTool() {
                             ProblemHighlightType.WEAK_WARNING
                         )
                     }
-                    
+
                     // Check cost estimate
                     val costEstimate = estimateCost(text, settings.selectedModel)
                     if (costEstimate > settings.maxCost) {
@@ -64,11 +64,11 @@ class PromptEfficiencyInspection : LocalInspectionTool() {
             }
         }
     }
-    
+
     private fun isPromptFile(file: PsiFile): Boolean {
         return file.name.endsWith(".prompt") || file.name.endsWith(".txt")
     }
-    
+
     private fun calculateComplexity(text: String): Double {
         // Simple complexity calculation based on length, special characters, and structure
         val length = text.length
@@ -76,12 +76,12 @@ class PromptEfficiencyInspection : LocalInspectionTool() {
         val sections = text.split("\n\n").size
         return (length * 0.01 + specialChars * 0.5 + sections * 2.0)
     }
-    
+
     private fun estimateTokenCount(text: String): Int {
         // Rough estimation: average English word is 4 characters
         return text.split(Regex("\\s+")).size + (text.length / 4)
     }
-    
+
     private fun analyzeClarity(text: String): Double {
         // Simple clarity score based on presence of key elements
         var score = 1.0
@@ -92,7 +92,7 @@ class PromptEfficiencyInspection : LocalInspectionTool() {
         if (text.split("\n").size < 3) score -= 0.3
         return score.coerceIn(0.0, 1.0)
     }
-    
+
     private fun estimateCost(text: String, model: String): Double {
         // Simple cost estimation based on token count and model
         val tokenCount = estimateTokenCount(text)
@@ -102,4 +102,4 @@ class PromptEfficiencyInspection : LocalInspectionTool() {
             else -> tokenCount * 0.000005
         }
     }
-} 
+}

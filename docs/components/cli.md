@@ -463,4 +463,4 @@ prompt-efficiency --version
 ### Support Channels
 - Email: support@prompt.com
 - GitHub Issues: https://github.com/yourusername/prompt-efficiency-suite/issues
-- Documentation: https://docs.prompt.com 
+- Documentation: https://docs.prompt.com

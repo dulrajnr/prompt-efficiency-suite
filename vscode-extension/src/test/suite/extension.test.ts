@@ -296,7 +296,7 @@ suite('Prompt Efficiency Suite Extension Test Suite', () => {
         await new Promise(resolve => setTimeout(resolve, 100)); // Give time for command to complete
 
         // Verify panel was created
-        sinon.assert.calledWith(createWebviewPanelStub, 
+        sinon.assert.calledWith(createWebviewPanelStub,
             'promptEfficiencyConfig',
             'Prompt Efficiency Settings',
             vscode.ViewColumn.One,
@@ -325,4 +325,4 @@ suite('Prompt Efficiency Suite Extension Test Suite', () => {
         // Verify API call
         sinon.assert.calledWith(axiosInstance.get, '/health');
     });
-}); 
+});

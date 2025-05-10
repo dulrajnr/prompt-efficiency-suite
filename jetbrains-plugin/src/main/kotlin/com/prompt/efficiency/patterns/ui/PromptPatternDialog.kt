@@ -157,4 +157,4 @@ class PromptPatternDialog(
             JOptionPane.ERROR_MESSAGE
         )
     }
-} 
+}

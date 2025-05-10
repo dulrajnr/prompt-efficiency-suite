@@ -144,4 +144,4 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 - JetBrains for the excellent IDE platform
 - The open-source community for inspiration and support
-- All contributors who have helped shape this project 
+- All contributors who have helped shape this project

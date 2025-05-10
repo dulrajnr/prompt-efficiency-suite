@@ -27,48 +27,48 @@
     <extensions defaultExtensionNs="com.intellij">
         <toolWindow id="Prompt Efficiency" secondary="true" icon="AllIcons.General.Modified" anchor="bottom"
                    factoryClass="com.prompt.efficiency.toolwindow.PromptEfficiencyToolWindowFactory"/>
-        
+
         <applicationService serviceImplementation="com.prompt.efficiency.settings.PromptEfficiencySettings"/>
-        
+
         <applicationConfigurable parentId="tools" instance="com.prompt.efficiency.settings.PromptEfficiencyConfigurable"
                                 id="com.prompt.efficiency.settings.PromptEfficiencyConfigurable"
                                 displayName="Prompt Efficiency"/>
     </extensions>
 
     <actions>
-        <action id="PromptEfficiency.AnalyzeAction" 
-                class="com.prompt.efficiency.actions.AnalyzeAction" 
-                text="Analyze Prompt" 
+        <action id="PromptEfficiency.AnalyzeAction"
+                class="com.prompt.efficiency.actions.AnalyzeAction"
+                text="Analyze Prompt"
                 description="Analyze the selected prompt for efficiency">
             <keyboard-shortcut keymap="$default" first-keystroke="ctrl alt A"/>
         </action>
-        <action id="PromptEfficiency.OptimizeAction" 
-                class="com.prompt.efficiency.actions.OptimizeAction" 
-                text="Optimize Prompt" 
+        <action id="PromptEfficiency.OptimizeAction"
+                class="com.prompt.efficiency.actions.OptimizeAction"
+                text="Optimize Prompt"
                 description="Optimize the selected prompt">
             <keyboard-shortcut keymap="$default" first-keystroke="ctrl alt O"/>
         </action>
-        <action id="PromptEfficiency.EstimateCostAction" 
-                class="com.prompt.efficiency.actions.EstimateCostAction" 
-                text="Estimate Cost" 
+        <action id="PromptEfficiency.EstimateCostAction"
+                class="com.prompt.efficiency.actions.EstimateCostAction"
+                text="Estimate Cost"
                 description="Estimate the cost of the selected prompt">
             <keyboard-shortcut keymap="$default" first-keystroke="ctrl alt E"/>
         </action>
-        <action id="PromptEfficiency.ScanRepositoryAction" 
-                class="com.prompt.efficiency.actions.ScanRepositoryAction" 
-                text="Scan Repository" 
+        <action id="PromptEfficiency.ScanRepositoryAction"
+                class="com.prompt.efficiency.actions.ScanRepositoryAction"
+                text="Scan Repository"
                 description="Scan the repository for prompts">
             <keyboard-shortcut keymap="$default" first-keystroke="ctrl alt S"/>
         </action>
-        <action id="PromptEfficiency.TranslateAction" 
-                class="com.prompt.efficiency.actions.TranslateAction" 
-                text="Translate Prompt" 
+        <action id="PromptEfficiency.TranslateAction"
+                class="com.prompt.efficiency.actions.TranslateAction"
+                text="Translate Prompt"
                 description="Translate the selected prompt">
             <keyboard-shortcut keymap="$default" first-keystroke="ctrl alt T"/>
         </action>
-        <action id="PromptEfficiency.ManageTemplatesAction" 
-                class="com.prompt.efficiency.actions.ManageTemplatesAction" 
-                text="Manage Templates" 
+        <action id="PromptEfficiency.ManageTemplatesAction"
+                class="com.prompt.efficiency.actions.ManageTemplatesAction"
+                text="Manage Templates"
                 description="Manage prompt templates">
             <keyboard-shortcut keymap="$default" first-keystroke="ctrl alt M"/>
         </action>
@@ -91,4 +91,4 @@
             <action id="PromptEfficiency.OpenConfig"/>
         </group>
     </actions>
-</idea-plugin> 
+</idea-plugin>

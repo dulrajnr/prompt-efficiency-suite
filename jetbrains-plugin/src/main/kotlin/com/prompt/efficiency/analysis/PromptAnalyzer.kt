@@ -168,7 +168,7 @@ class PromptAnalyzer(private val project: Project) {
     private fun analyzeQualityMetrics(prompt: String): QualityMetrics {
         val words = prompt.split("\\s+".toRegex())
         val sentences = prompt.split("[.!?]+".toRegex())
-        
+
         val clarity = calculateClarityScore(prompt, sentences)
         val specificity = calculateSpecificityScore(prompt, words)
         val consistency = calculateConsistencyScore(sentences)
@@ -189,7 +189,7 @@ class PromptAnalyzer(private val project: Project) {
         val clarityCount = clarityIndicators.count { prompt.contains(it, ignoreCase = true) }
         val sentenceCount = sentences.size
         val avgSentenceLength = sentences.map { it.length }.average()
-        
+
         return when {
             sentenceCount == 0 -> 0.0
             avgSentenceLength > 50 -> 0.3 // Long sentences reduce clarity
@@ -202,7 +202,7 @@ class PromptAnalyzer(private val project: Project) {
         val specificityCount = specificityIndicators.count { prompt.contains(it, ignoreCase = true) }
         val uniqueWords = words.distinct().size
         val totalWords = words.size
-        
+
         return when {
             totalWords == 0 -> 0.0
             specificityCount > 0 -> 0.6 + (specificityCount * 0.1).coerceAtMost(0.4)
@@ -212,10 +212,10 @@ class PromptAnalyzer(private val project: Project) {
     }
 
     private fun calculateConsistencyScore(sentences: List<String>): Double {
-        val consistencyCount = consistencyIndicators.count { 
+        val consistencyCount = consistencyIndicators.count {
             sentences.any { sentence -> sentence.contains(it, ignoreCase = true) }
         }
-        
+
         return when {
             sentences.size <= 1 -> 1.0 // Single sentence is always consistent
             consistencyCount > 0 -> 0.7 + (consistencyCount * 0.1).coerceAtMost(0.3)
@@ -227,7 +227,7 @@ class PromptAnalyzer(private val project: Project) {
         val completenessCount = completenessIndicators.count { prompt.contains(it, ignoreCase = true) }
         val hasTask = prompt.contains("task", ignoreCase = true)
         val hasOutput = prompt.contains("output", ignoreCase = true)
-        
+
         return when {
             !hasTask -> 0.3
             !hasOutput -> 0.5
@@ -243,7 +243,7 @@ class PromptAnalyzer(private val project: Project) {
         completeness: Double
     ): List<String> {
         val suggestions = mutableListOf<String>()
-        
+
         if (clarity < 0.7) {
             suggestions.add("Improve clarity by using more specific terms and shorter sentences")
         }
@@ -256,7 +256,7 @@ class PromptAnalyzer(private val project: Project) {
         if (completeness < 0.7) {
             suggestions.add("Ensure all necessary components (task, context, output) are included")
         }
-        
+
         return suggestions
     }
 
@@ -277,7 +277,7 @@ class PromptAnalyzer(private val project: Project) {
     private fun calculateDomainRelevance(prompt: String, context: PromptContext): Double {
         val domainTerms = context.availableContext["domain_terms"]?.split(",") ?: emptyList()
         val domainTermCount = domainTerms.count { prompt.contains(it, ignoreCase = true) }
-        
+
         return when {
             domainTerms.isEmpty() -> 0.5
             domainTermCount > 0 -> 0.5 + (domainTermCount * 0.1).coerceAtMost(0.5)
@@ -288,7 +288,7 @@ class PromptAnalyzer(private val project: Project) {
     private fun calculateTaskAlignment(prompt: String, context: PromptContext): Double {
         val taskTerms = context.currentTask.split("\\s+".toRegex())
         val taskTermCount = taskTerms.count { prompt.contains(it, ignoreCase = true) }
-        
+
         return when {
             taskTerms.isEmpty() -> 0.5
             taskTermCount > 0 -> 0.5 + (taskTermCount * 0.1).coerceAtMost(0.5)
@@ -299,7 +299,7 @@ class PromptAnalyzer(private val project: Project) {
     private fun calculateModelCompatibility(prompt: String, context: PromptContext): Double {
         val model = context.selectedModel
         val modelPatterns = patternLibrary.findPatterns(prompt, "general", model)
-        
+
         return when {
             modelPatterns.isNotEmpty() -> 0.8
             prompt.length > 1000 && model == "gpt-3.5-turbo" -> 0.4
@@ -310,7 +310,7 @@ class PromptAnalyzer(private val project: Project) {
     private fun calculateContextAwareness(prompt: String, context: PromptContext): Double {
         val contextTerms = context.availableContext.values.flatMap { it.split("\\s+".toRegex()) }
         val contextTermCount = contextTerms.count { prompt.contains(it, ignoreCase = true) }
-        
+
         return when {
             contextTerms.isEmpty() -> 0.5
             contextTermCount > 0 -> 0.5 + (contextTermCount * 0.1).coerceAtMost(0.5)
@@ -320,28 +320,28 @@ class PromptAnalyzer(private val project: Project) {
 
     private fun checkBestPractices(prompt: String, context: PromptContext): List<BestPractice> {
         val violations = mutableListOf<BestPractice>()
-        
+
         // Check structure best practices
         bestPractices["structure"]?.forEach { practice ->
             if (!matchesBestPractice(prompt, practice)) {
                 violations.add(practice)
             }
         }
-        
+
         // Check language best practices
         bestPractices["language"]?.forEach { practice ->
             if (!matchesBestPractice(prompt, practice)) {
                 violations.add(practice)
             }
         }
-        
+
         // Check model-specific best practices
         bestPractices["model"]?.get(context.selectedModel)?.forEach { practice ->
             if (!matchesBestPractice(prompt, practice)) {
                 violations.add(practice)
             }
         }
-        
+
         return violations
     }
 
@@ -378,13 +378,13 @@ class PromptAnalyzer(private val project: Project) {
     private fun calculatePatternConfidence(prompt: String, pattern: PromptPatternLibrary.PromptPattern): Double {
         val templateWords = pattern.template.split("\\s+".toRegex())
         val promptWords = prompt.split("\\s+".toRegex())
-        
+
         val matchingWords = templateWords.count { templateWord ->
             promptWords.any { promptWord ->
                 promptWord.contains(templateWord, ignoreCase = true)
             }
         }
-        
+
         return (matchingWords.toDouble() / templateWords.size).coerceIn(0.0, 1.0)
     }
 
@@ -398,4 +398,4 @@ data class PromptContext(
     val currentTask: String,
     val selectedModel: String,
     val availableContext: Map<String, String>
-) 
+)

@@ -31,4 +31,4 @@ class PromptEfficiencySettings : PersistentStateComponent<PromptEfficiencySettin
             return com.intellij.openapi.components.ServiceManager.getService(PromptEfficiencySettings::class.java)
         }
     }
-} 
+}

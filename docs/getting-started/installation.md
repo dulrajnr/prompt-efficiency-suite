@@ -174,4 +174,4 @@ curl -H "Authorization: Bearer $PROMPT_API_KEY" http://localhost:8000/api/v1/hea
 If you encounter any issues during installation:
 - Check the [Troubleshooting Guide](../troubleshooting/common-issues.md)
 - Visit our [GitHub Issues](https://github.com/yourusername/prompt-efficiency-suite/issues)
-- Contact support at support@prompt.com 
+- Contact support at support@prompt.com

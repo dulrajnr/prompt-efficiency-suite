@@ -290,4 +290,4 @@ prompt-efficiency maintenance
 3. Monitor system health:
 ```bash
 prompt-efficiency health-check
-``` 
+```

@@ -32,4 +32,4 @@ cache:
 
 # Optional: API Keys
 # api_keys:
-#   openai: your_api_key_here 
+#   openai: your_api_key_here

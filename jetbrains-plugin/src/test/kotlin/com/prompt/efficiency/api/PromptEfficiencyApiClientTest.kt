@@ -173,4 +173,4 @@ class PromptEfficiencyApiClientTest : LightPlatformTestCase() {
 
         apiClient.analyzePrompt("Test prompt")
     }
-} 
+}

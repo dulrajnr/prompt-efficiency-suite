@@ -162,14 +162,14 @@ def test_complete_workflow():
 ```python
 def analyze_prompt(prompt: str, options: Optional[Dict] = None) -> AnalysisResult:
     """Analyze a prompt for quality and effectiveness.
-    
+
     Args:
         prompt: The prompt to analyze
         options: Optional analysis parameters
-        
+
     Returns:
         AnalysisResult containing quality metrics
-        
+
     Raises:
         ValueError: If prompt is invalid
         APIError: If analysis fails
@@ -185,17 +185,17 @@ async def analyze_prompt(
     background_tasks: BackgroundTasks
 ) -> AnalyzeResponse:
     """Analyze a prompt for quality.
-    
+
     This endpoint analyzes the given prompt and returns quality metrics
     and suggestions for improvement.
-    
+
     Args:
         request: The analysis request
         background_tasks: FastAPI background tasks
-        
+
     Returns:
         Analysis results and suggestions
-        
+
     Raises:
         HTTPException: If analysis fails
     """
@@ -262,10 +262,10 @@ class TestPromptAnalyzer:
     @pytest.fixture
     def analyzer(self):
         return PromptAnalyzer()
-    
+
     def test_initialization(self, analyzer):
         assert analyzer is not None
-    
+
     def test_analyze_prompt(self, analyzer):
         result = analyzer.analyze("Test prompt")
         assert result.quality_score >= 0
@@ -290,14 +290,14 @@ def test_api_call():
 ```python
 def test_api_workflow():
     client = TestClient(app)
-    
+
     # Test analyze endpoint
     response = client.post(
         "/api/v1/analyze",
         json={"prompt": "Test prompt"}
     )
     assert response.status_code == 200
-    
+
     # Test optimize endpoint
     response = client.post(
         "/api/v1/optimize",
@@ -312,7 +312,7 @@ def test_database_operations():
     with TestDatabase() as db:
         # Test insert
         db.insert_prompt("Test prompt")
-        
+
         # Test query
         prompt = db.get_prompt("Test prompt")
         assert prompt is not None
@@ -324,15 +324,15 @@ def test_database_operations():
 ```python
 def test_complete_workflow():
     suite = PromptEfficiencySuite()
-    
+
     # Test analysis
     analysis = suite.analyze_prompt("Test prompt")
     assert analysis.quality_score >= 0
-    
+
     # Test optimization
     optimized = suite.optimize_prompt("Test prompt")
     assert optimized.token_count < len("Test prompt")
-    
+
     # Test cost estimation
     cost = suite.estimate_cost("Test prompt")
     assert cost > 0
@@ -342,12 +342,12 @@ def test_complete_workflow():
 ```python
 def test_ui_workflow():
     driver = webdriver.Chrome()
-    
+
     try:
         # Test login
         driver.get("http://localhost:8000")
         driver.find_element_by_id("login").click()
-        
+
         # Test analysis
         driver.find_element_by_id("analyze").click()
         assert "Analysis Results" in driver.page_source
@@ -361,7 +361,7 @@ def test_ui_workflow():
 ```python
 def test_load():
     client = TestClient(app)
-    
+
     # Test concurrent requests
     with ThreadPoolExecutor(max_workers=10) as executor:
         futures = [
@@ -372,7 +372,7 @@ def test_load():
             )
             for i in range(100)
         ]
-        
+
         results = [f.result() for f in futures]
         assert all(r.status_code == 200 for r in results)
 ```
@@ -382,14 +382,14 @@ def test_load():
 def test_memory_usage():
     import psutil
     import os
-    
+
     process = psutil.Process(os.getpid())
     initial_memory = process.memory_info().rss
-    
+
     # Run memory-intensive operation
     suite = PromptEfficiencySuite()
     suite.process_large_dataset()
-    
+
     final_memory = process.memory_info().rss
     assert final_memory - initial_memory < 100 * 1024 * 1024  # 100MB
 ```
@@ -400,14 +400,14 @@ def test_memory_usage():
 ```python
 def test_input_validation():
     client = TestClient(app)
-    
+
     # Test SQL injection
     response = client.post(
         "/api/v1/analyze",
         json={"prompt": "'; DROP TABLE prompts; --"}
     )
     assert response.status_code == 400
-    
+
     # Test XSS
     response = client.post(
         "/api/v1/analyze",
@@ -420,14 +420,14 @@ def test_input_validation():
 ```python
 def test_authentication():
     client = TestClient(app)
-    
+
     # Test without token
     response = client.post(
         "/api/v1/analyze",
         json={"prompt": "Test prompt"}
     )
     assert response.status_code == 401
-    
+
     # Test with invalid token
     response = client.post(
         "/api/v1/analyze",
@@ -526,4 +526,4 @@ def analyze_prompt(prompt: str):
 2. Create a feature branch
 3. Make your changes
 4. Run tests
-5. Submit a pull request 
+5. Submit a pull request

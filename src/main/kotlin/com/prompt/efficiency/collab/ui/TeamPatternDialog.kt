@@ -40,7 +40,7 @@ class TeamPatternDialog(
         val settings = PromptEfficiencySettings.getInstance()
         val models = settings.getModelSettings().keys.toTypedArray()
         modelCombo.model = DefaultComboBoxModel(models)
-        
+
         pattern?.let {
             nameField.text = it.name
             categoryField.text = it.category
@@ -52,56 +52,56 @@ class TeamPatternDialog(
 
     private fun createFormPanel(): JComponent {
         val panel = JPanel(BorderLayout())
-        
+
         val formPanel = JPanel()
         formPanel.layout = BoxLayout(formPanel, BoxLayout.Y_AXIS)
-        
+
         // Name field
         val nameLabel = JLabel("Name:")
         nameField.maximumSize = Dimension(400, nameField.preferredSize.height)
-        
+
         // Category field
         val categoryLabel = JLabel("Category:")
         categoryField.maximumSize = Dimension(400, categoryField.preferredSize.height)
-        
+
         // Model combo
         val modelLabel = JLabel("Model:")
         modelCombo.maximumSize = Dimension(400, modelCombo.preferredSize.height)
-        
+
         // Template area
         val templateLabel = JLabel("Template:")
         templateArea.lineWrap = true
         templateArea.wrapStyleWord = true
         val templateScroll = JBScrollPane(templateArea)
         templateScroll.preferredSize = Dimension(400, 200)
-        
+
         // Description area
         val descriptionLabel = JLabel("Description:")
         descriptionArea.lineWrap = true
         descriptionArea.wrapStyleWord = true
         val descriptionScroll = JBScrollPane(descriptionArea)
         descriptionScroll.preferredSize = Dimension(400, 100)
-        
+
         // Add components to form
         formPanel.add(nameLabel)
         formPanel.add(nameField)
         formPanel.add(Box.createVerticalStrut(10))
-        
+
         formPanel.add(categoryLabel)
         formPanel.add(categoryField)
         formPanel.add(Box.createVerticalStrut(10))
-        
+
         formPanel.add(modelLabel)
         formPanel.add(modelCombo)
         formPanel.add(Box.createVerticalStrut(10))
-        
+
         formPanel.add(templateLabel)
         formPanel.add(templateScroll)
         formPanel.add(Box.createVerticalStrut(10))
-        
+
         formPanel.add(descriptionLabel)
         formPanel.add(descriptionScroll)
-        
+
         panel.add(formPanel, BorderLayout.CENTER)
         return panel
     }
@@ -137,4 +137,4 @@ class TeamPatternDialog(
         }
         return null
     }
-} 
+}

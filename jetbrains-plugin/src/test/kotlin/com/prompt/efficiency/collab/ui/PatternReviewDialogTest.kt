@@ -36,8 +36,8 @@ class PatternReviewDialogTest : LightPlatformTestCase() {
         assertEquals("", findTextArea("Comments:").text)
 
         // Check pattern info display
-        val templateArea = dialog.contentPane.findComponent { 
-            it is JTextArea && it.text == pattern.template && !it.isEditable 
+        val templateArea = dialog.contentPane.findComponent {
+            it is JTextArea && it.text == pattern.template && !it.isEditable
         } as JTextArea
         assertEquals(pattern.template, templateArea.text)
     }
@@ -70,14 +70,14 @@ class PatternReviewDialogTest : LightPlatformTestCase() {
     }
 
     private fun findTextArea(label: String): JTextArea {
-        return dialog.contentPane.findComponent { 
-            it is JTextArea && it.parent?.parent?.findComponent { it is JLabel && it.text == label } != null 
+        return dialog.contentPane.findComponent {
+            it is JTextArea && it.parent?.parent?.findComponent { it is JLabel && it.text == label } != null
         } as JTextArea
     }
 
     private fun findComboBox(label: String): JComboBox<*> {
-        return dialog.contentPane.findComponent { 
-            it is JComboBox<*> && it.parent?.findComponent { it is JLabel && it.text == label } != null 
+        return dialog.contentPane.findComponent {
+            it is JComboBox<*> && it.parent?.findComponent { it is JLabel && it.text == label } != null
         } as JComboBox<*>
     }
-} 
+}

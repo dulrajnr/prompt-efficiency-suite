@@ -2,22 +2,24 @@
 Orchestrator - A module for coordinating prompt optimization components.
 """
 
-from typing import Dict, List, Optional, Union
-from dataclasses import dataclass, field
 import json
 import logging
 from concurrent.futures import ThreadPoolExecutor
+from dataclasses import dataclass, field
 from pathlib import Path
+from typing import Dict, List, Optional, Union
 
 from .analyzer import PromptAnalyzer
-from .optimizer import PromptOptimizer
-from .model_translator import ModelTranslator, ModelType
 from .code_aware_compressor import CodeAwareCompressor
 from .macro_suggester import MacroSuggester
+from .model_translator import ModelTranslator, ModelType
+from .optimizer import PromptOptimizer
+
 
 @dataclass
 class ModelPerformance:
     """Performance metrics for a model."""
+
     model_type: ModelType
     response_time: float
     token_count: int
@@ -25,9 +27,11 @@ class ModelPerformance:
     success_rate: float
     metadata: Dict[str, any] = field(default_factory=dict)
 
+
 @dataclass
 class PerformanceMetrics:
     """Performance metrics for prompt optimization."""
+
     clarity_improvement: float
     completeness_improvement: float
     consistency_improvement: float
@@ -36,9 +40,11 @@ class PerformanceMetrics:
     execution_time: float
     metadata: Dict[str, any] = field(default_factory=dict)
 
+
 @dataclass
 class OrchestrationResult:
     """Result of orchestrated optimization."""
+
     original_prompt: str
     optimized_prompt: str
     analysis_result: Dict[str, any]
@@ -46,6 +52,7 @@ class OrchestrationResult:
     translation_result: Optional[Dict[str, any]]
     performance_metrics: PerformanceMetrics
     metadata: Dict[str, any] = field(default_factory=dict)
+
 
 class PromptOrchestrator:
     """Class for orchestrating prompt optimization."""
@@ -63,15 +70,15 @@ class PromptOrchestrator:
         self,
         prompt: str,
         target_model: Optional[Union[str, ModelType]] = None,
-        optimization_params: Optional[Dict[str, any]] = None
+        optimization_params: Optional[Dict[str, any]] = None,
     ) -> OrchestrationResult:
         """Optimize a prompt.
-        
+
         Args:
             prompt (str): Prompt to optimize.
             target_model (Optional[Union[str, ModelType]]): Target model for optimization.
             optimization_params (Optional[Dict[str, any]]): Additional optimization parameters.
-            
+
         Returns:
             OrchestrationResult: Result of optimization.
         """
@@ -91,7 +98,7 @@ class PromptOrchestrator:
             translation_result = self.translator.translate(
                 optimization_result.optimized_prompt,
                 source_format=ModelType.OPENAI,  # Assuming OpenAI format by default
-                target_format=target_model
+                target_format=target_model,
             )
 
         # Calculate performance metrics
@@ -102,7 +109,7 @@ class PromptOrchestrator:
             efficiency_improvement=optimization_result.efficiency_score - 0.5,
             length_reduction=optimization_result.length_reduction,
             execution_time=optimization_result.optimization_time,
-            metadata={}
+            metadata={},
         )
 
         result = OrchestrationResult(
@@ -112,7 +119,7 @@ class PromptOrchestrator:
             optimization_result=optimization_result.__dict__,
             translation_result=translation_result.__dict__ if translation_result else None,
             performance_metrics=metrics,
-            metadata={"optimization_params": params}
+            metadata={"optimization_params": params},
         )
 
         self.optimization_history.append(result)
@@ -123,34 +130,28 @@ class PromptOrchestrator:
         prompts: List[str],
         target_model: Optional[Union[str, ModelType]] = None,
         optimization_params: Optional[Dict[str, any]] = None,
-        max_workers: int = 4
+        max_workers: int = 4,
     ) -> List[OrchestrationResult]:
         """Optimize a batch of prompts.
-        
+
         Args:
             prompts (List[str]): Prompts to optimize.
             target_model (Optional[Union[str, ModelType]]): Target model for optimization.
             optimization_params (Optional[Dict[str, any]]): Additional optimization parameters.
             max_workers (int): Maximum number of worker threads.
-            
+
         Returns:
             List[OrchestrationResult]: Results of optimization.
         """
         with ThreadPoolExecutor(max_workers=max_workers) as executor:
             futures = [
-                executor.submit(
-                    self.optimize_prompt,
-                    prompt,
-                    target_model,
-                    optimization_params
-                )
-                for prompt in prompts
+                executor.submit(self.optimize_prompt, prompt, target_model, optimization_params) for prompt in prompts
             ]
             return [future.result() for future in futures]
 
     def get_optimization_stats(self) -> Dict[str, any]:
         """Get statistics about optimizations.
-        
+
         Returns:
             Dict[str, any]: Optimization statistics.
         """
@@ -159,12 +160,24 @@ class PromptOrchestrator:
 
         return {
             "total_optimizations": len(self.optimization_history),
-            "avg_clarity_improvement": sum(r.performance_metrics.clarity_improvement for r in self.optimization_history) / len(self.optimization_history),
-            "avg_completeness_improvement": sum(r.performance_metrics.completeness_improvement for r in self.optimization_history) / len(self.optimization_history),
-            "avg_consistency_improvement": sum(r.performance_metrics.consistency_improvement for r in self.optimization_history) / len(self.optimization_history),
-            "avg_efficiency_improvement": sum(r.performance_metrics.efficiency_improvement for r in self.optimization_history) / len(self.optimization_history),
-            "avg_length_reduction": sum(r.performance_metrics.length_reduction for r in self.optimization_history) / len(self.optimization_history),
-            "avg_execution_time": sum(r.performance_metrics.execution_time for r in self.optimization_history) / len(self.optimization_history)
+            "avg_clarity_improvement": sum(r.performance_metrics.clarity_improvement for r in self.optimization_history)
+            / len(self.optimization_history),
+            "avg_completeness_improvement": sum(
+                r.performance_metrics.completeness_improvement for r in self.optimization_history
+            )
+            / len(self.optimization_history),
+            "avg_consistency_improvement": sum(
+                r.performance_metrics.consistency_improvement for r in self.optimization_history
+            )
+            / len(self.optimization_history),
+            "avg_efficiency_improvement": sum(
+                r.performance_metrics.efficiency_improvement for r in self.optimization_history
+            )
+            / len(self.optimization_history),
+            "avg_length_reduction": sum(r.performance_metrics.length_reduction for r in self.optimization_history)
+            / len(self.optimization_history),
+            "avg_execution_time": sum(r.performance_metrics.execution_time for r in self.optimization_history)
+            / len(self.optimization_history),
         }
 
     def clear_history(self) -> None:
@@ -177,32 +190,32 @@ class PromptOrchestrator:
 
     def export_results(self, output_path: Path) -> None:
         """Export optimization results to a file.
-        
+
         Args:
             output_path (Path): Path to save results.
         """
         results_data = {
-            'statistics': self.get_optimization_stats(),
-            'results': [
+            "statistics": self.get_optimization_stats(),
+            "results": [
                 {
-                    'prompt': result.original_prompt,
-                    'optimized_prompt': result.optimized_prompt,
-                    'analysis_metrics': result.analysis_result,
-                    'optimization_stats': result.optimization_result,
-                    'translation_info': (
+                    "prompt": result.original_prompt,
+                    "optimized_prompt": result.optimized_prompt,
+                    "analysis_metrics": result.analysis_result,
+                    "optimization_stats": result.optimization_result,
+                    "translation_info": (
                         {
-                            'source_format': result.translation_result['source_format'],
-                            'target_format': result.translation_result['target_format']
+                            "source_format": result.translation_result["source_format"],
+                            "target_format": result.translation_result["target_format"],
                         }
                         if result.translation_result
                         else None
                     ),
-                    'performance_metrics': result.performance_metrics.__dict__,
-                    'metadata': result.metadata
+                    "performance_metrics": result.performance_metrics.__dict__,
+                    "metadata": result.metadata,
                 }
                 for result in self.optimization_history
-            ]
+            ],
         }
-        
-        with open(output_path, 'w', encoding='utf-8') as f:
-            json.dump(results_data, f, indent=2) 
+
+        with open(output_path, "w", encoding="utf-8") as f:
+            json.dump(results_data, f, indent=2)

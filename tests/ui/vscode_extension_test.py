@@ -1,11 +1,12 @@
 #!/usr/bin/env python3
 
-import unittest
-import os
 import json
-from pathlib import Path
+import os
 import subprocess
 import time
+import unittest
+from pathlib import Path
+
 
 class VSCodeExtensionTest(unittest.TestCase):
     @classmethod
@@ -14,7 +15,7 @@ class VSCodeExtensionTest(unittest.TestCase):
         cls.vscode_path = os.path.expanduser("~/.vscode/extensions")
         cls.extension_id = "prompt-efficiency-suite"
         cls.test_file = "test_prompt.py"
-        
+
         # Create test file
         with open(cls.test_file, "w") as f:
             f.write('prompt = """Write a function to calculate Fibonacci numbers"""')
@@ -31,11 +32,7 @@ class VSCodeExtensionTest(unittest.TestCase):
     def test_command_palette(self):
         """Test if commands are available in command palette."""
         # Simulate command palette activation
-        result = subprocess.run(
-            ["code", "--list-extensions"],
-            capture_output=True,
-            text=True
-        )
+        result = subprocess.run(["code", "--list-extensions"], capture_output=True, text=True)
         self.assertIn(self.extension_id, result.stdout)
 
     def test_status_bar(self):
@@ -53,7 +50,7 @@ class VSCodeExtensionTest(unittest.TestCase):
         result = subprocess.run(
             ["code", "--list-extensions", "--show-versions"],
             capture_output=True,
-            text=True
+            text=True,
         )
         self.assertIn(self.extension_id, result.stdout)
 
@@ -71,7 +68,7 @@ class VSCodeExtensionTest(unittest.TestCase):
         result = subprocess.run(
             ["code", "--list-extensions", "--show-versions"],
             capture_output=True,
-            text=True
+            text=True,
         )
         self.assertIn(self.extension_id, result.stdout)
 
@@ -81,7 +78,7 @@ class VSCodeExtensionTest(unittest.TestCase):
         result = subprocess.run(
             ["code", "--list-extensions", "--show-versions"],
             capture_output=True,
-            text=True
+            text=True,
         )
         self.assertIn(self.extension_id, result.stdout)
 
@@ -90,29 +87,25 @@ class VSCodeExtensionTest(unittest.TestCase):
         # Test invalid prompt
         with open(self.test_file, "w") as f:
             f.write('prompt = """Invalid prompt"""')
-        
+
         # Check error handling
         result = subprocess.run(
             ["code", "--list-extensions", "--show-versions"],
             capture_output=True,
-            text=True
+            text=True,
         )
         self.assertIn(self.extension_id, result.stdout)
 
     def test_performance(self):
         """Test extension performance."""
         start_time = time.time()
-        
+
         # Simulate extension operations
-        subprocess.run(
-            ["code", "--list-extensions"],
-            capture_output=True,
-            text=True
-        )
-        
+        subprocess.run(["code", "--list-extensions"], capture_output=True, text=True)
+
         end_time = time.time()
         execution_time = end_time - start_time
-        
+
         self.assertLess(execution_time, 5.0, "Extension operations took too long")
 
     @classmethod
@@ -121,5 +114,6 @@ class VSCodeExtensionTest(unittest.TestCase):
         if os.path.exists(cls.test_file):
             os.remove(cls.test_file)
 
+
 if __name__ == "__main__":
-    unittest.main() 
+    unittest.main()

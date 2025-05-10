@@ -105,4 +105,4 @@ class PromptCompletionProvider : CompletionProvider<CompletionParameters>() {
             result.addElement(element)
         }
     }
-} 
+}

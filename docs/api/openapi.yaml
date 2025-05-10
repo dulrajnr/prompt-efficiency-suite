@@ -412,4 +412,4 @@ paths:
       description: WebSocket endpoint for real-time prompt analysis and optimization
       responses:
         '101':
-          description: Switching to WebSocket protocol 
+          description: Switching to WebSocket protocol

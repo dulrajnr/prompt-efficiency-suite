@@ -1,1 +1,1 @@
-"""Domain-aware prompt trimming module.""" 
+"""Domain-aware prompt trimming module."""

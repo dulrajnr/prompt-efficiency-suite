@@ -24,7 +24,7 @@ class PromptEfficiencyConfigurable : Configurable {
 
     override fun createComponent(): JComponent {
         val settings = PromptEfficiencySettings.getInstance()
-        
+
         apiKeyField.text = settings.apiKey
         serverUrlField.text = settings.serverUrl
         defaultModelCombo.selectedItem = settings.defaultModel
@@ -79,4 +79,4 @@ class PromptEfficiencyConfigurable : Configurable {
     override fun disposeUIResources() {
         mainPanel = null
     }
-} 
+}

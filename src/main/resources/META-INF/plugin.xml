@@ -86,4 +86,4 @@
             <add-to-group group-id="ToolsMenu" anchor="last"/>
         </action>
     </actions>
-</idea-plugin> 
+</idea-plugin>

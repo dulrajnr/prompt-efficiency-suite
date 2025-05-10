@@ -13,4 +13,4 @@ All notable changes to the "Prompt Efficiency Suite" extension will be documente
 - Support for scanning repositories for prompts
 - Support for translating prompts between different language models
 - Configuration options for API key and server URL
-- Basic test suite for extension functionality 
+- Basic test suite for extension functionality

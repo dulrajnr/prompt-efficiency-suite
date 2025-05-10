@@ -14,16 +14,16 @@ async def optimize_prompt(prompt: str):
     compressor = BaseCompressor()
     analyzer = PromptAnalyzer()
     tracker = MetricsTracker()
-    
+
     # Compress the prompt
     compression_result = await compressor.compress(
         text=prompt,
         target_ratio=0.7
     )
-    
+
     # Analyze the compressed prompt
     analysis = analyzer.analyze(compression_result.compressed_text)
-    
+
     # Track metrics
     metrics = EfficiencyMetrics(
         prompt_id="prompt_1",
@@ -33,7 +33,7 @@ async def optimize_prompt(prompt: str):
         quality_score=analysis.readability_score
     )
     tracker.add_metrics(metrics)
-    
+
     return {
         "compressed_text": compression_result.compressed_text,
         "compression_ratio": compression_result.compression_ratio,
@@ -61,7 +61,7 @@ async def process_prompt_batch(prompts: List[str]):
     compressor = BaseCompressor()
     analyzer = PromptAnalyzer()
     tracker = MetricsTracker()
-    
+
     # Create optimizer
     optimizer = BulkOptimizer(
         compressor=compressor,
@@ -69,14 +69,14 @@ async def process_prompt_batch(prompts: List[str]):
         metrics_tracker=tracker,
         max_workers=4
     )
-    
+
     # Process batch
     results = await optimizer.optimize_batch(
         prompts=prompts,
         target_ratio=0.7,
         min_quality_score=0.8
     )
-    
+
     return results
 
 # Usage
@@ -98,40 +98,40 @@ from prompt_efficiency_suite import MacroManager, MacroDefinition
 def setup_macros():
     # Initialize macro manager
     manager = MacroManager()
-    
+
     # Define macros
     summary_macro = MacroDefinition(
         name="summary",
         template="""
         Please provide a {length} summary of the following text:
-        
+
         {text}
-        
+
         Focus on the following aspects:
         {aspects}
         """,
         parameters=["length", "text", "aspects"],
         description="Creates a summary prompt with specified length and focus"
     )
-    
+
     analysis_macro = MacroDefinition(
         name="analysis",
         template="""
         Analyze the following {type} with respect to:
-        
+
         {criteria}
-        
+
         Text to analyze:
         {text}
         """,
         parameters=["type", "criteria", "text"],
         description="Creates an analysis prompt with specific criteria"
     )
-    
+
     # Register macros
     manager.register_macro(summary_macro)
     manager.register_macro(analysis_macro)
-    
+
     return manager
 
 # Usage
@@ -166,10 +166,10 @@ from prompt_efficiency_suite import RepositoryScanner
 async def scan_codebase(repo_path: str):
     # Initialize scanner
     scanner = RepositoryScanner(max_workers=4)
-    
+
     # Scan repository
     locations = scanner.scan_repository(repo_path)
-    
+
     # Process results
     for location in locations:
         print(f"Found prompt in {location.file_path}:{location.line_number}")
@@ -196,17 +196,17 @@ def setup_budget_management():
         min_budget=10000,      # 10K minimum
         max_budget=1000000     # 1M maximum
     )
-    
+
     return budget_manager
 
 async def process_with_budget(prompt: str, budget_manager: AdaptiveBudgetManager):
     # Check budget
     if not budget_manager.can_allocate(1000):  # Example token requirement
         raise BudgetError("Insufficient budget")
-    
+
     # Process prompt
     result = await optimize_prompt(prompt)
-    
+
     # Record usage
     budget_manager.record_usage(
         EfficiencyMetrics(
@@ -216,7 +216,7 @@ async def process_with_budget(prompt: str, budget_manager: AdaptiveBudgetManager
             success_rate=0.95
         )
     )
-    
+
     return result
 
 # Usage
@@ -253,11 +253,11 @@ async def optimize_prompt(prompt: str):
         # Check budget
         if not budget_manager.can_allocate(1000):
             raise HTTPException(status_code=429, detail="Budget exceeded")
-        
+
         # Process prompt
         compression_result = await compressor.compress(prompt)
         analysis = analyzer.analyze(compression_result.compressed_text)
-        
+
         # Record usage
         budget_manager.record_usage(
             EfficiencyMetrics(
@@ -267,7 +267,7 @@ async def optimize_prompt(prompt: str):
                 success_rate=0.95
             )
         )
-        
+
         return {
             "compressed_text": compression_result.compressed_text,
             "compression_ratio": compression_result.compression_ratio,
@@ -299,10 +299,10 @@ def optimize(prompt, target_ratio):
     """Optimize a single prompt"""
     compressor = BaseCompressor()
     analyzer = PromptAnalyzer()
-    
+
     result = await compressor.compress(prompt, target_ratio)
     analysis = analyzer.analyze(result.compressed_text)
-    
+
     click.echo(f"Compression ratio: {result.compression_ratio:.2f}")
     click.echo(f"Readability score: {analysis.readability_score:.2f}")
     click.echo(f"Compressed text: {result.compressed_text}")
@@ -313,7 +313,7 @@ def scan(repo_path):
     """Scan repository for prompts"""
     scanner = RepositoryScanner()
     locations = scanner.scan_repository(repo_path)
-    
+
     for location in locations:
         click.echo(f"Found in {location.file_path}:{location.line_number}")
         click.echo(f"Prompt: {location.prompt_text}")
@@ -360,22 +360,22 @@ from prompt_efficiency_suite import load_config
 def setup_from_config():
     # Load configuration
     config = load_config("config.yaml")
-    
+
     # Initialize components with config
     compressor = BaseCompressor(
         model_name=config["compressor"]["model_name"]
     )
-    
+
     analyzer = PromptAnalyzer(
         model_name=config["analyzer"]["model_name"]
     )
-    
+
     budget_manager = AdaptiveBudgetManager(
         initial_budget=config["budget"]["initial_budget"],
         min_budget=config["budget"]["min_budget"],
         max_budget=config["budget"]["max_budget"]
     )
-    
+
     return compressor, analyzer, budget_manager
 ```
 
@@ -391,7 +391,7 @@ from prompt_efficiency_suite import BaseCompressor, PromptAnalyzer
 async def test_compressor():
     compressor = BaseCompressor()
     result = await compressor.compress("Test prompt")
-    
+
     assert result.compression_ratio > 0
     assert result.compressed_text != ""
     assert result.original_tokens > result.compressed_tokens
@@ -399,7 +399,7 @@ async def test_compressor():
 def test_analyzer():
     analyzer = PromptAnalyzer()
     analysis = analyzer.analyze("Test prompt")
-    
+
     assert analysis.readability_score >= 0
     assert analysis.complexity_score >= 0
     assert len(analysis.key_phrases) >= 0
@@ -407,7 +407,7 @@ def test_analyzer():
 @pytest.mark.asyncio
 async def test_budget_manager():
     budget_manager = AdaptiveBudgetManager(initial_budget=1000)
-    
+
     assert budget_manager.get_remaining_budget() == 1000
     assert budget_manager.can_allocate(500)
     assert not budget_manager.can_allocate(1500)
@@ -425,18 +425,18 @@ async def test_optimization_workflow():
     compressor = BaseCompressor()
     analyzer = PromptAnalyzer()
     tracker = MetricsTracker()
-    
+
     # Create optimizer
     optimizer = BulkOptimizer(
         compressor=compressor,
         analyzer=analyzer,
         metrics_tracker=tracker
     )
-    
+
     # Test batch processing
     prompts = ["Test prompt 1", "Test prompt 2"]
     results = await optimizer.optimize_batch(prompts)
-    
+
     assert len(results) == len(prompts)
     assert all(r["compression"].compression_ratio > 0 for r in results)
     assert all(r["analysis"].readability_score >= 0 for r in results)
@@ -457,11 +457,11 @@ def get_cached_analysis(prompt: str) -> Optional[PromptAnalysis]:
     # Check cache
     if prompt in analysis_cache:
         return analysis_cache[prompt]
-    
+
     # Perform analysis
     analyzer = PromptAnalyzer()
     analysis = analyzer.analyze(prompt)
-    
+
     # Cache result
     analysis_cache[prompt] = analysis
     return analysis
@@ -475,13 +475,13 @@ from prompt_efficiency_suite import BaseCompressor
 
 async def process_prompts_parallel(prompts: List[str]):
     compressor = BaseCompressor()
-    
+
     # Create tasks
     tasks = [
         compressor.compress(prompt)
         for prompt in prompts
     ]
-    
+
     # Process in parallel
     results = await asyncio.gather(*tasks)
     return results
@@ -489,4 +489,4 @@ async def process_prompts_parallel(prompts: List[str]):
 # Usage
 prompts = ["Prompt 1", "Prompt 2", "Prompt 3"]
 results = await process_prompts_parallel(prompts)
-``` 
+```

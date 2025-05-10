@@ -1,13 +1,15 @@
 #!/usr/bin/env python3
 
-import os
-import sys
-import subprocess
-import platform
-import json
-from pathlib import Path
 import importlib
+import json
+import os
+import platform
+import subprocess
+import sys
+from pathlib import Path
+
 import pkg_resources
+
 
 class InstallationVerifier:
     def __init__(self):
@@ -17,20 +19,15 @@ class InstallationVerifier:
             "core": [],
             "extensions": [],
             "dependencies": [],
-            "configuration": []
+            "configuration": [],
         }
-        self.results = {
-            "status": "pending",
-            "checks": {},
-            "errors": [],
-            "warnings": []
-        }
+        self.results = {"status": "pending", "checks": {}, "errors": [], "warnings": []}
 
     def check_python_version(self):
         """Verify Python version compatibility."""
         required_version = (3, 8)
-        current_version = tuple(map(int, self.python_version.split('.')))
-        
+        current_version = tuple(map(int, self.python_version.split(".")))
+
         if current_version < required_version:
             self.results["errors"].append(
                 f"Python version {self.python_version} is not supported. "
@@ -43,12 +40,9 @@ class InstallationVerifier:
         """Verify core package installation."""
         try:
             import prompt_efficiency_suite
+
             version = pkg_resources.get_distribution("prompt-efficiency-suite").version
-            self.checks["core"].append({
-                "name": "Core Package",
-                "status": "success",
-                "version": version
-            })
+            self.checks["core"].append({"name": "Core Package", "status": "success", "version": version})
             return True
         except ImportError:
             self.results["errors"].append("Core package not installed correctly.")
@@ -72,11 +66,13 @@ class InstallationVerifier:
                 extension_found = True
                 break
 
-        self.checks["extensions"].append({
-            "name": "VS Code Extension",
-            "status": "success" if extension_found else "warning",
-            "message": "Extension found" if extension_found else "Extension not found"
-        })
+        self.checks["extensions"].append(
+            {
+                "name": "VS Code Extension",
+                "status": "success" if extension_found else "warning",
+                "message": "Extension found" if extension_found else "Extension not found",
+            }
+        )
         return extension_found
 
     def check_jetbrains_plugin(self):
@@ -99,11 +95,13 @@ class InstallationVerifier:
                 plugin_found = True
                 break
 
-        self.checks["extensions"].append({
-            "name": "JetBrains Plugin",
-            "status": "success" if plugin_found else "warning",
-            "message": "Plugin found" if plugin_found else "Plugin not found"
-        })
+        self.checks["extensions"].append(
+            {
+                "name": "JetBrains Plugin",
+                "status": "success" if plugin_found else "warning",
+                "message": "Plugin found" if plugin_found else "Plugin not found",
+            }
+        )
         return plugin_found
 
     def check_dependencies(self):
@@ -114,17 +112,13 @@ class InstallationVerifier:
             "pandas",
             "scikit-learn",
             "transformers",
-            "torch"
+            "torch",
         ]
 
         for package in required_packages:
             try:
                 version = pkg_resources.get_distribution(package).version
-                self.checks["dependencies"].append({
-                    "name": package,
-                    "status": "success",
-                    "version": version
-                })
+                self.checks["dependencies"].append({"name": package, "status": "success", "version": version})
             except pkg_resources.DistributionNotFound:
                 self.results["errors"].append(f"Required package {package} not found.")
                 return False
@@ -133,30 +127,31 @@ class InstallationVerifier:
     def check_configuration(self):
         """Verify configuration files and settings."""
         config_path = os.path.expanduser("~/.prompt-efficiency/config.yaml")
-        
+
         if not os.path.exists(config_path):
             self.results["warnings"].append("Configuration file not found.")
             return False
 
         try:
             import yaml
-            with open(config_path, 'r') as f:
+
+            with open(config_path, "r") as f:
                 config = yaml.safe_load(f)
-            
+
             required_keys = ["api_key", "model", "default_settings"]
             missing_keys = [key for key in required_keys if key not in config]
-            
+
             if missing_keys:
-                self.results["errors"].append(
-                    f"Missing required configuration keys: {', '.join(missing_keys)}"
-                )
+                self.results["errors"].append(f"Missing required configuration keys: {', '.join(missing_keys)}")
                 return False
 
-            self.checks["configuration"].append({
-                "name": "Configuration",
-                "status": "success",
-                "message": "Configuration file valid"
-            })
+            self.checks["configuration"].append(
+                {
+                    "name": "Configuration",
+                    "status": "success",
+                    "message": "Configuration file valid",
+                }
+            )
             return True
         except Exception as e:
             self.results["errors"].append(f"Error reading configuration: {str(e)}")
@@ -170,7 +165,7 @@ class InstallationVerifier:
             self.check_vscode_extension,
             self.check_jetbrains_plugin,
             self.check_dependencies,
-            self.check_configuration
+            self.check_configuration,
         ]
 
         all_passed = True
@@ -184,7 +179,7 @@ class InstallationVerifier:
     def print_results(self):
         """Print verification results in a user-friendly format."""
         print("\n=== Prompt Efficiency Suite Installation Verification ===\n")
-        
+
         print(f"System: {self.system}")
         print(f"Python Version: {self.python_version}\n")
 
@@ -211,13 +206,15 @@ class InstallationVerifier:
 
         print(f"\nOverall Status: {self.results['status'].upper()}")
 
+
 def main():
     verifier = InstallationVerifier()
     results = verifier.run_checks()
     verifier.print_results()
-    
+
     # Exit with appropriate status code
     sys.exit(0 if results["status"] == "success" else 1)
 
+
 if __name__ == "__main__":
-    main() 
+    main()

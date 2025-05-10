@@ -13,4 +13,4 @@ recursive-exclude tests *.pyo
 recursive-exclude tests *.pyd
 recursive-exclude tests .pytest_cache
 recursive-exclude tests .coverage
-recursive-exclude tests htmlcov 
+recursive-exclude tests htmlcov

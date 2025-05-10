@@ -74,7 +74,7 @@ class PromptEfficiencyToolWindowPanelTest : LightPlatformTestCase() {
         // Given
         val selectedText = "Test prompt"
         val responseJson = """{"clarity": 0.8, "structure": 0.7, "complexity": 0.6}"""
-        
+
         `when`(selectionModel.selectedText).thenReturn(selectedText)
         `when`(response.isSuccessful).thenReturn(true)
         `when`(response.body()).thenReturn(responseBody)
@@ -98,7 +98,7 @@ class PromptEfficiencyToolWindowPanelTest : LightPlatformTestCase() {
         // Given
         val selectedText = "Test prompt"
         val errorMessage = "Connection failed"
-        
+
         `when`(selectionModel.selectedText).thenReturn(selectedText)
         `when`(client.newCall(any())).thenReturn(call)
         `when`(call.enqueue(any())).thenAnswer { invocation ->
@@ -119,7 +119,7 @@ class PromptEfficiencyToolWindowPanelTest : LightPlatformTestCase() {
         // Given
         val selectedText = "Test prompt"
         val responseJson = """{"optimized_prompt": "Optimized test prompt"}"""
-        
+
         `when`(selectionModel.selectedText).thenReturn(selectedText)
         `when`(response.isSuccessful).thenReturn(true)
         `when`(response.body()).thenReturn(responseBody)
@@ -144,7 +144,7 @@ class PromptEfficiencyToolWindowPanelTest : LightPlatformTestCase() {
         // Given
         val selectedText = "Test prompt"
         val responseJson = """{"total_cost": 0.5, "currency": "USD"}"""
-        
+
         `when`(selectionModel.selectedText).thenReturn(selectedText)
         `when`(response.isSuccessful).thenReturn(true)
         `when`(response.body()).thenReturn(responseBody)
@@ -167,7 +167,7 @@ class PromptEfficiencyToolWindowPanelTest : LightPlatformTestCase() {
     fun `test scan repository success`() {
         // Given
         val responseJson = """{"files_scanned": 2, "prompts_found": 2}"""
-        
+
         `when`(project.basePath).thenReturn("/test/path")
         `when`(response.isSuccessful).thenReturn(true)
         `when`(response.body()).thenReturn(responseBody)
@@ -191,7 +191,7 @@ class PromptEfficiencyToolWindowPanelTest : LightPlatformTestCase() {
         // Given
         val selectedText = "Test prompt"
         val responseJson = """{"translated_prompt": "Translated test prompt"}"""
-        
+
         `when`(selectionModel.selectedText).thenReturn(selectedText)
         `when`(response.isSuccessful).thenReturn(true)
         `when`(response.body()).thenReturn(responseBody)
@@ -371,4 +371,4 @@ class PromptEfficiencyToolWindowPanelTest : LightPlatformTestCase() {
         }
         throw NoSuchElementException("Component of type ${T::class.java} not found")
     }
-} 
+}
