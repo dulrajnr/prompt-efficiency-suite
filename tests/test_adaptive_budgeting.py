@@ -185,14 +185,7 @@ def test_export_alerts(budgeting, temp_config_file, tempfile):
         alerts_data = json.load(f)
         assert len(alerts_data) > 0
         assert all(
-            key in alerts_data[0]
-            for key in [
-                "timestamp",
-                "alert_type",
-                "message",
-                "threshold",
-                "current_value",
-            ]
+            key in alerts_data[0] for key in ["timestamp", "alert_type", "message", "threshold", "current_value"]
         )
 
 

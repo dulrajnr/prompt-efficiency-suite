@@ -61,10 +61,7 @@ class PromptOptimizer:
             improvement_metrics=improvement_metrics,
             token_reduction=token_reduction,
             execution_time=1.0,  # Placeholder value
-            metadata={
-                "optimization_params": params,
-                "techniques_applied": list(self.patterns.keys()),
-            },
+            metadata={"optimization_params": params, "techniques_applied": list(self.patterns.keys())},
         )
 
         self.optimization_history.append(result)

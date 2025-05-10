@@ -81,8 +81,7 @@ def test_validate_response_tokens(tester, sample_test_case):
     # Test token count
     assert tester._validate_response("4", sample_test_case)  # 1 token
     assert not tester._validate_response(
-        "The answer is four and this is a very long response that exceeds the token limit",
-        sample_test_case,
+        "The answer is four and this is a very long response that exceeds the token limit", sample_test_case
     )
 
 
@@ -106,10 +105,7 @@ def test_retry_mechanism(tester, sample_test_case):
     """Test retry mechanism for failed tests."""
     # Create a test case that will fail
     failing_case = TestCase(
-        name="Failing Test",
-        prompt="This will fail",
-        expected_response="This should never match",
-        timeout=1.0,
+        name="Failing Test", prompt="This will fail", expected_response="This should never match", timeout=1.0
     )
 
     result = tester.run_test_case(test_case=failing_case, model=ModelType.GPT4, max_retries=3)
@@ -121,11 +117,7 @@ def test_retry_mechanism(tester, sample_test_case):
 def test_timeout_handling(tester):
     """Test timeout handling."""
     # Create a test case with very short timeout
-    timeout_case = TestCase(
-        name="Timeout Test",
-        prompt="This should timeout",
-        timeout=0.001,  # Very short timeout
-    )
+    timeout_case = TestCase(name="Timeout Test", prompt="This should timeout", timeout=0.001)  # Very short timeout
 
     result = tester.run_test_case(test_case=timeout_case, model=ModelType.GPT4)
 
@@ -148,19 +140,11 @@ def test_metadata_handling(tester):
 def test_multiple_test_cases(tester):
     """Test running multiple test cases in a suite."""
     test_cases = [
-        TestCase(
-            name=f"Test Case {i}",
-            prompt=f"Test prompt {i}",
-            expected_response=f"Response {i}",
-        )
-        for i in range(3)
+        TestCase(name=f"Test Case {i}", prompt=f"Test prompt {i}", expected_response=f"Response {i}") for i in range(3)
     ]
 
     test_suite = TestSuite(
-        name="Multiple Test Suite",
-        description="Test multiple cases",
-        test_cases=test_cases,
-        model=ModelType.GPT4,
+        name="Multiple Test Suite", description="Test multiple cases", test_cases=test_cases, model=ModelType.GPT4
     )
 
     results = tester.run_test_suite(test_suite)

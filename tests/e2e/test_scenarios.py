@@ -64,11 +64,7 @@ const prompt3 = `Implement a binary search tree in JavaScript`;
     def test_installation(self):
         """Test complete installation process."""
         # Test pip installation
-        result = subprocess.run(
-            ["pip", "install", "prompt-efficiency-suite"],
-            capture_output=True,
-            text=True,
-        )
+        result = subprocess.run(["pip", "install", "prompt-efficiency-suite"], capture_output=True, text=True)
         self.assertEqual(result.returncode, 0, "Pip installation failed")
 
         # Test verification
@@ -79,11 +75,7 @@ const prompt3 = `Implement a binary search tree in JavaScript`;
         """Test prompt analysis features."""
         # Test single prompt analysis
         result = subprocess.run(
-            [
-                "prompt-efficiency",
-                "analyze",
-                "Write a function to calculate Fibonacci numbers",
-            ],
+            ["prompt-efficiency", "analyze", "Write a function to calculate Fibonacci numbers"],
             capture_output=True,
             text=True,
         )
@@ -91,11 +83,7 @@ const prompt3 = `Implement a binary search tree in JavaScript`;
 
         # Test batch analysis
         result = subprocess.run(
-            [
-                "prompt-efficiency",
-                "analyze-batch",
-                str(self.test_dir / "test_prompts.py"),
-            ],
+            ["prompt-efficiency", "analyze-batch", str(self.test_dir / "test_prompts.py")],
             capture_output=True,
             text=True,
         )
@@ -105,11 +93,7 @@ const prompt3 = `Implement a binary search tree in JavaScript`;
         """Test prompt optimization features."""
         # Test single prompt optimization
         result = subprocess.run(
-            [
-                "prompt-efficiency",
-                "optimize",
-                "Write a function to calculate Fibonacci numbers",
-            ],
+            ["prompt-efficiency", "optimize", "Write a function to calculate Fibonacci numbers"],
             capture_output=True,
             text=True,
         )
@@ -117,11 +101,7 @@ const prompt3 = `Implement a binary search tree in JavaScript`;
 
         # Test batch optimization
         result = subprocess.run(
-            [
-                "prompt-efficiency",
-                "optimize-batch",
-                str(self.test_dir / "test_prompts.py"),
-            ],
+            ["prompt-efficiency", "optimize-batch", str(self.test_dir / "test_prompts.py")],
             capture_output=True,
             text=True,
         )
@@ -130,33 +110,21 @@ const prompt3 = `Implement a binary search tree in JavaScript`;
     def test_repository_scanning(self):
         """Test repository scanning features."""
         # Test repository scan
-        result = subprocess.run(
-            ["prompt-efficiency", "scan", str(self.test_dir)],
-            capture_output=True,
-            text=True,
-        )
+        result = subprocess.run(["prompt-efficiency", "scan", str(self.test_dir)], capture_output=True, text=True)
         self.assertEqual(result.returncode, 0, "Repository scanning failed")
 
     def test_cost_management(self):
         """Test cost management features."""
         # Test cost estimation
         result = subprocess.run(
-            [
-                "prompt-efficiency",
-                "estimate-cost",
-                str(self.test_dir / "test_prompts.py"),
-            ],
+            ["prompt-efficiency", "estimate-cost", str(self.test_dir / "test_prompts.py")],
             capture_output=True,
             text=True,
         )
         self.assertEqual(result.returncode, 0, "Cost estimation failed")
 
         # Test budget setting
-        result = subprocess.run(
-            ["prompt-efficiency", "budget", "--set", "1000"],
-            capture_output=True,
-            text=True,
-        )
+        result = subprocess.run(["prompt-efficiency", "budget", "--set", "1000"], capture_output=True, text=True)
         self.assertEqual(result.returncode, 0, "Budget setting failed")
 
     def test_ide_integration(self):
@@ -168,9 +136,7 @@ const prompt3 = `Implement a binary search tree in JavaScript`;
         # Test JetBrains plugin
         if os.path.exists(os.path.expanduser("~/Library/Application Support/JetBrains")):
             result = subprocess.run(
-                ["ls", os.path.expanduser("~/Library/Application Support/JetBrains")],
-                capture_output=True,
-                text=True,
+                ["ls", os.path.expanduser("~/Library/Application Support/JetBrains")], capture_output=True, text=True
             )
             self.assertIn("prompt-efficiency-suite", result.stdout, "JetBrains plugin not found")
 
@@ -200,11 +166,7 @@ const prompt3 = `Implement a binary search tree in JavaScript`;
         with open(config_path, "w") as f:
             yaml.dump(config, f)
 
-        result = subprocess.run(
-            ["prompt-efficiency", "analyze", "Test prompt"],
-            capture_output=True,
-            text=True,
-        )
+        result = subprocess.run(["prompt-efficiency", "analyze", "Test prompt"], capture_output=True, text=True)
         self.assertNotEqual(result.returncode, 0, "Invalid API key not detected")
 
         # Restore valid API key
@@ -218,11 +180,7 @@ const prompt3 = `Implement a binary search tree in JavaScript`;
 
         # Run performance test
         result = subprocess.run(
-            [
-                "prompt-efficiency",
-                "analyze-batch",
-                str(self.test_dir / "test_prompts.py"),
-            ],
+            ["prompt-efficiency", "analyze-batch", str(self.test_dir / "test_prompts.py")],
             capture_output=True,
             text=True,
         )

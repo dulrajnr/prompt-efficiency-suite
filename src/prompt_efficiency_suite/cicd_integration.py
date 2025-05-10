@@ -218,11 +218,7 @@ class CICDIntegration:
 
     def _check_prompt_quality(self, prompt_data: Dict[str, Any]) -> Dict[str, float]:
         """Run quality checks on a prompt."""
-        metrics = {
-            "clarity_score": 0.0,
-            "completeness_score": 0.0,
-            "consistency_score": 0.0,
-        }
+        metrics = {"clarity_score": 0.0, "completeness_score": 0.0, "consistency_score": 0.0}
 
         # Implement quality checks here
         # This is a placeholder implementation

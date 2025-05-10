@@ -46,10 +46,7 @@ def test_translate_endpoint_invalid_model():
 
 def test_compare_endpoint():
     """Test the /compare endpoint."""
-    response = client.post(
-        "/compare",
-        json={"prompt": "This is a test prompt.", "models": ["gpt-4", "claude-3"]},
-    )
+    response = client.post("/compare", json={"prompt": "This is a test prompt.", "models": ["gpt-4", "claude-3"]})
 
     assert response.status_code == 200
     data = response.json()
@@ -67,10 +64,7 @@ def test_compare_endpoint():
 
 def test_compare_endpoint_invalid_model():
     """Test the /compare endpoint with invalid model."""
-    response = client.post(
-        "/compare",
-        json={"prompt": "This is a test prompt.", "models": ["invalid-model"]},
-    )
+    response = client.post("/compare", json={"prompt": "This is a test prompt.", "models": ["invalid-model"]})
 
     assert response.status_code == 400
     assert "Invalid model type" in response.json()["detail"]

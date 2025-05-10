@@ -66,9 +66,7 @@ async def optimize_prompt(request: OptimizeRequest) -> OptimizeResponse:
     try:
         optimizer = PromptOptimizer()
         result = optimizer.optimize(
-            request.prompt,
-            optimization_targets=request.optimization_targets,
-            options=request.options,
+            request.prompt, optimization_targets=request.optimization_targets, options=request.options
         )
         return OptimizeResponse(
             optimized_prompt=result.optimized_prompt,
@@ -81,9 +79,7 @@ async def optimize_prompt(request: OptimizeRequest) -> OptimizeResponse:
 
 
 @router.post("/optimize/batch", response_model=BatchOptimizeResponse)
-async def optimize_prompts_batch(
-    request: BatchOptimizeRequest,
-) -> BatchOptimizeResponse:
+async def optimize_prompts_batch(request: BatchOptimizeRequest) -> BatchOptimizeResponse:
     """Optimize multiple prompts in batch.
 
     Args:
@@ -100,9 +96,7 @@ async def optimize_prompts_batch(
 
         for prompt in request.prompts:
             result = optimizer.optimize(
-                prompt,
-                optimization_targets=request.optimization_targets,
-                options=request.options,
+                prompt, optimization_targets=request.optimization_targets, options=request.options
             )
             results.append(
                 OptimizeResponse(

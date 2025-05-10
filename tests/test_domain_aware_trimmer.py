@@ -56,11 +56,7 @@ def test_add_domain_terms(trimmer):
 
 def test_set_tokenization_rules(trimmer):
     """Test setting tokenization rules."""
-    rules = {
-        "preserve_pos": ["NOUN", "VERB"],
-        "min_length": 3,
-        "remove_stop_words": True,
-    }
+    rules = {"preserve_pos": ["NOUN", "VERB"], "min_length": 3, "remove_stop_words": True}
     trimmer.set_tokenization_rules("api", rules)
     assert "api" in trimmer.tokenization_rules
     assert trimmer.tokenization_rules["api"] == rules

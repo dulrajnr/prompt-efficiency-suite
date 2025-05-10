@@ -36,12 +36,7 @@ def auth_headers(token):
 @pytest.fixture
 def sample_domain_dict():
     """Create a sample domain dictionary."""
-    return {
-        "terms": ["test", "domain"],
-        "compound_terms": [],
-        "preserve_patterns": [],
-        "remove_patterns": [],
-    }
+    return {"terms": ["test", "domain"], "compound_terms": [], "preserve_patterns": [], "remove_patterns": []}
 
 
 def test_login(client):
@@ -69,11 +64,7 @@ def test_trim_text(client, auth_headers, sample_domain_dict):
     response = client.post(
         "/trim",
         headers=auth_headers,
-        json={
-            "text": "This is a test text with some domain terms.",
-            "domain": domain_path,
-            "preserve_ratio": 0.8,
-        },
+        json={"text": "This is a test text with some domain terms.", "domain": domain_path, "preserve_ratio": 0.8},
     )
     assert response.status_code == 200
     data = response.json()

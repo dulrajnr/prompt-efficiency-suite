@@ -32,10 +32,7 @@ class BulkOptimizer:
         self.executor = ThreadPoolExecutor(max_workers=max_workers)
 
     async def optimize_batch(
-        self,
-        prompts: List[str],
-        target_ratio: Optional[float] = None,
-        min_quality_score: float = 0.7,
+        self, prompts: List[str], target_ratio: Optional[float] = None, min_quality_score: float = 0.7
     ) -> List[Dict[str, Union[CompressionResult, PromptAnalysis]]]:
         """Optimize a batch of prompts.
 
@@ -89,11 +86,7 @@ class BulkOptimizer:
 
             # Return results if quality threshold is met
             if analysis.quality_score >= min_quality_score:
-                return {
-                    "compression": compression_result,
-                    "analysis": analysis,
-                    "metrics": metrics,
-                }
+                return {"compression": compression_result, "analysis": analysis, "metrics": metrics}
             return None
 
         except Exception as e:

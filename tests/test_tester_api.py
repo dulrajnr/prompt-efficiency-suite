@@ -34,9 +34,7 @@ def test_run_test_case():
 def test_run_test_case_invalid_model():
     """Test the /test-case endpoint with invalid model."""
     response = client.post(
-        "/test-case",
-        json={"name": "Test Case 1", "prompt": "Test prompt"},
-        params={"model": "invalid-model"},
+        "/test-case", json={"name": "Test Case 1", "prompt": "Test prompt"}, params={"model": "invalid-model"}
     )
 
     assert response.status_code == 400
@@ -51,16 +49,8 @@ def test_run_test_suite():
             "name": "Math Test Suite",
             "description": "Test basic math operations",
             "test_cases": [
-                {
-                    "name": "Test Case 1",
-                    "prompt": "What is 2+2?",
-                    "expected_response": "4",
-                },
-                {
-                    "name": "Test Case 2",
-                    "prompt": "What is 3+3?",
-                    "expected_response": "6",
-                },
+                {"name": "Test Case 1", "prompt": "What is 2+2?", "expected_response": "4"},
+                {"name": "Test Case 2", "prompt": "What is 3+3?", "expected_response": "6"},
             ],
             "model": "gpt-4",
             "max_retries": 3,
@@ -98,11 +88,7 @@ def test_run_test_suite_invalid_model():
 def test_get_test_history():
     """Test the /history endpoint."""
     # First run a test to generate history
-    client.post(
-        "/test-case",
-        json={"name": "Test Case 1", "prompt": "Test prompt"},
-        params={"model": "gpt-4"},
-    )
+    client.post("/test-case", json={"name": "Test Case 1", "prompt": "Test prompt"}, params={"model": "gpt-4"})
 
     # Then get history
     response = client.get("/history")
@@ -123,11 +109,7 @@ def test_get_test_history():
 def test_clear_test_history():
     """Test the /history endpoint DELETE method."""
     # First run a test to generate history
-    client.post(
-        "/test-case",
-        json={"name": "Test Case 1", "prompt": "Test prompt"},
-        params={"model": "gpt-4"},
-    )
+    client.post("/test-case", json={"name": "Test Case 1", "prompt": "Test prompt"}, params={"model": "gpt-4"})
 
     # Clear history
     response = client.delete("/history")
@@ -144,11 +126,7 @@ def test_test_case_metadata():
     """Test metadata handling in test cases."""
     response = client.post(
         "/test-case",
-        json={
-            "name": "Test Case 1",
-            "prompt": "Test prompt",
-            "metadata": {"key": "value", "number": 42},
-        },
+        json={"name": "Test Case 1", "prompt": "Test prompt", "metadata": {"key": "value", "number": 42}},
         params={"model": "gpt-4"},
     )
 

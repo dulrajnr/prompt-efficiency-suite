@@ -204,11 +204,7 @@ class PromptAnalyzer:
             consistency_score=consistency_score,
             efficiency_score=efficiency_score,
             complexity_score=complexity_score,
-            metadata={
-                "analysis_params": params,
-                "prompt_length": len(prompt),
-                "word_count": len(prompt.split()),
-            },
+            metadata={"analysis_params": params, "prompt_length": len(prompt), "word_count": len(prompt.split())},
         )
 
     def _calculate_clarity_score(self, prompt: str) -> float:

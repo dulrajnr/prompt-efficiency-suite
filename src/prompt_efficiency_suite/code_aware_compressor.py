@@ -77,10 +77,7 @@ class CodeAwareCompressor:
             compression_ratio=compression_ratio,
             preserved_code_blocks=code_blocks,
             removed_tokens=removed_tokens,
-            metadata={
-                "compression_params": params,
-                "code_blocks_count": len(code_blocks),
-            },
+            metadata={"compression_params": params, "code_blocks_count": len(code_blocks)},
         )
 
         self.compression_history.append(result)
@@ -107,15 +104,9 @@ class CodeAwareCompressor:
     def _load_code_patterns(self) -> Dict[str, Any]:
         """Load code pattern configurations."""
         return {
-            "block": {
-                "pattern": r"```[\s\S]*?```",
-                "description": "Code block with language marker",
-            },
+            "block": {"pattern": r"```[\s\S]*?```", "description": "Code block with language marker"},
             "inline": {"pattern": r"`[^`]+`", "description": "Inline code"},
-            "indented": {
-                "pattern": r"(?m)^( {4}|\t).*$",
-                "description": "Indented code block",
-            },
+            "indented": {"pattern": r"(?m)^( {4}|\t).*$", "description": "Indented code block"},
         }
 
     def _extract_code_blocks(self, text: str) -> List[str]:
@@ -137,14 +128,7 @@ class CodeAwareCompressor:
         text = text.strip()
 
         # Remove common filler words
-        filler_words = [
-            r"\bvery\b",
-            r"\breally\b",
-            r"\bquite\b",
-            r"\bjust\b",
-            r"\bsimply\b",
-            r"\bbasically\b",
-        ]
+        filler_words = [r"\bvery\b", r"\breally\b", r"\bquite\b", r"\bjust\b", r"\bsimply\b", r"\bbasically\b"]
         for word in filler_words:
             text = re.sub(word, "", text, flags=re.IGNORECASE)
 

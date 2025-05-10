@@ -100,18 +100,8 @@ def test_metrics_calculation(optimizer):
     """Test metrics calculation from test results."""
     # Create mock test results
     results = [
-        {
-            "success": True,
-            "response": "4",
-            "execution_time": 0.5,
-            "token_usage": {"prompt": 10, "completion": 5},
-        },
-        {
-            "success": False,
-            "response": "5",
-            "execution_time": 0.6,
-            "token_usage": {"prompt": 10, "completion": 5},
-        },
+        {"success": True, "response": "4", "execution_time": 0.5, "token_usage": {"prompt": 10, "completion": 5}},
+        {"success": False, "response": "5", "execution_time": 0.6, "token_usage": {"prompt": 10, "completion": 5}},
     ]
 
     metrics = optimizer._calculate_metrics(results)
@@ -179,9 +169,7 @@ def test_min_improvement(optimizer, sample_test_case):
     config = OptimizationConfig(target_model=ModelType.GPT4, min_improvement=0.2)
 
     result = optimizer.optimize_prompt(
-        prompt="This is a prompt that should show significant improvement",
-        test_cases=[sample_test_case],
-        config=config,
+        prompt="This is a prompt that should show significant improvement", test_cases=[sample_test_case], config=config
     )
 
     assert result.improvement_percentage >= 0.2

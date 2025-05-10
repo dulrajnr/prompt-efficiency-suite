@@ -47,11 +47,7 @@ class VSCodeExtensionTest(unittest.TestCase):
     def test_quick_fixes(self):
         """Test if quick fixes are available."""
         # Simulate quick fix request
-        result = subprocess.run(
-            ["code", "--list-extensions", "--show-versions"],
-            capture_output=True,
-            text=True,
-        )
+        result = subprocess.run(["code", "--list-extensions", "--show-versions"], capture_output=True, text=True)
         self.assertIn(self.extension_id, result.stdout)
 
     def test_configuration(self):
@@ -65,21 +61,13 @@ class VSCodeExtensionTest(unittest.TestCase):
     def test_analysis_features(self):
         """Test prompt analysis features."""
         # Test file analysis
-        result = subprocess.run(
-            ["code", "--list-extensions", "--show-versions"],
-            capture_output=True,
-            text=True,
-        )
+        result = subprocess.run(["code", "--list-extensions", "--show-versions"], capture_output=True, text=True)
         self.assertIn(self.extension_id, result.stdout)
 
     def test_optimization_features(self):
         """Test prompt optimization features."""
         # Test optimization command
-        result = subprocess.run(
-            ["code", "--list-extensions", "--show-versions"],
-            capture_output=True,
-            text=True,
-        )
+        result = subprocess.run(["code", "--list-extensions", "--show-versions"], capture_output=True, text=True)
         self.assertIn(self.extension_id, result.stdout)
 
     def test_error_handling(self):
@@ -89,11 +77,7 @@ class VSCodeExtensionTest(unittest.TestCase):
             f.write('prompt = """Invalid prompt"""')
 
         # Check error handling
-        result = subprocess.run(
-            ["code", "--list-extensions", "--show-versions"],
-            capture_output=True,
-            text=True,
-        )
+        result = subprocess.run(["code", "--list-extensions", "--show-versions"], capture_output=True, text=True)
         self.assertIn(self.extension_id, result.stdout)
 
     def test_performance(self):

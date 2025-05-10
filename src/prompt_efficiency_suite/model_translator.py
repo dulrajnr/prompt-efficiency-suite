@@ -74,9 +74,7 @@ class ModelTranslator:
         return {
             ModelType.OPENAI: ModelConfig(model_type=ModelType.OPENAI, max_tokens=4096, preferred_style="balanced"),
             ModelType.ANTHROPIC: ModelConfig(
-                model_type=ModelType.ANTHROPIC,
-                max_tokens=8192,
-                preferred_style="concise",
+                model_type=ModelType.ANTHROPIC, max_tokens=8192, preferred_style="concise"
             ),
             ModelType.COHERE: ModelConfig(model_type=ModelType.COHERE, max_tokens=2048, preferred_style="concise"),
             ModelType.CUSTOM: ModelConfig(model_type=ModelType.CUSTOM, max_tokens=4096, preferred_style="balanced"),
@@ -108,11 +106,7 @@ class ModelTranslator:
                 "add_context": True,
                 "expand_acronyms": True,
             },
-            "balanced": {
-                "remove_redundant": True,
-                "simplify_phrases": False,
-                "preserve_context": True,
-            },
+            "balanced": {"remove_redundant": True, "simplify_phrases": False, "preserve_context": True},
         }
 
     def translate(
@@ -181,10 +175,7 @@ class ModelTranslator:
             key = f"{result.source_format.value}->{result.target_format.value}"
             format_conversions[key] += 1
 
-        return {
-            "total_translations": len(self.translation_history),
-            "format_conversions": dict(format_conversions),
-        }
+        return {"total_translations": len(self.translation_history), "format_conversions": dict(format_conversions)}
 
     def export_templates(self, output_path: Path) -> None:
         """Export format templates to a file.
@@ -228,21 +219,13 @@ class ModelTranslator:
                 "system": "system",
                 "user": "user",
                 "assistant": "assistant",
-                "format": {
-                    "system": "{content}",
-                    "user": "User: {content}",
-                    "assistant": "Assistant: {content}",
-                },
+                "format": {"system": "{content}", "user": "User: {content}", "assistant": "Assistant: {content}"},
             },
             ModelType.CUSTOM: {
                 "system": "system",
                 "user": "user",
                 "assistant": "assistant",
-                "format": {
-                    "system": "{content}",
-                    "user": "{content}",
-                    "assistant": "{content}",
-                },
+                "format": {"system": "{content}", "user": "{content}", "assistant": "{content}"},
             },
         }
 

@@ -164,11 +164,7 @@ class DomainAwareTrimmer:
         return terms
 
     def _apply_domain_rules(
-        self,
-        tokens: List[str],
-        domain: str,
-        domain_terms: Set[str],
-        preserve_ratio: float,
+        self, tokens: List[str], domain: str, domain_terms: Set[str], preserve_ratio: float
     ) -> List[str]:
         """Apply domain-specific rules to trim the text."""
         rules = self.tokenization_rules.get(domain, {})

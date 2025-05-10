@@ -13,9 +13,7 @@ ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
 
 app = FastAPI(
-    title="Prompt Efficiency Suite API",
-    description="API for optimizing and managing prompts",
-    version="1.0.0",
+    title="Prompt Efficiency Suite API", description="API for optimizing and managing prompts", version="1.0.0"
 )
 
 # Configure CORS

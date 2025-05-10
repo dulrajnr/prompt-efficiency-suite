@@ -180,10 +180,7 @@ def test_analyze_with_metadata():
     """Test analysis with metadata."""
     metadata = {"key": "value", "number": 42, "tags": ["test", "analysis"]}
 
-    response = client.post(
-        "/analyze",
-        json={"prompt": "Test prompt", "model": "gpt-4", "metadata": metadata},
-    )
+    response = client.post("/analyze", json={"prompt": "Test prompt", "model": "gpt-4", "metadata": metadata})
 
     assert response.status_code == 200
     data = response.json()
@@ -301,12 +298,7 @@ def test_metrics_endpoint_invalid_model():
 def test_suggestions_endpoint():
     """Test the /suggestions endpoint."""
     response = client.get(
-        "/suggestions",
-        params={
-            "prompt": "Do something about this.",
-            "model": "gpt-4",
-            "target_complexity": "medium",
-        },
+        "/suggestions", params={"prompt": "Do something about this.", "model": "gpt-4", "target_complexity": "medium"}
     )
 
     assert response.status_code == 200

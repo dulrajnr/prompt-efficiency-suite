@@ -332,10 +332,7 @@ class MacroSuggester:
         return matches
 
     def _generate_macro_suggestions(
-        self,
-        prompt: str,
-        matched_patterns: List[Dict[str, Any]],
-        params: Dict[str, Any],
+        self, prompt: str, matched_patterns: List[Dict[str, Any]], params: Dict[str, Any]
     ) -> List[Dict[str, Any]]:
         """Generate macro suggestions based on matched patterns.
 

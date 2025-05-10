@@ -104,8 +104,7 @@ class AdaptiveBudgetManager:
         if self.current_allocation:
             self.current_allocation.used_budget += metrics.token_count
             self.current_allocation.remaining_budget = max(
-                0,
-                self.current_allocation.total_budget - self.current_allocation.used_budget,
+                0, self.current_allocation.total_budget - self.current_allocation.used_budget
             )
 
     def get_remaining_budget(self) -> int:

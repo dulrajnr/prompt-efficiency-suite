@@ -108,12 +108,7 @@ def test_model_selection_with_available_models(orchestrator):
 def test_performance_metrics_creation():
     """Test creation of performance metrics."""
     metrics = PerformanceMetrics(
-        latency=100.0,
-        tokens_per_second=500.0,
-        cost=0.001,
-        success_rate=1.0,
-        error_rate=0.0,
-        timestamp=datetime.now(),
+        latency=100.0, tokens_per_second=500.0, cost=0.001, success_rate=1.0, error_rate=0.0, timestamp=datetime.now()
     )
 
     assert metrics.latency == 100.0
@@ -127,11 +122,7 @@ def test_performance_metrics_creation():
 def test_model_performance_creation():
     """Test creation of model performance object."""
     performance = ModelPerformance(
-        metrics=[],
-        average_latency=0.0,
-        average_cost=0.0,
-        success_rate=1.0,
-        last_updated=datetime.now(),
+        metrics=[], average_latency=0.0, average_cost=0.0, success_rate=1.0, last_updated=datetime.now()
     )
 
     assert len(performance.metrics) == 0

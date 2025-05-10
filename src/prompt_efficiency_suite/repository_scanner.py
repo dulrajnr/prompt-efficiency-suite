@@ -227,9 +227,7 @@ class RepositoryScanner:
         }
 
     def scan_repository(
-        self,
-        repository_path: Union[str, Path],
-        scan_params: Optional[Dict[str, Any]] = None,
+        self, repository_path: Union[str, Path], scan_params: Optional[Dict[str, Any]] = None
     ) -> ScanResult:
         """Scan a repository for prompts.
 
@@ -248,11 +246,7 @@ class RepositoryScanner:
 
         # Scan files for prompts
         found_prompts = []
-        file_stats = {
-            "total_files": len(files_to_scan),
-            "scanned_files": 0,
-            "files_with_prompts": 0,
-        }
+        file_stats = {"total_files": len(files_to_scan), "scanned_files": 0, "files_with_prompts": 0}
 
         with ThreadPoolExecutor(max_workers=params.get("max_workers", 4)) as executor:
             futures = [executor.submit(self._scan_file, file_path, params) for file_path in files_to_scan]

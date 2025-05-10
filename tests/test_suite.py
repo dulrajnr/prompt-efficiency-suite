@@ -21,10 +21,7 @@ def sample_prompts():
 
 @pytest.fixture
 def sample_image_prompt():
-    return {
-        "text": "Describe this image of a sunset",
-        "image_path": "tests/data/sample_image.jpg",
-    }
+    return {"text": "Describe this image of a sunset", "image_path": "tests/data/sample_image.jpg"}
 
 
 def test_batch_optimizer(sample_prompts):

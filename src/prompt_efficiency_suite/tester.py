@@ -85,10 +85,7 @@ class PromptTester:
         return results
 
     def create_test_suite(
-        self,
-        name: str,
-        test_cases: List[Dict[str, Any]],
-        metadata: Optional[Dict[str, Any]] = None,
+        self, name: str, test_cases: List[Dict[str, Any]], metadata: Optional[Dict[str, Any]] = None
     ) -> TestSuite:
         """Create a test suite from test cases.
 
@@ -125,11 +122,7 @@ class PromptTester:
         with open(file_path, "r", encoding="utf-8") as f:
             data = json.load(f)
 
-        return self.create_test_suite(
-            name=data["name"],
-            test_cases=data["test_cases"],
-            metadata=data.get("metadata"),
-        )
+        return self.create_test_suite(name=data["name"], test_cases=data["test_cases"], metadata=data.get("metadata"))
 
     def save_test_suite(self, test_suite: TestSuite, file_path: Path) -> None:
         """Save a test suite to a file.

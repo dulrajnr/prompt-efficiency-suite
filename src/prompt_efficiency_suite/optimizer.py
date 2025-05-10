@@ -324,12 +324,7 @@ class Optimizer:
             json.dump(results_data, f, indent=2)
 
     def _combine_optimizations(
-        self,
-        prompt: str,
-        analysis_result: Any,
-        compression_result: Any,
-        macro_result: Any,
-        params: Dict[str, Any],
+        self, prompt: str, analysis_result: Any, compression_result: Any, macro_result: Any, params: Dict[str, Any]
     ) -> str:
         """Combine different optimizations.
 

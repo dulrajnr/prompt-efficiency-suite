@@ -51,10 +51,7 @@ def test_optimize_endpoint(client, sample_prompt):
 
 def test_estimate_cost_endpoint(client, sample_prompt):
     """Test the estimate_cost endpoint."""
-    response = client.post(
-        "/api/v1/estimate-cost",
-        json={"prompt": sample_prompt, "model": "gpt-4", "currency": "USD"},
-    )
+    response = client.post("/api/v1/estimate-cost", json={"prompt": sample_prompt, "model": "gpt-4", "currency": "USD"})
     assert response.status_code == 200
     data = response.json()
     assert "input_tokens" in data
@@ -72,11 +69,7 @@ def test_scan_repository_endpoint(client, tmp_path):
 
     response = client.post(
         "/api/v1/scan-repository",
-        json={
-            "directory": str(tmp_path),
-            "include_patterns": ["*.txt"],
-            "exclude_patterns": ["*.py"],
-        },
+        json={"directory": str(tmp_path), "include_patterns": ["*.txt"], "exclude_patterns": ["*.py"]},
     )
     assert response.status_code == 200
     data = response.json()
@@ -88,12 +81,7 @@ def test_scan_repository_endpoint(client, tmp_path):
 def test_translate_endpoint(client, sample_prompt):
     """Test the translate endpoint."""
     response = client.post(
-        "/api/v1/translate",
-        json={
-            "prompt": sample_prompt,
-            "source_model": "gpt-4",
-            "target_model": "gpt-3.5-turbo",
-        },
+        "/api/v1/translate", json={"prompt": sample_prompt, "source_model": "gpt-4", "target_model": "gpt-3.5-turbo"}
     )
     assert response.status_code == 200
     data = response.json()
@@ -156,16 +144,12 @@ def test_authentication(client, sample_prompt):
 
     # Test with invalid token
     response = client.post(
-        "/api/v1/analyze",
-        json={"prompt": sample_prompt},
-        headers={"Authorization": "Bearer invalid_token"},
+        "/api/v1/analyze", json={"prompt": sample_prompt}, headers={"Authorization": "Bearer invalid_token"}
     )
     assert response.status_code == 401
 
     # Test with valid token
     response = client.post(
-        "/api/v1/analyze",
-        json={"prompt": sample_prompt},
-        headers={"Authorization": "Bearer test_token"},
+        "/api/v1/analyze", json={"prompt": sample_prompt}, headers={"Authorization": "Bearer test_token"}
     )
     assert response.status_code == 200

@@ -27,9 +27,7 @@ class TestAllAccessPoints(unittest.TestCase):
 
         # Test benchmark creation
         result = subprocess.run(
-            ["prompt-efficiency", "benchmark", "create-task", "TEST_TASK", "Test Task"],
-            capture_output=True,
-            text=True,
+            ["prompt-efficiency", "benchmark", "create-task", "TEST_TASK", "Test Task"], capture_output=True, text=True
         )
         self.assertEqual(result.returncode, 0)
         task_id = json.loads(result.stdout)["task_id"]
@@ -71,11 +69,7 @@ class TestAllAccessPoints(unittest.TestCase):
         self.assertIn("quality_score", analysis_result)
 
         # Test trimming
-        trimmed = trimmer.trim(
-            text=self.test_prompt,
-            preserve_ratio=0.8,
-            domain_terms=["assistant", "help"],
-        )
+        trimmed = trimmer.trim(text=self.test_prompt, preserve_ratio=0.8, domain_terms=["assistant", "help"])
         self.assertIsNotNone(trimmed)
         self.assertLess(len(trimmed), len(self.test_prompt))
 

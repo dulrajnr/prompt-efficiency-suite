@@ -125,11 +125,7 @@ class MultimodalCompressor:
     def _load_media_patterns(self) -> Dict[str, Dict[str, Any]]:
         """Load media pattern configurations."""
         return {
-            "image": {
-                "pattern": r"!\[([^\]]*)\]\(([^)]+)\)",
-                "description": "Markdown image",
-                "type": "image",
-            },
+            "image": {"pattern": r"!\[([^\]]*)\]\(([^)]+)\)", "description": "Markdown image", "type": "image"},
             "base64_image": {
                 "pattern": r"data:image/[^;]+;base64,([a-zA-Z0-9+/=]+)",
                 "description": "Base64 encoded image",
@@ -189,14 +185,7 @@ class MultimodalCompressor:
         text = text.strip()
 
         # Remove common filler words
-        filler_words = [
-            r"\bvery\b",
-            r"\breally\b",
-            r"\bquite\b",
-            r"\bjust\b",
-            r"\bsimply\b",
-            r"\bbasically\b",
-        ]
+        filler_words = [r"\bvery\b", r"\breally\b", r"\bquite\b", r"\bjust\b", r"\bsimply\b", r"\bbasically\b"]
         for word in filler_words:
             text = re.sub(word, "", text, flags=re.IGNORECASE)
 

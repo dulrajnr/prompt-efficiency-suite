@@ -28,14 +28,7 @@ def check_dependencies():
 def start_api_server():
     """Start the API server for testing."""
     server_process = subprocess.Popen(
-        [
-            "uvicorn",
-            "prompt_efficiency_suite.main:app",
-            "--host",
-            "0.0.0.0",
-            "--port",
-            "8000",
-        ],
+        ["uvicorn", "prompt_efficiency_suite.main:app", "--host", "0.0.0.0", "--port", "8000"],
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE,
     )
@@ -61,9 +54,7 @@ def run_tests():
     # Run unit tests
     print("\nRunning unit tests...")
     result = subprocess.run(
-        ["python", "-m", "pytest", "tests/test_all_access_points.py", "-v"],
-        capture_output=True,
-        text=True,
+        ["python", "-m", "pytest", "tests/test_all_access_points.py", "-v"], capture_output=True, text=True
     )
     print(result.stdout)
     if result.returncode != 0:
@@ -74,9 +65,7 @@ def run_tests():
     # Run integration tests
     print("\nRunning integration tests...")
     result = subprocess.run(
-        ["python", "-m", "pytest", "tests/test_integration.py", "-v"],
-        capture_output=True,
-        text=True,
+        ["python", "-m", "pytest", "tests/test_integration.py", "-v"], capture_output=True, text=True
     )
     print(result.stdout)
     if result.returncode != 0:

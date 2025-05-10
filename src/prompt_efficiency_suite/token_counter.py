@@ -57,10 +57,7 @@ class TokenCounter:
             text=text,
             total_tokens=token_count,
             token_distribution=dict(distribution),
-            metadata={
-                "tokenization_method": "whitespace",
-                "timestamp": self._get_timestamp(),
-            },
+            metadata={"tokenization_method": "whitespace", "timestamp": self._get_timestamp()},
         )
 
         self.count_history.append(result)
