@@ -8,7 +8,9 @@ with open("README.md", "r", encoding="utf-8") as fh:
     long_description = fh.read()
 
 with open("requirements.txt", "r", encoding="utf-8") as fh:
-    requirements = [line.strip() for line in fh if line.strip() and not line.startswith("#")]
+    requirements = [
+        line.strip() for line in fh if line.strip() and not line.startswith("#")
+    ]
 
 setup(
     name="prompt-efficiency-suite",
@@ -45,7 +47,9 @@ setup(
             "flake8>=6.1.0",
         ]
     },
-    entry_points={"console_scripts": ["prompt-efficiency=prompt_efficiency_suite.cli:main"]},
+    entry_points={
+        "console_scripts": ["prompt-efficiency=prompt_efficiency_suite.cli:main"]
+    },
     include_package_data=True,
     zip_safe=False,
 )

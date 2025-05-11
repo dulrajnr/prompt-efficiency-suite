@@ -27,7 +27,9 @@ class DomainAwareTrimmer:
             logger.debug(f"Dictionary file found at: {dict_path}")
             with open(dict_path, "r") as f:
                 self.domain_dictionaries[domain] = json.load(f)
-                logger.debug(f"Loaded {len(self.domain_dictionaries[domain])} terms for domain {domain}")
+                logger.debug(
+                    f"Loaded {len(self.domain_dictionaries[domain])} terms for domain {domain}"
+                )
         else:
             logger.error(f"Dictionary file not found at: {dict_path}")
             # Try current working directory as fallback
@@ -37,9 +39,13 @@ class DomainAwareTrimmer:
                 logger.debug(f"Dictionary file found at fallback path: {cwd_path}")
                 with open(cwd_path, "r") as f:
                     self.domain_dictionaries[domain] = json.load(f)
-                    logger.debug(f"Loaded {len(self.domain_dictionaries[domain])} terms for domain {domain}")
+                    logger.debug(
+                        f"Loaded {len(self.domain_dictionaries[domain])} terms for domain {domain}"
+                    )
 
-    def find_important_spans(self, text: str, domain: str, min_importance: float = 0.7) -> List[tuple[int, int]]:
+    def find_important_spans(
+        self, text: str, domain: str, min_importance: float = 0.7
+    ) -> List[tuple[int, int]]:
         """Find spans of text that contain important domain terms."""
         important_spans = []
 

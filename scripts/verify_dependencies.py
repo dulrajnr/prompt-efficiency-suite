@@ -48,7 +48,9 @@ class DependencyVerifier:
                                     pkg, version = line.split("<=")
                                     requirements[pkg.lower()] = f"<={version}"
                             except ValueError:
-                                self.issues.append(f"Invalid requirement format in {req_file}: {line}")
+                                self.issues.append(
+                                    f"Invalid requirement format in {req_file}: {line}"
+                                )
         return requirements
 
     def check_package_versions(self) -> List[str]:
@@ -62,14 +64,24 @@ class DependencyVerifier:
                 issues.append(f"Required package {pkg} is not installed")
             elif version.startswith(">="):
                 min_version = version[2:]
-                if pkg_resources.parse_version(installed[pkg]) < pkg_resources.parse_version(min_version):
-                    issues.append(f"Package {pkg} version {installed[pkg]} is below required minimum {min_version}")
+                if pkg_resources.parse_version(
+                    installed[pkg]
+                ) < pkg_resources.parse_version(min_version):
+                    issues.append(
+                        f"Package {pkg} version {installed[pkg]} is below required minimum {min_version}"
+                    )
             elif version.startswith("<="):
                 max_version = version[2:]
-                if pkg_resources.parse_version(installed[pkg]) > pkg_resources.parse_version(max_version):
-                    issues.append(f"Package {pkg} version {installed[pkg]} is above required maximum {max_version}")
+                if pkg_resources.parse_version(
+                    installed[pkg]
+                ) > pkg_resources.parse_version(max_version):
+                    issues.append(
+                        f"Package {pkg} version {installed[pkg]} is above required maximum {max_version}"
+                    )
             elif installed[pkg] != version:
-                issues.append(f"Package {pkg} version mismatch: installed {installed[pkg]}, required {version}")
+                issues.append(
+                    f"Package {pkg} version mismatch: installed {installed[pkg]}, required {version}"
+                )
 
         return issues
 
@@ -83,8 +95,12 @@ class DependencyVerifier:
                 response = requests.get(f"https://pypi.org/pypi/{pkg}/json")
                 if response.status_code == 200:
                     latest_version = response.json()["info"]["version"]
-                    if pkg_resources.parse_version(latest_version) > pkg_resources.parse_version(version):
-                        issues.append(f"Package {pkg} has update available: {version} -> {latest_version}")
+                    if pkg_resources.parse_version(
+                        latest_version
+                    ) > pkg_resources.parse_version(version):
+                        issues.append(
+                            f"Package {pkg} has update available: {version} -> {latest_version}"
+                        )
             except Exception as e:
                 self.issues.append(f"Error checking PyPI for {pkg}: {str(e)}")
 
@@ -95,7 +111,9 @@ class DependencyVerifier:
         issues = []
         try:
             # Run safety check
-            result = subprocess.run(["safety", "check", "--json"], capture_output=True, text=True)
+            result = subprocess.run(
+                ["safety", "check", "--json"], capture_output=True, text=True
+            )
             if result.returncode != 0:
                 vulnerabilities = json.loads(result.stdout)
                 for vuln in vulnerabilities:

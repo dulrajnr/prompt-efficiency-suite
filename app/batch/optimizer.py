@@ -36,7 +36,11 @@ class BatchOptimizer:
                 raise ValueError(f"Invalid YAML content in {file_path}")
         elif suffix == ".py":
             # Remove comments and normalize whitespace
-            lines = [line.strip() for line in content.split("\n") if not line.strip().startswith("#")]
+            lines = [
+                line.strip()
+                for line in content.split("\n")
+                if not line.strip().startswith("#")
+            ]
             return " ".join(lines)
         else:
             return content
@@ -64,7 +68,9 @@ class BatchOptimizer:
 
     def _get_top_patterns(self) -> List[str]:
         """Get patterns that appear more than the threshold times."""
-        return [p for p, count in self.patterns.items() if count >= self.macro_threshold]
+        return [
+            p for p, count in self.patterns.items() if count >= self.macro_threshold
+        ]
 
     def generate_macros(self) -> Dict[str, str]:
         """Generate macro definitions for repeated patterns."""

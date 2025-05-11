@@ -77,7 +77,9 @@ async def analyze_prompts_batch(request: BatchAnalyzeRequest) -> BatchAnalyzeRes
         summary = {
             "total_prompts": num_prompts,
             "average_tokens": total_tokens / num_prompts if num_prompts > 0 else 0,
-            "average_complexity": total_complexity / num_prompts if num_prompts > 0 else 0,
+            "average_complexity": (
+                total_complexity / num_prompts if num_prompts > 0 else 0
+            ),
             "average_clarity": total_clarity / num_prompts if num_prompts > 0 else 0,
             "total_warnings": sum(len(r.warnings) for r in results),
             "total_suggestions": sum(len(r.suggestions) for r in results),

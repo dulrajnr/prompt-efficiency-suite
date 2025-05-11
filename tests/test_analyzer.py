@@ -1,7 +1,12 @@
 import pytest
 
-from prompt_efficiency_suite.analyzer import AnalysisMetrics, AnalysisResult, PromptAnalyzer
+from prompt_efficiency_suite.analyzer import (
+    AnalysisMetrics,
+    AnalysisResult,
+    PromptAnalyzer,
+)
 from prompt_efficiency_suite.model_translator import ModelType
+from prompt_efficiency_suite.models import PromptAnalysis, PromptMetrics
 
 
 @pytest.fixture
@@ -47,7 +52,9 @@ def test_analyze_prompt_with_target_complexity(analyzer):
     Instruction: Please help me with this task.
     """
 
-    result = analyzer.analyze_prompt(prompt=prompt, model=ModelType.GPT4, target_complexity="medium")
+    result = analyzer.analyze_prompt(
+        prompt=prompt, model=ModelType.GPT4, target_complexity="medium"
+    )
 
     assert isinstance(result, AnalysisResult)
     assert result.metrics.complexity_level in ["low", "medium", "high", "very_high"]
@@ -99,7 +106,9 @@ def test_calculate_structure_score(analyzer):
 def test_calculate_context_score(analyzer):
     """Test context score calculation."""
     # Good context
-    good_prompt = "Context: This is relevant background information within the scope of the task."
+    good_prompt = (
+        "Context: This is relevant background information within the scope of the task."
+    )
     score = analyzer._calculate_context_score(good_prompt)
     assert score > 0.7
 
@@ -112,7 +121,9 @@ def test_calculate_context_score(analyzer):
 def test_calculate_instruction_score(analyzer):
     """Test instruction score calculation."""
     # Good instructions
-    good_prompt = "Instruction: Please perform this task and format the output as requested."
+    good_prompt = (
+        "Instruction: Please perform this task and format the output as requested."
+    )
     score = analyzer._calculate_instruction_score(good_prompt)
     assert score > 0.7
 
@@ -266,7 +277,9 @@ def test_structure_score_calculation(analyzer):
 def test_complexity_score_calculation(analyzer):
     """Test complexity score calculation."""
     # Complex prompt
-    complex_prompt = "This is a complex and sophisticated task that requires advanced expertise."
+    complex_prompt = (
+        "This is a complex and sophisticated task that requires advanced expertise."
+    )
     complex_score = analyzer._calculate_complexity_score(complex_prompt)
     assert complex_score > 0.7
 
@@ -384,7 +397,9 @@ def test_metadata_handling(analyzer):
     """Test metadata handling in analysis."""
     metadata = {"key": "value", "number": 42}
 
-    result = analyzer.analyze_prompt(prompt="Test prompt", model=ModelType.GPT4, metadata=metadata)
+    result = analyzer.analyze_prompt(
+        prompt="Test prompt", model=ModelType.GPT4, metadata=metadata
+    )
 
     assert result.metadata == metadata
 
@@ -398,3 +413,77 @@ def test_model_specific_analysis(analyzer):
         assert isinstance(result, AnalysisResult)
         assert result.metrics.quality_score >= 0
         assert result.metrics.quality_score <= 1
+
+
+def test_analyzer_initialization() -> None:
+    """Test analyzer initialization."""
+    analyzer = PromptAnalyzer()
+    assert analyzer is not None
+
+
+def test_analyze_prompt() -> None:
+    """Test analyzing a prompt."""
+    analyzer = PromptAnalyzer()
+    prompt = "This is a test prompt"
+    analysis = analyzer.analyze_prompt(prompt)
+    assert isinstance(analysis, PromptAnalysis)
+    assert analysis.prompt == prompt
+    assert isinstance(analysis.metrics, PromptMetrics)
+    assert isinstance(analysis.suggestions, list)
+    assert analysis.metrics.token_count > 0
+    assert analysis.metrics.word_count > 0
+    assert analysis.metrics.sentence_count > 0
+    assert analysis.metrics.avg_word_length > 0
+    assert 0.0 <= analysis.metrics.quality_score <= 1.0
+
+
+def test_analyze_complex_prompt() -> None:
+    """Test analyzing a complex prompt."""
+    analyzer = PromptAnalyzer()
+    prompt = """
+    This is a complex prompt.
+    It has multiple lines.
+    And some special characters: !@#$%^&*()
+    """
+    analysis = analyzer.analyze_prompt(prompt)
+    assert isinstance(analysis, PromptAnalysis)
+    assert analysis.prompt == prompt
+    assert isinstance(analysis.metrics, PromptMetrics)
+    assert isinstance(analysis.suggestions, list)
+    assert analysis.metrics.token_count > 0
+    assert analysis.metrics.word_count > 0
+    assert analysis.metrics.sentence_count > 0
+    assert analysis.metrics.avg_word_length > 0
+    assert 0.0 <= analysis.metrics.quality_score <= 1.0
+
+
+def test_analyze_empty_prompt() -> None:
+    """Test analyzing an empty prompt."""
+    analyzer = PromptAnalyzer()
+    prompt = ""
+    analysis = analyzer.analyze_prompt(prompt)
+    assert isinstance(analysis, PromptAnalysis)
+    assert analysis.prompt == prompt
+    assert isinstance(analysis.metrics, PromptMetrics)
+    assert isinstance(analysis.suggestions, list)
+    assert analysis.metrics.token_count == 0
+    assert analysis.metrics.word_count == 0
+    assert analysis.metrics.sentence_count == 0
+    assert analysis.metrics.avg_word_length == 0.0
+    assert 0.0 <= analysis.metrics.quality_score <= 1.0
+
+
+def test_analyze_prompt_with_special_chars() -> None:
+    """Test analyzing a prompt with special characters."""
+    analyzer = PromptAnalyzer()
+    prompt = "Hello! How are you? I'm fine, thanks."
+    analysis = analyzer.analyze_prompt(prompt)
+    assert isinstance(analysis, PromptAnalysis)
+    assert analysis.prompt == prompt
+    assert isinstance(analysis.metrics, PromptMetrics)
+    assert isinstance(analysis.suggestions, list)
+    assert analysis.metrics.token_count > 0
+    assert analysis.metrics.word_count > 0
+    assert analysis.metrics.sentence_count > 0
+    assert analysis.metrics.avg_word_length > 0
+    assert 0.0 <= analysis.metrics.quality_score <= 1.0

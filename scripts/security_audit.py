@@ -58,7 +58,10 @@ class SecurityAudit:
                     with open(full_path, "r") as f:
                         content = f.read()
                         # Check for actual API key values, not just comments
-                        if any(re.search(pattern, content, re.I) for pattern in self.sensitive_patterns):
+                        if any(
+                            re.search(pattern, content, re.I)
+                            for pattern in self.sensitive_patterns
+                        ):
                             issues.append(f"Potential sensitive data in {config_path}")
                 except Exception as e:
                     issues.append(f"Error reading {config_path}: {str(e)}")
@@ -71,8 +74,13 @@ class SecurityAudit:
                     try:
                         with open(file_path, "r") as f:
                             content = f.read()
-                            if any(re.search(pattern, content, re.I) for pattern in self.sensitive_patterns):
-                                issues.append(f"Potential hardcoded sensitive data in {file_path}")
+                            if any(
+                                re.search(pattern, content, re.I)
+                                for pattern in self.sensitive_patterns
+                            ):
+                                issues.append(
+                                    f"Potential hardcoded sensitive data in {file_path}"
+                                )
                     except Exception as e:
                         issues.append(f"Error reading {file_path}: {str(e)}")
 
@@ -88,9 +96,13 @@ class SecurityAudit:
                 try:
                     mode = os.stat(full_path).st_mode
                     if mode & 0o777 != 0o600:  # Should be readable only by owner
-                        issues.append(f"Insecure permissions on {config_path}: {oct(mode & 0o777)}")
+                        issues.append(
+                            f"Insecure permissions on {config_path}: {oct(mode & 0o777)}"
+                        )
                 except Exception as e:
-                    issues.append(f"Error checking permissions on {config_path}: {str(e)}")
+                    issues.append(
+                        f"Error checking permissions on {config_path}: {str(e)}"
+                    )
 
         return issues
 
@@ -102,7 +114,9 @@ class SecurityAudit:
         for key in os.environ:
             if key in self.ignored_env_vars:
                 continue
-            if any(re.search(pattern, key, re.I) for pattern in self.sensitive_patterns):
+            if any(
+                re.search(pattern, key, re.I) for pattern in self.sensitive_patterns
+            ):
                 issues.append(f"Sensitive environment variable found: {key}")
 
         return issues
@@ -142,7 +156,9 @@ class SecurityAudit:
                                 issues.append(f"Potential SQL injection in {file_path}")
                             # Check for potential command injection
                             if re.search(r"os\.system|subprocess\.call", content):
-                                issues.append(f"Potential command injection in {file_path}")
+                                issues.append(
+                                    f"Potential command injection in {file_path}"
+                                )
                     except Exception as e:
                         issues.append(f"Error reading {file_path}: {str(e)}")
 

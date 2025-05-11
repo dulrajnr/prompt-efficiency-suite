@@ -17,7 +17,9 @@ PASSWORD = "test"
 
 def get_access_token():
     """Get access token for authentication."""
-    response = requests.post(f"{BASE_URL}/token", data={"username": USERNAME, "password": PASSWORD})
+    response = requests.post(
+        f"{BASE_URL}/token", data={"username": USERNAME, "password": PASSWORD}
+    )
     response.raise_for_status()
     return response.json()["access_token"]
 
@@ -107,7 +109,9 @@ def main():
 
         # Example 3: Get budget alerts
         print("\n4. Getting budget alerts...")
-        response = requests.get(f"{BASE_URL}/budget/alerts", headers=headers, params={"model": "gpt-4"})
+        response = requests.get(
+            f"{BASE_URL}/budget/alerts", headers=headers, params={"model": "gpt-4"}
+        )
         response.raise_for_status()
         alerts = response.json()
         if alerts:
@@ -132,7 +136,9 @@ def main():
 
         # Example 5: Deploy package
         print("\n6. Deploying package...")
-        response = requests.post(f"{BASE_URL}/cicd/deploy", headers=headers, params={"target": "pypi"})
+        response = requests.post(
+            f"{BASE_URL}/cicd/deploy", headers=headers, params={"target": "pypi"}
+        )
         response.raise_for_status()
         deploy_result = response.json()
         print(f"Status: {deploy_result['status']}")

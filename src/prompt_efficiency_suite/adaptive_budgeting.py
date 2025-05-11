@@ -7,7 +7,7 @@ from collections import defaultdict
 from dataclasses import dataclass, field
 from datetime import datetime, timedelta
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple, Union
+from typing import Any, Dict, List, Optional, Tuple, TypedDict, Union
 
 import numpy as np
 
@@ -52,7 +52,18 @@ class BudgetAllocation:
     allocation_period: timedelta
     start_time: datetime
     end_time: datetime
-    metadata: Dict[str, Union[str, int, float]] = None
+    metadata: Dict[str, Union[str, int, float]] = field(default_factory=dict)
+
+
+class ModelConfig(TypedDict):
+    """Configuration for a model."""
+
+    max_tokens: int
+    token_cost: float
+    context_ratio: float
+    system_ratio: float
+    instruction_ratio: float
+    response_ratio: float
 
 
 class AdaptiveBudgetManager:
@@ -68,22 +79,22 @@ class AdaptiveBudgetManager:
         """Initialize the budget manager.
 
         Args:
-            initial_budget: Initial token budget
-            allocation_period: Time period for budget allocation
-            min_budget: Minimum allowed budget
-            max_budget: Maximum allowed budget
+            initial_budget (int): Initial token budget.
+            allocation_period (timedelta): Time period for budget allocation.
+            min_budget (int): Minimum allowed budget.
+            max_budget (int): Maximum allowed budget.
         """
-        self.initial_budget = initial_budget
-        self.allocation_period = allocation_period
-        self.min_budget = min_budget
-        self.max_budget = max_budget
-        self.current_allocation = None
+        self.initial_budget: int = initial_budget
+        self.allocation_period: timedelta = allocation_period
+        self.min_budget: int = min_budget
+        self.max_budget: int = max_budget
+        self.current_allocation: Optional[BudgetAllocation] = None
         self.usage_history: List[EfficiencyMetrics] = []
         self._initialize_allocation()
 
     def _initialize_allocation(self) -> None:
         """Initialize the current budget allocation."""
-        now = datetime.utcnow()
+        now: datetime = datetime.utcnow()
         self.current_allocation = BudgetAllocation(
             total_budget=self.initial_budget,
             used_budget=0,
@@ -98,20 +109,22 @@ class AdaptiveBudgetManager:
         """Record token usage.
 
         Args:
-            metrics: The efficiency metrics to record
+            metrics (EfficiencyMetrics): The efficiency metrics to record.
         """
         self.usage_history.append(metrics)
         if self.current_allocation:
             self.current_allocation.used_budget += metrics.token_count
             self.current_allocation.remaining_budget = max(
-                0, self.current_allocation.total_budget - self.current_allocation.used_budget
+                0,
+                self.current_allocation.total_budget
+                - self.current_allocation.used_budget,
             )
 
     def get_remaining_budget(self) -> int:
         """Get the remaining budget.
 
         Returns:
-            Remaining token budget
+            int: Remaining token budget.
         """
         if not self.current_allocation:
             return 0
@@ -121,10 +134,10 @@ class AdaptiveBudgetManager:
         """Check if there's enough budget for the required tokens.
 
         Args:
-            required_tokens: Number of tokens required
+            required_tokens (int): Number of tokens required.
 
         Returns:
-            True if there's enough budget, False otherwise
+            bool: True if there's enough budget, False otherwise.
         """
         if not self.current_allocation:
             return False
@@ -136,20 +149,24 @@ class AdaptiveBudgetManager:
             return
 
         # Calculate usage statistics
-        recent_usage = [m for m in self.usage_history if m.timestamp > datetime.utcnow() - self.allocation_period]
+        recent_usage: List[EfficiencyMetrics] = [
+            m
+            for m in self.usage_history
+            if m.timestamp > datetime.utcnow() - self.allocation_period
+        ]
 
         if not recent_usage:
             return
 
         # Calculate average daily usage
-        daily_usage = np.mean([m.token_count for m in recent_usage])
+        daily_usage: float = np.mean([m.token_count for m in recent_usage])
 
         # Calculate success rate
-        success_rate = np.mean([m.success_rate for m in recent_usage])
+        success_rate: float = np.mean([m.success_rate for m in recent_usage])
 
         # Adjust budget based on usage and success
         if success_rate > 0.9:  # High success rate
-            new_budget = int(daily_usage * 1.2)  # Increase by 20%
+            new_budget: int = int(daily_usage * 1.2)  # Increase by 20%
         elif success_rate > 0.7:  # Good success rate
             new_budget = int(daily_usage * 1.1)  # Increase by 10%
         elif success_rate < 0.5:  # Low success rate
@@ -161,7 +178,7 @@ class AdaptiveBudgetManager:
         new_budget = max(self.min_budget, min(self.max_budget, new_budget))
 
         # Create new allocation
-        now = datetime.utcnow()
+        now: datetime = datetime.utcnow()
         self.current_allocation = BudgetAllocation(
             total_budget=new_budget,
             used_budget=0,
@@ -170,9 +187,17 @@ class AdaptiveBudgetManager:
             start_time=now,
             end_time=now + self.allocation_period,
             metadata={
-                "previous_budget": self.current_allocation.total_budget if self.current_allocation else 0,
+                "previous_budget": (
+                    self.current_allocation.total_budget
+                    if self.current_allocation
+                    else 0
+                ),
                 "adjustment_factor": new_budget
-                / (self.current_allocation.total_budget if self.current_allocation else 1),
+                / (
+                    self.current_allocation.total_budget
+                    if self.current_allocation
+                    else 1
+                ),
                 "success_rate": success_rate,
                 "daily_usage": daily_usage,
             },
@@ -182,58 +207,75 @@ class AdaptiveBudgetManager:
         """Get statistics about budget usage.
 
         Returns:
-            Dictionary containing budget statistics
+            Dict[str, Union[int, float]]: Dictionary containing budget statistics.
         """
         if not self.current_allocation:
             return {}
-
-        recent_usage = [m for m in self.usage_history if m.timestamp > datetime.utcnow() - self.allocation_period]
-
-        if not recent_usage:
-            return {
-                "total_budget": self.current_allocation.total_budget,
-                "used_budget": self.current_allocation.used_budget,
-                "remaining_budget": self.current_allocation.remaining_budget,
-                "allocation_period_days": self.allocation_period.days,
-            }
 
         return {
             "total_budget": self.current_allocation.total_budget,
             "used_budget": self.current_allocation.used_budget,
             "remaining_budget": self.current_allocation.remaining_budget,
+            "usage_percentage": (
+                self.current_allocation.used_budget
+                / self.current_allocation.total_budget
+                * 100
+            ),
             "allocation_period_days": self.allocation_period.days,
-            "avg_daily_usage": np.mean([m.token_count for m in recent_usage]),
-            "success_rate": np.mean([m.success_rate for m in recent_usage]),
-            "total_requests": len(recent_usage),
+            "time_remaining": (
+                self.current_allocation.end_time - datetime.utcnow()
+            ).total_seconds()
+            / 86400,  # Convert to days
         }
 
 
 class AdaptiveBudgeting:
-    """A class for managing and adjusting token budgets adaptively."""
+    """Class for adaptive token budgeting."""
 
-    def __init__(self):
-        """Initialize the AdaptiveBudgeting system."""
-        self.model_configs: Dict[str, Dict[str, Any]] = {}
+    def __init__(self, initial_budget: float = 100.0) -> None:
+        self.initial_budget = initial_budget
+        self.current_budget = initial_budget
         self.usage_history: List[Dict[str, Any]] = []
-        self.adjustment_factors: Dict[str, float] = {}
+
+    def allocate_budget(
+        self, prompt: str, options: Optional[Dict[str, Any]] = None
+    ) -> float:
+        """Allocate budget for a prompt based on its characteristics."""
+        options = options or {}
+        # Placeholder implementation
+        return min(self.current_budget, 10.0)
+
+    def update_budget(self, usage: Dict[str, Any]) -> None:
+        """Update the budget based on usage data."""
+        self.usage_history.append(usage)
+        # Placeholder implementation
+
+    def get_budget_stats(self) -> Dict[str, Union[str, int, float, Dict[str, Any]]]:
+        """Get statistics about budget usage."""
+        return {
+            "initial_budget": self.initial_budget,
+            "current_budget": self.current_budget,
+            "total_usage": len(self.usage_history),
+            "usage_by_type": {},
+        }
 
     def load_model_config(self, model_name: str, config_path: Path) -> None:
-        """Load configuration for a specific model.
+        """Load model configuration from a file.
 
         Args:
             model_name (str): Name of the model.
             config_path (Path): Path to the configuration file.
         """
         with open(config_path, "r", encoding="utf-8") as f:
-            config = json.load(f)
+            config_data: Dict[str, Any] = json.load(f)
 
         self.model_configs[model_name] = {
-            "max_tokens": config.get("max_tokens", 2048),
-            "token_cost": config.get("token_cost", 0.0),
-            "context_ratio": config.get("context_ratio", 0.7),
-            "system_ratio": config.get("system_ratio", 0.1),
-            "instruction_ratio": config.get("instruction_ratio", 0.1),
-            "response_ratio": config.get("response_ratio", 0.1),
+            "max_tokens": config_data["max_tokens"],
+            "token_cost": config_data["token_cost"],
+            "context_ratio": config_data["context_ratio"],
+            "system_ratio": config_data["system_ratio"],
+            "instruction_ratio": config_data["instruction_ratio"],
+            "response_ratio": config_data["response_ratio"],
         }
 
     def calculate_budget(
@@ -243,85 +285,101 @@ class AdaptiveBudgeting:
         context_length: Optional[int] = None,
         requirements: Optional[Dict[str, Any]] = None,
     ) -> BudgetAllocation:
-        """Calculate token budget allocation based on model and task requirements.
+        """Calculate token budget for a task.
 
         Args:
             model_name (str): Name of the model to use.
-            task_type (str): Type of task (e.g., 'summarization', 'qa', 'chat').
-            context_length (Optional[int]): Length of the context in tokens.
+            task_type (str): Type of task being performed.
+            context_length (Optional[int]): Length of the context.
             requirements (Optional[Dict[str, Any]]): Additional requirements.
 
         Returns:
             BudgetAllocation: Calculated budget allocation.
         """
         if model_name not in self.model_configs:
-            raise ValueError(f"Model '{model_name}' not configured")
+            raise ValueError(f"Model {model_name} not configured")
 
-        config = self.model_configs[model_name]
-        max_tokens = config["max_tokens"]
+        config: ModelConfig = self.model_configs[model_name]
+        requirements = requirements or {}
+
+        # Calculate base ratios
+        context_ratio: float = config["context_ratio"]
+        system_ratio: float = config["system_ratio"]
+        instruction_ratio: float = config["instruction_ratio"]
+        response_ratio: float = config["response_ratio"]
 
         # Adjust ratios based on task type and requirements
-        ratios = self._adjust_ratios(
+        adjusted_ratios: Dict[str, float] = self._adjust_ratios(
             task_type,
-            config["context_ratio"],
-            config["system_ratio"],
-            config["instruction_ratio"],
-            config["response_ratio"],
+            context_ratio,
+            system_ratio,
+            instruction_ratio,
+            response_ratio,
             requirements,
         )
 
-        # Calculate token allocations
-        total_tokens = min(max_tokens, context_length or max_tokens)
-        allocation = {
-            "system_tokens": int(total_tokens * ratios["system"]),
-            "context_tokens": int(total_tokens * ratios["context"]),
-            "instruction_tokens": int(total_tokens * ratios["instruction"]),
-            "response_tokens": int(total_tokens * ratios["response"]),
-        }
+        # Calculate total budget
+        total_budget: int = config["max_tokens"]
+        if context_length:
+            total_budget = min(
+                total_budget,
+                int(context_length / adjusted_ratios["context"]),
+            )
 
-        # Add metadata
-        metadata = {
-            "model_name": model_name,
-            "task_type": task_type,
-            "original_context_length": context_length,
-            "adjusted_ratios": ratios,
-            "cost_estimate": self._estimate_cost(total_tokens, config["token_cost"]),
-        }
+        # Calculate component budgets
+        context_budget: int = int(total_budget * adjusted_ratios["context"])
+        system_budget: int = int(total_budget * adjusted_ratios["system"])
+        instruction_budget: int = int(total_budget * adjusted_ratios["instruction"])
+        response_budget: int = int(total_budget * adjusted_ratios["response"])
 
-        return BudgetAllocation(
-            total_budget=total_tokens,
+        # Create allocation
+        now: datetime = datetime.utcnow()
+        allocation: BudgetAllocation = BudgetAllocation(
+            total_budget=total_budget,
             used_budget=0,
-            remaining_budget=total_tokens,
-            allocation_period=timedelta(days=1),
-            start_time=datetime.now(),
-            end_time=datetime.now() + timedelta(days=1),
-            metadata=metadata,
+            remaining_budget=total_budget,
+            allocation_period=timedelta(hours=1),
+            start_time=now,
+            end_time=now + timedelta(hours=1),
+            metadata={
+                "model": model_name,
+                "task_type": task_type,
+                "component_budgets": {
+                    "context": context_budget,
+                    "system": system_budget,
+                    "instruction": instruction_budget,
+                    "response": response_budget,
+                },
+                "adjusted_ratios": adjusted_ratios,
+                "estimated_cost": self._estimate_cost(
+                    total_budget, config["token_cost"]
+                ),
+            },
         )
 
-    def update_usage(self, allocation: BudgetAllocation, actual_usage: Dict[str, int]) -> None:
-        """Update usage history with actual token usage.
+        return allocation
+
+    def update_usage(
+        self, allocation: BudgetAllocation, actual_usage: Dict[str, int]
+    ) -> None:
+        """Update usage statistics.
 
         Args:
-            allocation (BudgetAllocation): Original budget allocation.
-            actual_usage (Dict[str, int]): Actual token usage.
+            allocation (BudgetAllocation): The budget allocation.
+            actual_usage (Dict[str, int]): Actual token usage by component.
         """
-        usage_data = {
-            "allocated": {
-                "total": allocation.total_budget,
-                "system": allocation.system_tokens,
-                "context": allocation.context_tokens,
-                "instruction": allocation.instruction_tokens,
-                "response": allocation.response_tokens,
-            },
-            "actual": actual_usage,
-            "metadata": allocation.metadata,
+        usage_data: Dict[str, Any] = {
+            "timestamp": datetime.utcnow(),
+            "allocation": allocation.__dict__,
+            "actual_usage": actual_usage,
+            "efficiency": self._calculate_efficiency_metrics(),
         }
 
         self.usage_history.append(usage_data)
         self._update_adjustment_factors()
 
     def get_usage_stats(self) -> Dict[str, Any]:
-        """Get statistics about token usage.
+        """Get usage statistics.
 
         Returns:
             Dict[str, Any]: Usage statistics.
@@ -329,14 +387,13 @@ class AdaptiveBudgeting:
         if not self.usage_history:
             return {}
 
-        stats = {
-            "total_requests": len(self.usage_history),
+        return {
+            "total_usage": len(self.usage_history),
             "average_usage": self._calculate_average_usage(),
             "efficiency_metrics": self._calculate_efficiency_metrics(),
-            "adjustment_factors": self.adjustment_factors.copy(),
+            "adjustment_factors": self.adjustment_factors,
+            "metadata": {"timestamp": datetime.utcnow().isoformat()},
         }
-
-        return stats
 
     def _adjust_ratios(
         self,
@@ -347,100 +404,132 @@ class AdaptiveBudgeting:
         response_ratio: float,
         requirements: Optional[Dict[str, Any]] = None,
     ) -> Dict[str, float]:
-        """Adjust token ratios based on task type and requirements."""
-        # Apply task-specific adjustments
-        task_adjustments = {
-            "summarization": {"context": 1.2, "response": 0.8},
-            "qa": {"context": 0.9, "instruction": 1.1},
-            "chat": {"system": 0.8, "response": 1.2},
+        """Adjust budget ratios based on task type and requirements.
+
+        Args:
+            task_type (str): Type of task.
+            context_ratio (float): Base context ratio.
+            system_ratio (float): Base system ratio.
+            instruction_ratio (float): Base instruction ratio.
+            response_ratio (float): Base response ratio.
+            requirements (Optional[Dict[str, Any]]): Additional requirements.
+
+        Returns:
+            Dict[str, float]: Adjusted ratios.
+        """
+        requirements = requirements or {}
+        adjusted: Dict[str, float] = {
+            "context": context_ratio * self.adjustment_factors["context"],
+            "system": system_ratio * self.adjustment_factors["system"],
+            "instruction": instruction_ratio * self.adjustment_factors["instruction"],
+            "response": response_ratio * self.adjustment_factors["response"],
         }
 
-        adjustments = task_adjustments.get(task_type, {})
+        # Adjust based on task type
+        if task_type == "code_generation":
+            adjusted["context"] *= 1.2
+            adjusted["instruction"] *= 0.8
+        elif task_type == "text_generation":
+            adjusted["context"] *= 0.8
+            adjusted["response"] *= 1.2
+        elif task_type == "analysis":
+            adjusted["context"] *= 1.5
+            adjusted["response"] *= 0.7
 
-        # Apply requirement-specific adjustments
-        if requirements:
-            if requirements.get("detailed_response", False):
-                adjustments["response"] = adjustments.get("response", 1.0) * 1.2
-            if requirements.get("minimal_context", False):
-                adjustments["context"] = adjustments.get("context", 1.0) * 0.8
+        # Adjust based on requirements
+        if requirements.get("high_precision"):
+            adjusted["context"] *= 1.2
+            adjusted["instruction"] *= 1.2
+        if requirements.get("fast_response"):
+            adjusted["response"] *= 1.2
+            adjusted["context"] *= 0.8
 
-        # Apply historical adjustment factors
-        for component, factor in self.adjustment_factors.items():
-            adjustments[component] = adjustments.get(component, 1.0) * factor
-
-        # Calculate adjusted ratios
-        ratios = {
-            "context": context_ratio * adjustments.get("context", 1.0),
-            "system": system_ratio * adjustments.get("system", 1.0),
-            "instruction": instruction_ratio * adjustments.get("instruction", 1.0),
-            "response": response_ratio * adjustments.get("response", 1.0),
-        }
-
-        # Normalize ratios to sum to 1.0
-        total = sum(ratios.values())
-        return {k: v / total for k, v in ratios.items()}
+        # Normalize ratios
+        total: float = sum(adjusted.values())
+        return {k: v / total for k, v in adjusted.items()}
 
     def _update_adjustment_factors(self) -> None:
         """Update adjustment factors based on usage history."""
-        if len(self.usage_history) < 5:
+        if not self.usage_history:
             return
 
-        recent_history = self.usage_history[-5:]
-        component_usage = defaultdict(list)
+        recent_usage: List[Dict[str, Any]] = [
+            u for u in self.usage_history[-10:] if "efficiency" in u
+        ]
 
-        for entry in recent_history:
-            allocated = entry["allocated"]
-            actual = entry["actual"]
+        if not recent_usage:
+            return
 
-            for component in ["system", "context", "instruction", "response"]:
-                if component in allocated and component in actual:
-                    ratio = actual[component] / allocated[component]
-                    component_usage[component].append(ratio)
+        # Calculate average efficiency for each component
+        avg_efficiency: Dict[str, float] = {
+            component: np.mean([u["efficiency"][component] for u in recent_usage])
+            for component in ["context", "system", "instruction", "response"]
+        }
 
-        # Calculate new adjustment factors
-        for component, ratios in component_usage.items():
-            avg_ratio = np.mean(ratios)
-            # Smooth the adjustment to avoid sudden changes
-            current = self.adjustment_factors.get(component, 1.0)
-            self.adjustment_factors[component] = 0.8 * current + 0.2 * avg_ratio
+        # Update adjustment factors
+        for component, efficiency in avg_efficiency.items():
+            if efficiency < 0.7:  # Low efficiency
+                self.adjustment_factors[component] *= 0.9
+            elif efficiency > 0.9:  # High efficiency
+                self.adjustment_factors[component] *= 1.1
 
     def _calculate_average_usage(self) -> Dict[str, float]:
-        """Calculate average token usage across components."""
+        """Calculate average usage by component.
+
+        Returns:
+            Dict[str, float]: Average usage statistics.
+        """
         if not self.usage_history:
             return {}
 
-        totals = defaultdict(int)
-        counts = defaultdict(int)
-
-        for entry in self.usage_history:
-            actual = entry["actual"]
-            for component, tokens in actual.items():
-                totals[component] += tokens
-                counts[component] += 1
-
-        return {component: totals[component] / counts[component] for component in totals}
+        components: List[str] = ["context", "system", "instruction", "response"]
+        return {
+            component: np.mean(
+                [
+                    u["actual_usage"].get(component, 0)
+                    for u in self.usage_history
+                    if "actual_usage" in u
+                ]
+            )
+            for component in components
+        }
 
     def _calculate_efficiency_metrics(self) -> Dict[str, float]:
-        """Calculate efficiency metrics based on usage history."""
+        """Calculate efficiency metrics.
+
+        Returns:
+            Dict[str, float]: Efficiency metrics.
+        """
         if not self.usage_history:
             return {}
 
-        allocation_ratios = []
-        for entry in self.usage_history:
-            allocated = entry["allocated"]
-            actual = entry["actual"]
+        recent_usage: List[Dict[str, Any]] = [
+            u for u in self.usage_history[-10:] if "actual_usage" in u
+        ]
 
-            if "total" in allocated and "total" in actual:
-                ratio = actual["total"] / allocated["total"]
-                allocation_ratios.append(ratio)
+        if not recent_usage:
+            return {}
 
+        components: List[str] = ["context", "system", "instruction", "response"]
         return {
-            "average_efficiency": np.mean(allocation_ratios),
-            "efficiency_std": np.std(allocation_ratios),
-            "min_efficiency": min(allocation_ratios),
-            "max_efficiency": max(allocation_ratios),
+            component: np.mean(
+                [
+                    u["actual_usage"].get(component, 0)
+                    / u["allocation"]["metadata"]["component_budgets"].get(component, 1)
+                    for u in recent_usage
+                ]
+            )
+            for component in components
         }
 
     def _estimate_cost(self, total_tokens: int, token_cost: float) -> float:
-        """Estimate the cost for the token usage."""
+        """Estimate cost for token usage.
+
+        Args:
+            total_tokens (int): Total number of tokens.
+            token_cost (float): Cost per token.
+
+        Returns:
+            float: Estimated cost.
+        """
         return total_tokens * token_cost

@@ -38,7 +38,10 @@ def test_optimization_with_params():
     optimizer = PromptOptimizer()
 
     prompt = "This is a test prompt."
-    params = {"apply_remove_redundant_whitespace": False, "apply_remove_empty_lines": False}
+    params = {
+        "apply_remove_redundant_whitespace": False,
+        "apply_remove_empty_lines": False,
+    }
 
     result = optimizer.optimize(prompt, params)
 

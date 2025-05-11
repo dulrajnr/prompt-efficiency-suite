@@ -3,12 +3,14 @@ Test suite for the CICDIntegration class.
 """
 
 import json
+import os
+import subprocess
 import tempfile
 from pathlib import Path
 
 import pytest
 
-from prompt_efficiency_suite.cicd_integration import CICDIntegration, DeploymentResult, TestResult
+from prompt_efficiency_suite import CICDIntegration, DeploymentResult, TestResult
 
 
 @pytest.fixture

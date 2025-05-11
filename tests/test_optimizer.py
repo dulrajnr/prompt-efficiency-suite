@@ -1,7 +1,22 @@
+"""Test suite for the optimizer module."""
+
 import pytest
 
+from prompt_efficiency_suite import (
+    BatchOptimizer,
+    CostEstimator,
+    MultimodalCompressor,
+    PromptOptimizer,
+    QualityAnalyzer,
+    TokenCounter,
+)
 from prompt_efficiency_suite.model_translator import ModelType
-from prompt_efficiency_suite.optimizer import OptimizationConfig, OptimizationResult, PromptOptimizer
+from prompt_efficiency_suite.models import PromptAnalysis
+from prompt_efficiency_suite.optimizer import (
+    OptimizationConfig,
+    OptimizationMetrics,
+    OptimizationResult,
+)
 from prompt_efficiency_suite.tester import TestCase
 
 
@@ -44,7 +59,9 @@ def test_optimize_prompt(optimizer, sample_test_case, sample_config):
     """Test basic prompt optimization."""
     original_prompt = "Please tell me what is the sum of 2 plus 2?"
 
-    result = optimizer.optimize_prompt(prompt=original_prompt, test_cases=[sample_test_case], config=sample_config)
+    result = optimizer.optimize_prompt(
+        prompt=original_prompt, test_cases=[sample_test_case], config=sample_config
+    )
 
     assert isinstance(result, OptimizationResult)
     assert result.original_prompt == original_prompt
@@ -59,7 +76,9 @@ def test_optimize_prompt(optimizer, sample_test_case, sample_config):
 def test_optimization_history(optimizer, sample_test_case, sample_config):
     """Test optimization history functionality."""
     # Run an optimization
-    result = optimizer.optimize_prompt(prompt="Test prompt", test_cases=[sample_test_case], config=sample_config)
+    result = optimizer.optimize_prompt(
+        prompt="Test prompt", test_cases=[sample_test_case], config=sample_config
+    )
 
     # Check history
     history = optimizer.get_optimization_history()
@@ -89,7 +108,9 @@ def test_preserve_patterns(optimizer):
     prompt = "The number 42 is the sum of 40 and 2."
     preserve_patterns = ["number", "sum"]
 
-    candidates = optimizer._generate_optimization_candidates(prompt, preserve_patterns=preserve_patterns)
+    candidates = optimizer._generate_optimization_candidates(
+        prompt, preserve_patterns=preserve_patterns
+    )
 
     for candidate in candidates:
         assert "number" in candidate
@@ -100,8 +121,18 @@ def test_metrics_calculation(optimizer):
     """Test metrics calculation from test results."""
     # Create mock test results
     results = [
-        {"success": True, "response": "4", "execution_time": 0.5, "token_usage": {"prompt": 10, "completion": 5}},
-        {"success": False, "response": "5", "execution_time": 0.6, "token_usage": {"prompt": 10, "completion": 5}},
+        {
+            "success": True,
+            "response": "4",
+            "execution_time": 0.5,
+            "token_usage": {"prompt": 10, "completion": 5},
+        },
+        {
+            "success": False,
+            "response": "5",
+            "execution_time": 0.6,
+            "token_usage": {"prompt": 10, "completion": 5},
+        },
     ]
 
     metrics = optimizer._calculate_metrics(results)
@@ -133,14 +164,20 @@ def test_better_candidate_detection(optimizer, sample_config):
 
     worse_metrics = {"total_tokens": 120, "total_time": 1.2, "success_rate": 0.7}
 
-    assert optimizer._is_better_candidate(better_metrics, original_metrics, sample_config)
+    assert optimizer._is_better_candidate(
+        better_metrics, original_metrics, sample_config
+    )
 
-    assert not optimizer._is_better_candidate(worse_metrics, original_metrics, sample_config)
+    assert not optimizer._is_better_candidate(
+        worse_metrics, original_metrics, sample_config
+    )
 
 
 def test_token_reduction_target(optimizer, sample_test_case):
     """Test token reduction target in optimization."""
-    config = OptimizationConfig(target_model=ModelType.GPT4, token_reduction_target=10, min_improvement=0.0)
+    config = OptimizationConfig(
+        target_model=ModelType.GPT4, token_reduction_target=10, min_improvement=0.0
+    )
 
     result = optimizer.optimize_prompt(
         prompt="This is a very long prompt that should be optimized to reduce tokens",
@@ -153,7 +190,9 @@ def test_token_reduction_target(optimizer, sample_test_case):
 
 def test_execution_time_target(optimizer, sample_test_case):
     """Test execution time target in optimization."""
-    config = OptimizationConfig(target_model=ModelType.GPT4, execution_time_target=0.5, min_improvement=0.0)
+    config = OptimizationConfig(
+        target_model=ModelType.GPT4, execution_time_target=0.5, min_improvement=0.0
+    )
 
     result = optimizer.optimize_prompt(
         prompt="This is a prompt that should be optimized for faster execution",
@@ -169,7 +208,9 @@ def test_min_improvement(optimizer, sample_test_case):
     config = OptimizationConfig(target_model=ModelType.GPT4, min_improvement=0.2)
 
     result = optimizer.optimize_prompt(
-        prompt="This is a prompt that should show significant improvement", test_cases=[sample_test_case], config=config
+        prompt="This is a prompt that should show significant improvement",
+        test_cases=[sample_test_case],
+        config=config,
     )
 
     assert result.improvement_percentage >= 0.2
@@ -212,7 +253,9 @@ def test_optimize_prompt_with_config(optimizer):
         target_cost_reduction=0.3,
     )
 
-    optimized, metrics = optimizer.optimize_prompt(prompt=prompt, model=ModelType.GPT4, config=config)
+    optimized, metrics = optimizer.optimize_prompt(
+        prompt=prompt, model=ModelType.GPT4, config=config
+    )
 
     assert metrics.quality_score >= config.min_quality_score
     assert metrics.token_reduction >= 0
@@ -321,3 +364,66 @@ def test_get_optimization_suggestions(optimizer):
     suggestions = optimizer.get_optimization_suggestions(prompt)
     assert len(suggestions) > 0
     assert any("redundant" in s.lower() for s in suggestions)
+
+
+def test_optimizer_initialization() -> None:
+    """Test optimizer initialization."""
+    optimizer = PromptOptimizer()
+    assert optimizer is not None
+
+
+def test_optimize_prompt() -> None:
+    """Test optimizing a prompt."""
+    optimizer = PromptOptimizer()
+    prompt = "This is a test prompt that needs optimization"
+    result = optimizer.optimize(prompt)
+    assert isinstance(result, PromptAnalysis)
+    assert result.prompt != prompt  # Should be different after optimization
+    assert isinstance(result.metrics, dict)
+    assert "token_count" in result.metrics
+    assert "quality_score" in result.metrics
+    assert isinstance(result.suggestions, list)
+    assert len(result.suggestions) > 0
+
+
+def test_optimize_with_config() -> None:
+    """Test optimizing a prompt with custom configuration."""
+    optimizer = PromptOptimizer()
+    prompt = "This is a test prompt that needs optimization"
+    config = {"max_tokens": 100, "target_quality": 0.8, "optimization_level": "high"}
+    result = optimizer.optimize(prompt, config)
+    assert isinstance(result, PromptAnalysis)
+    assert result.prompt != prompt
+    assert isinstance(result.metrics, dict)
+    assert "token_count" in result.metrics
+    assert "quality_score" in result.metrics
+    assert isinstance(result.suggestions, list)
+    assert len(result.suggestions) > 0
+
+
+def test_optimize_empty_prompt() -> None:
+    """Test optimizing an empty prompt."""
+    optimizer = PromptOptimizer()
+    prompt = ""
+    result = optimizer.optimize(prompt)
+    assert isinstance(result, PromptAnalysis)
+    assert result.prompt == prompt  # Empty prompt should remain empty
+    assert isinstance(result.metrics, dict)
+    assert "token_count" in result.metrics
+    assert "quality_score" in result.metrics
+    assert isinstance(result.suggestions, list)
+    assert len(result.suggestions) > 0
+
+
+def test_optimize_prompt_with_special_chars() -> None:
+    """Test optimizing a prompt with special characters."""
+    optimizer = PromptOptimizer()
+    prompt = "Hello! How are you? I'm fine, thanks."
+    result = optimizer.optimize(prompt)
+    assert isinstance(result, PromptAnalysis)
+    assert result.prompt != prompt
+    assert isinstance(result.metrics, dict)
+    assert "token_count" in result.metrics
+    assert "quality_score" in result.metrics
+    assert isinstance(result.suggestions, list)
+    assert len(result.suggestions) > 0

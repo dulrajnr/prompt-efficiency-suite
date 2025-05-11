@@ -9,7 +9,11 @@ from pathlib import Path
 
 import pytest
 
-from prompt_efficiency_suite.adaptive_budgeting import AdaptiveBudgeting, BudgetAlert, BudgetMetrics
+from prompt_efficiency_suite.adaptive_budgeting import (
+    AdaptiveBudgeting,
+    BudgetAlert,
+    BudgetMetrics,
+)
 
 
 @pytest.fixture
@@ -124,7 +128,10 @@ def test_get_alerts(budgeting, temp_config_file):
     start_time = datetime.now() - timedelta(minutes=5)
     end_time = datetime.now() + timedelta(minutes=5)
     time_alerts = budgeting.get_alerts(start_time=start_time, end_time=end_time)
-    assert all(start_time <= datetime.fromisoformat(a.timestamp) <= end_time for a in time_alerts)
+    assert all(
+        start_time <= datetime.fromisoformat(a.timestamp) <= end_time
+        for a in time_alerts
+    )
 
 
 def test_reset_metrics(budgeting):
@@ -185,7 +192,14 @@ def test_export_alerts(budgeting, temp_config_file, tempfile):
         alerts_data = json.load(f)
         assert len(alerts_data) > 0
         assert all(
-            key in alerts_data[0] for key in ["timestamp", "alert_type", "message", "threshold", "current_value"]
+            key in alerts_data[0]
+            for key in [
+                "timestamp",
+                "alert_type",
+                "message",
+                "threshold",
+                "current_value",
+            ]
         )
 
 

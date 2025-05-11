@@ -1,20 +1,21 @@
-"""
-Macro Suggester - A module for suggesting macros for common prompt patterns.
-"""
+"""Macro Suggester - A module for suggesting macros for prompts."""
+
+import logging
+from typing import Any, Dict, List, Optional
+
+logger = logging.getLogger(__name__)
 
 import json
-import logging
 import re
-from collections import defaultdict
+from collections import Counter
 from dataclasses import dataclass, field
+from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Set, Union
+from typing import Pattern, Set, TypedDict, Union
 
 from pydantic import BaseModel
 
 from .macro_manager import MacroDefinition, MacroManager
-
-logger = logging.getLogger(__name__)
 
 
 @dataclass
@@ -26,7 +27,7 @@ class Suggestion:
     description: str
     example: str
     confidence: float
-    metadata: Dict[str, any] = field(default_factory=dict)
+    metadata: Dict[str, Any] = field(default_factory=dict)
 
 
 @dataclass
@@ -36,7 +37,7 @@ class SuggestionResult:
     prompt: str
     suggestions: List[Suggestion]
     matched_patterns: List[str]
-    metadata: Dict[str, any] = field(default_factory=dict)
+    metadata: Dict[str, Any] = field(default_factory=dict)
 
 
 class PatternMatch(BaseModel):
@@ -49,27 +50,55 @@ class PatternMatch(BaseModel):
 
 
 class MacroSuggester:
-    """Suggests macros based on prompt patterns."""
+    """A class for suggesting macros for prompts."""
 
-    def __init__(self, macro_manager: MacroManager):
-        """Initialize the macro suggester.
+    def __init__(self, min_pattern_length: int = 3, min_frequency: int = 2) -> None:
+        """Initialize the macro suggester."""
+        self.min_pattern_length = min_pattern_length
+        self.min_frequency = min_frequency
+        self.pattern_matches: Dict[str, List[str]] = {}
+        self.logger = logging.getLogger(__name__)
+
+    def suggest(self, prompt: str) -> List[Dict[str, Any]]:
+        """Suggest macros for a prompt.
 
         Args:
-            macro_manager: The macro manager to use
+            prompt: The prompt to suggest macros for
+
+        Returns:
+            List of suggested macros
         """
-        self.macro_manager = macro_manager
-        self.pattern_matches: Dict[str, PatternMatch] = {}
-        self.min_pattern_length = 10
-        self.min_frequency = 2
+        # Get patterns
+        patterns = self._get_patterns()
+
+        # Find matching patterns
+        matches = []
+        for pattern in patterns:
+            if pattern["regex"].search(prompt):
+                matches.append(pattern)
+
+        return matches
+
+    def _get_patterns(self) -> List[Dict[str, Any]]:
+        """Get a list of patterns.
+
+        Args:
+            None
+
+        Returns:
+            List of patterns
+        """
+        # TODO: Implement pattern loading
+        return []
 
     def analyze_prompts(self, prompts: List[str]) -> List[PatternMatch]:
         """Analyze a list of prompts to find common patterns.
 
         Args:
-            prompts: List of prompts to analyze
+            prompts (List[str]): List of prompts to analyze.
 
         Returns:
-            List of pattern matches found
+            List[PatternMatch]: List of pattern matches found.
         """
         # Reset pattern matches
         self.pattern_matches.clear()
@@ -82,7 +111,8 @@ class MacroSuggester:
         valid_patterns = [
             match
             for match in self.pattern_matches.values()
-            if len(match.pattern) >= self.min_pattern_length and match.frequency >= self.min_frequency
+            if len(match.pattern) >= self.min_pattern_length
+            and match.frequency >= self.min_frequency
         ]
 
         return sorted(valid_patterns, key=lambda x: x.frequency, reverse=True)
@@ -91,7 +121,7 @@ class MacroSuggester:
         """Find patterns in a single prompt.
 
         Args:
-            prompt: The prompt to analyze
+            prompt (str): The prompt to analyze.
         """
         # Split into sentences or logical chunks
         chunks = self._split_into_chunks(prompt)
@@ -106,7 +136,9 @@ class MacroSuggester:
                 if i != j and self._is_similar(chunk, other_chunk):
                     pattern = self._normalize_pattern(chunk)
                     if pattern not in self.pattern_matches:
-                        self.pattern_matches[pattern] = PatternMatch(pattern=pattern, frequency=1, examples=[chunk])
+                        self.pattern_matches[pattern] = PatternMatch(
+                            pattern=pattern, frequency=1, examples=[chunk]
+                        )
                     else:
                         match = self.pattern_matches[pattern]
                         match.frequency += 1
@@ -117,32 +149,32 @@ class MacroSuggester:
         """Split text into logical chunks.
 
         Args:
-            text: The text to split
+            text (str): The text to split.
 
         Returns:
-            List of text chunks
+            List[str]: List of text chunks.
         """
         # Split by sentences, bullet points, or other logical boundaries
-        chunks = re.split(r"[.!?]|\n|\*", text)
+        chunks: List[str] = re.split(r"[.!?]|\n|\*", text)
         return [chunk.strip() for chunk in chunks if chunk.strip()]
 
     def _is_similar(self, chunk1: str, chunk2: str) -> bool:
         """Check if two chunks are similar enough to be considered the same pattern.
 
         Args:
-            chunk1: First text chunk
-            chunk2: Second text chunk
+            chunk1 (str): First text chunk.
+            chunk2 (str): Second text chunk.
 
         Returns:
-            True if chunks are similar, False otherwise
+            bool: True if chunks are similar, False otherwise.
         """
         # Simple similarity check - can be improved with more sophisticated methods
-        chunk1_words = set(chunk1.lower().split())
-        chunk2_words = set(chunk2.lower().split())
+        chunk1_words: Set[str] = set(chunk1.lower().split())
+        chunk2_words: Set[str] = set(chunk2.lower().split())
 
         # Calculate Jaccard similarity
-        intersection = len(chunk1_words & chunk2_words)
-        union = len(chunk1_words | chunk2_words)
+        intersection: int = len(chunk1_words & chunk2_words)
+        union: int = len(chunk1_words | chunk2_words)
 
         return intersection / union > 0.7 if union > 0 else False
 
@@ -150,13 +182,13 @@ class MacroSuggester:
         """Normalize a pattern for comparison.
 
         Args:
-            pattern: The pattern to normalize
+            pattern (str): The pattern to normalize.
 
         Returns:
-            Normalized pattern
+            str: Normalized pattern.
         """
         # Convert to lowercase and remove extra whitespace
-        normalized = " ".join(pattern.lower().split())
+        normalized: str = " ".join(pattern.lower().split())
 
         # Replace specific values with placeholders
         normalized = re.sub(r"\d+", "{number}", normalized)
@@ -168,12 +200,12 @@ class MacroSuggester:
         """Suggest macros based on found patterns.
 
         Args:
-            patterns: List of pattern matches to analyze
+            patterns (List[PatternMatch]): List of pattern matches to analyze.
 
         Returns:
-            List of suggested macro definitions
+            List[MacroDefinition]: List of suggested macro definitions.
         """
-        suggested_macros = []
+        suggested_macros: List[MacroDefinition] = []
 
         for pattern in patterns:
             if pattern.frequency >= self.min_frequency:
@@ -194,176 +226,195 @@ class MacroSuggester:
         """Extract parameters from a pattern.
 
         Args:
-            pattern: The pattern to extract parameters from
+            pattern (str): The pattern to extract parameters from.
 
         Returns:
-            List of parameter names
+            List[str]: List of parameter names.
         """
         # Find all placeholders in the pattern
-        placeholders = re.findall(r"\{([^}]+)\}", pattern)
-        return list(set(placeholders))
+        params: List[str] = []
+        for match in re.finditer(r"{(\w+)}", pattern):
+            param = match.group(1)
+            if param not in params:
+                params.append(param)
+        return params
 
-    def get_suggestion_stats(self) -> Dict[str, any]:
+    def get_suggestion_stats(self) -> Dict[str, Any]:
         """Get statistics about suggestions.
 
         Returns:
-            Dict[str, any]: Suggestion statistics.
+            Dict[str, Any]: Suggestion statistics.
         """
         if not self.pattern_matches:
             return {}
 
-        pattern_counts = {}
-        for match in self.pattern_matches.values():
-            pattern_counts[match.pattern] = match.frequency
+        total_patterns = len(self.pattern_matches)
+        total_frequency = sum(
+            match.frequency for match in self.pattern_matches.values()
+        )
+        avg_frequency = total_frequency / total_patterns if total_patterns > 0 else 0
 
         return {
-            "total_suggestions": len(self.pattern_matches),
-            "avg_suggestions_per_prompt": sum(match.frequency for match in self.pattern_matches.values())
-            / len(self.pattern_matches),
-            "pattern_frequency": pattern_counts,
+            "total_patterns": total_patterns,
+            "total_frequency": total_frequency,
+            "avg_frequency": avg_frequency,
+            "pattern_lengths": {
+                match.pattern: len(match.pattern)
+                for match in self.pattern_matches.values()
+            },
+            "metadata": {"timestamp": self._get_timestamp()},
         }
 
     def _load_macro_patterns(self) -> None:
-        """Load macro patterns."""
+        """Load macro patterns from configuration."""
+        pattern_strings: Dict[str, List[str]] = {
+            "code_blocks": [
+                r"```[\s\S]*?```",
+                r"`[^`]+`",
+            ],
+            "examples": [
+                r"Example:[\s\S]*?(?=\n\n|\Z)",
+                r"For example:[\s\S]*?(?=\n\n|\Z)",
+            ],
+            "instructions": [
+                r"Please[\s\S]*?(?=\n\n|\Z)",
+                r"Instructions:[\s\S]*?(?=\n\n|\Z)",
+            ],
+        }
+
         self.patterns = {
-            "function_definition": {
-                "pattern": r"def\s+\w+\s*\([^)]*\)\s*:",
-                "replacement": "${function_name}(${params})",
-                "description": "Function definition pattern",
-                "example": "def process_data(data: List[str]) -> Dict[str, int]:",
-                "confidence": 0.9,
-            },
-            "class_definition": {
-                "pattern": r"class\s+\w+(\s*\([^)]*\))?:",
-                "replacement": "${class_name}",
-                "description": "Class definition pattern",
-                "example": "class DataProcessor:",
-                "confidence": 0.9,
-            },
-            "import_statement": {
-                "pattern": r"(from\s+[\w.]+\s+)?import\s+[\w.]+(\s+as\s+\w+)?",
-                "replacement": "${import_statement}",
-                "description": "Import statement pattern",
-                "example": "from typing import List, Dict",
-                "confidence": 0.9,
-            },
-            "docstring": {
-                "pattern": r'"""[^"]*"""',
-                "replacement": "${docstring}",
-                "description": "Docstring pattern",
-                "example": '"""Process the input data."""',
-                "confidence": 0.8,
-            },
-            "type_hint": {
-                "pattern": r":\s*[\w\[\],\s]+",
-                "replacement": "${type_hint}",
-                "description": "Type hint pattern",
-                "example": ": List[str]",
-                "confidence": 0.8,
-            },
-            "error_handling": {
-                "pattern": r"try:.*?except\s+\w+(\s+as\s+\w+)?:",
-                "replacement": "${error_handling}",
-                "description": "Error handling pattern",
-                "example": "try: ... except ValueError as e:",
-                "confidence": 0.8,
-            },
-            "logging_statement": {
-                "pattern": r"logger\.\w+\([^)]+\)",
-                "replacement": "${logging_statement}",
-                "description": "Logging statement pattern",
-                "example": 'logger.info("Processing data")',
-                "confidence": 0.8,
-            },
-            "configuration_dict": {
-                "pattern": r"\{[^}]+\}",
-                "replacement": "${config}",
-                "description": "Configuration dictionary pattern",
-                "example": '{"model": "gpt-4", "max_tokens": 100}',
-                "confidence": 0.7,
-            },
+            category: [re.compile(pattern) for pattern in patterns]
+            for category, patterns in pattern_strings.items()
         }
 
     def export_patterns(self, output_path: Path) -> None:
-        """Export macro patterns to a file.
+        """Export pattern matches to a file.
 
         Args:
-            output_path (Path): Path to save patterns.
+            output_path (Path): Path to save results.
         """
-        patterns_data = {
+        results_data = {
+            "statistics": self.get_suggestion_stats(),
             "patterns": [
                 {
-                    "name": pattern.name,
-                    "pattern": pattern.pattern,
-                    "description": pattern.description,
-                    "example": pattern.example,
-                    "metadata": pattern.metadata,
+                    "pattern": match.pattern,
+                    "frequency": match.frequency,
+                    "examples": match.examples,
+                    "suggested_macro": (
+                        match.suggested_macro.dict() if match.suggested_macro else None
+                    ),
                 }
-                for pattern in self.patterns.values()
-            ]
+                for match in self.pattern_matches.values()
+            ],
+            "metadata": {"timestamp": self._get_timestamp()},
         }
 
         with open(output_path, "w", encoding="utf-8") as f:
-            json.dump(patterns_data, f, indent=2)
+            json.dump(results_data, f, indent=2)
 
     def _find_matching_patterns(self, prompt: str) -> List[Dict[str, Any]]:
         """Find patterns that match the prompt.
 
         Args:
-            prompt (str): Prompt to analyze.
+            prompt (str): The prompt to analyze.
 
         Returns:
-            List[Dict[str, Any]]: List of matched patterns.
+            List[Dict[str, Any]]: List of matching patterns.
         """
-        matches = []
+        matches: List[Dict[str, Any]] = []
 
-        for pattern in self.patterns.values():
-            if re.search(pattern["pattern"], prompt, re.MULTILINE | re.DOTALL):
-                matches.append(
-                    {
-                        "name": pattern["name"],
-                        "pattern": pattern["pattern"],
-                        "description": pattern["description"],
-                        "example": pattern["example"],
-                        "metadata": pattern["metadata"],
-                    }
-                )
+        for category, patterns in self.patterns.items():
+            for pattern in patterns:
+                for match in pattern.finditer(prompt):
+                    matches.append(
+                        {
+                            "category": category,
+                            "pattern": pattern.pattern,
+                            "match": match.group(0),
+                            "start": match.start(),
+                            "end": match.end(),
+                        }
+                    )
 
         return matches
 
     def _generate_macro_suggestions(
-        self, prompt: str, matched_patterns: List[Dict[str, Any]], params: Dict[str, Any]
+        self,
+        prompt: str,
+        matched_patterns: List[Dict[str, Any]],
+        params: Dict[str, Any],
     ) -> List[Dict[str, Any]]:
         """Generate macro suggestions based on matched patterns.
 
         Args:
-            prompt (str): Original prompt.
-            matched_patterns (List[Dict[str, Any]]): Matched patterns.
-            params (Dict[str, Any]]): Suggestion parameters.
+            prompt (str): The prompt to analyze.
+            matched_patterns (List[Dict[str, Any]]): List of matched patterns.
+            params (Dict[str, Any]): Additional parameters.
 
         Returns:
-            List[Dict[str, Any]]: List of suggested macros.
+            List[Dict[str, Any]]: List of macro suggestions.
         """
-        suggestions = []
-        used_patterns: Set[str] = set()
+        suggestions: List[Dict[str, Any]] = []
 
-        # Sort patterns by frequency in the prompt
-        pattern_frequency = defaultdict(int)
-        for pattern in matched_patterns:
-            matches = re.findall(pattern["pattern"], prompt, re.MULTILINE | re.DOTALL)
-            pattern_frequency[pattern["name"]] = len(matches)
-
-        # Sort patterns by frequency
-        sorted_patterns = sorted(matched_patterns, key=lambda p: pattern_frequency[p["name"]], reverse=True)
-
-        # Generate suggestions
-        for pattern in sorted_patterns:
-            if pattern["name"] in used_patterns:
-                continue
-
-            # Check if pattern is frequent enough
-            if pattern_frequency[pattern["name"]] >= params.get("min_frequency", 2):
-                suggestions.append(pattern)
-                used_patterns.add(pattern["name"])
+        for match in matched_patterns:
+            if match["category"] in params.get("enabled_categories", []):
+                suggestion = {
+                    "pattern": match["pattern"],
+                    "replacement": f"{{macro_{match['category']}}}",
+                    "description": f"Replace {match['category']} pattern with macro",
+                    "example": match["match"],
+                    "confidence": 0.8,  # TODO: Implement confidence calculation
+                    "metadata": {
+                        "category": match["category"],
+                        "position": {"start": match["start"], "end": match["end"]},
+                    },
+                }
+                suggestions.append(suggestion)
 
         return suggestions
+
+    def _get_timestamp(self) -> str:
+        """Get current timestamp.
+
+        Returns:
+            str: ISO format timestamp.
+        """
+        return datetime.now().isoformat()
+
+    def analyze_prompt(self, prompt: str) -> List[MacroDefinition]:
+        """Analyze a prompt and suggest macros."""
+        patterns = self._find_patterns(prompt)
+        return self._generate_macro_definitions(patterns)
+
+    def _find_patterns(self, prompt: str) -> Dict[str, int]:
+        """Find repeated patterns in the prompt."""
+        patterns: Dict[str, int] = {}
+        words = prompt.split()
+
+        for i in range(len(words) - self.min_pattern_length + 1):
+            pattern = " ".join(words[i : i + self.min_pattern_length])
+            patterns[pattern] = patterns.get(pattern, 0) + 1
+
+        return {p: f for p, f in patterns.items() if f >= self.min_frequency}
+
+    def _generate_macro_definitions(
+        self, patterns: Dict[str, int]
+    ) -> List[MacroDefinition]:
+        """Generate macro definitions from patterns."""
+        macros: List[MacroDefinition] = []
+
+        for pattern, frequency in patterns.items():
+            if frequency >= self.min_frequency:
+                macro = MacroDefinition(
+                    name=f"MACRO_{len(macros) + 1}",
+                    pattern=pattern,
+                    parameters=[],
+                    description=f"Replaces '{pattern}'",
+                )
+                macros.append(macro)
+
+        return macros
+
+    def get_pattern_matches(self) -> Dict[str, List[str]]:
+        """Get all pattern matches found during analysis."""
+        return self.pattern_matches

@@ -1,19 +1,25 @@
 """API package for the prompt efficiency suite."""
 
+import os
 from datetime import datetime, timedelta
 from typing import Any, Dict
 
 import jwt
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException, Security
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 
 # JWT settings
-SECRET_KEY = "your-secret-key"  # Change this in production
+SECRET_KEY = os.environ.get("PROMPT_EFFICIENCY_SECRET_KEY")
+if not SECRET_KEY:
+    raise ValueError("PROMPT_EFFICIENCY_SECRET_KEY environment variable must be set")
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
 
 app = FastAPI(
-    title="Prompt Efficiency Suite API", description="API for optimizing and managing prompts", version="1.0.0"
+    title="Prompt Efficiency Suite API",
+    description="API for optimizing and managing prompts",
+    version="1.0.0",
 )
 
 # Configure CORS
@@ -56,5 +62,7 @@ from .tester_api import router as tester_router
 app.include_router(analyzer_router, prefix="/api/v1/analyzer", tags=["analyzer"])
 app.include_router(translator_router, prefix="/api/v1/translator", tags=["translator"])
 app.include_router(optimizer_router, prefix="/api/v1/optimizer", tags=["optimizer"])
-app.include_router(orchestrator_router, prefix="/api/v1/orchestrator", tags=["orchestrator"])
+app.include_router(
+    orchestrator_router, prefix="/api/v1/orchestrator", tags=["orchestrator"]
+)
 app.include_router(tester_router, prefix="/api/v1/tester", tags=["tester"])

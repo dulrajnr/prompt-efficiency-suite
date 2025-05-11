@@ -1,6 +1,9 @@
 import pytest
 
-from prompt_efficiency_suite.code_aware_compressor import CodeAwareCompressor, CompressionResult
+from prompt_efficiency_suite.code_aware_compressor import (
+    CodeAwareCompressor,
+    CompressionResult,
+)
 
 
 @pytest.fixture
@@ -124,7 +127,9 @@ def test_compress_markdown(compressor, sample_markdown):
     assert "word_count" in result.metadata
 
 
-def test_content_type_detection(compressor, sample_json, sample_yaml, sample_python, sample_markdown):
+def test_content_type_detection(
+    compressor, sample_json, sample_yaml, sample_python, sample_markdown
+):
     # Test JSON detection
     result = compressor.compress(sample_json)
     assert result.content_type == "json"
@@ -175,7 +180,9 @@ def test_compression_metadata(compressor, sample_json, sample_yaml, sample_pytho
     assert python_result.metadata["character_count"] > 0
 
 
-def test_compression_ratio(compressor, sample_json, sample_yaml, sample_python, sample_markdown):
+def test_compression_ratio(
+    compressor, sample_json, sample_yaml, sample_python, sample_markdown
+):
     # Test compression ratios for different content types
     json_result = compressor.compress(sample_json, "json")
     yaml_result = compressor.compress(sample_yaml, "yaml")

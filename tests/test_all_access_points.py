@@ -6,7 +6,13 @@ from pathlib import Path
 import pytest
 import requests
 
-from prompt_efficiency_suite import AdaptiveBudgeting, CodeAwareCompressor, DomainAwareTrimmer, PromptAnalyzer
+from prompt_efficiency_suite import (
+    AdaptiveBudgeting,
+    CICDIntegration,
+    CodeAwareCompressor,
+    DomainAwareTrimmer,
+    PromptAnalyzer,
+)
 
 
 class TestAllAccessPoints(unittest.TestCase):
@@ -22,12 +28,16 @@ class TestAllAccessPoints(unittest.TestCase):
     def test_01_cli_commands(self):
         """Test CLI functionality."""
         # Test basic commands
-        result = subprocess.run(["prompt-efficiency", "--help"], capture_output=True, text=True)
+        result = subprocess.run(
+            ["prompt-efficiency", "--help"], capture_output=True, text=True
+        )
         self.assertEqual(result.returncode, 0)
 
         # Test benchmark creation
         result = subprocess.run(
-            ["prompt-efficiency", "benchmark", "create-task", "TEST_TASK", "Test Task"], capture_output=True, text=True
+            ["prompt-efficiency", "benchmark", "create-task", "TEST_TASK", "Test Task"],
+            capture_output=True,
+            text=True,
         )
         self.assertEqual(result.returncode, 0)
         task_id = json.loads(result.stdout)["task_id"]
@@ -69,17 +79,25 @@ class TestAllAccessPoints(unittest.TestCase):
         self.assertIn("quality_score", analysis_result)
 
         # Test trimming
-        trimmed = trimmer.trim(text=self.test_prompt, preserve_ratio=0.8, domain_terms=["assistant", "help"])
+        trimmed = trimmer.trim(
+            text=self.test_prompt,
+            preserve_ratio=0.8,
+            domain_terms=["assistant", "help"],
+        )
         self.assertIsNotNone(trimmed)
         self.assertLess(len(trimmed), len(self.test_prompt))
 
         # Test budget tracking
-        budget_result = budget_tracker.track_usage(prompt=self.test_prompt, model="gpt-4", tokens=150)
+        budget_result = budget_tracker.track_usage(
+            prompt=self.test_prompt, model="gpt-4", tokens=150
+        )
         self.assertIsNotNone(budget_result)
         self.assertIn("remaining_budget", budget_result)
 
         # Test code compression
-        code_prompt = self.test_prompt + "\n```python\ndef hello():\n    print('Hello')\n```"
+        code_prompt = (
+            self.test_prompt + "\n```python\ndef hello():\n    print('Hello')\n```"
+        )
         compressed = compressor.compress(prompt=code_prompt, language="python")
         self.assertIsNotNone(compressed)
         self.assertLess(len(compressed), len(code_prompt))
@@ -91,12 +109,16 @@ class TestAllAccessPoints(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
 
         # Test prompt analysis
-        response = requests.post(f"{self.api_base_url}/analyze", json={"prompt": self.test_prompt})
+        response = requests.post(
+            f"{self.api_base_url}/analyze", json={"prompt": self.test_prompt}
+        )
         self.assertEqual(response.status_code, 200)
         self.assertIn("quality_score", response.json())
 
         # Test quick analysis
-        response = requests.post(f"{self.api_base_url}/analyze/quick", json={"prompt": self.test_prompt})
+        response = requests.post(
+            f"{self.api_base_url}/analyze/quick", json={"prompt": self.test_prompt}
+        )
         self.assertEqual(response.status_code, 200)
         self.assertIn("token_count", response.json())
 
@@ -109,7 +131,9 @@ class TestAllAccessPoints(unittest.TestCase):
         plugin_api = JetBrainsPluginAPI()
 
         # Test pattern management
-        pattern_result = plugin_api.create_pattern(name="Test Pattern", template=self.test_prompt, category="test")
+        pattern_result = plugin_api.create_pattern(
+            name="Test Pattern", template=self.test_prompt, category="test"
+        )
         self.assertIsNotNone(pattern_result)
         self.assertIn("pattern_id", pattern_result)
 

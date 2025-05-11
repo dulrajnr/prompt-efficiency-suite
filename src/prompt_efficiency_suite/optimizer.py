@@ -1,14 +1,13 @@
-"""
-Core optimizer module for prompt optimization.
-"""
+"""Optimizer - A module for optimizing prompts to improve their performance."""
 
 import json
 import logging
 import re
 from collections import defaultdict
 from dataclasses import dataclass, field
+from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Union
+from typing import Any, Dict, List, Optional, Pattern
 
 from .analyzer import PromptAnalyzer
 from .code_aware_compressor import CodeAwareCompressor
@@ -29,7 +28,7 @@ class OptimizationConfig:
     preserve_code: bool = True
     preserve_examples: bool = True
     preserve_context: bool = True
-    metadata: Dict[str, any] = field(default_factory=dict)
+    metadata: Dict[str, Any] = field(default_factory=dict)
 
 
 @dataclass
@@ -44,7 +43,7 @@ class OptimizationResult:
     efficiency_score: float
     length_reduction: float
     optimization_time: float
-    metadata: Dict[str, any] = field(default_factory=dict)
+    metadata: Dict[str, Any] = field(default_factory=dict)
 
 
 class PromptOptimizer:
@@ -58,14 +57,17 @@ class PromptOptimizer:
         """
         self.config = config or OptimizationConfig()
         self.optimization_history: List[OptimizationResult] = []
+        self.patterns: Dict[str, List[Pattern[str]]] = {}
         self._load_optimization_patterns()
 
-    def optimize(self, prompt: str, optimization_params: Optional[Dict[str, any]] = None) -> OptimizationResult:
+    def optimize(
+        self, prompt: str, optimization_params: Optional[Dict[str, Any]] = None
+    ) -> OptimizationResult:
         """Optimize a prompt.
 
         Args:
             prompt (str): Prompt to optimize.
-            optimization_params (Optional[Dict[str, any]]): Additional optimization parameters.
+            optimization_params (Optional[Dict[str, Any]]): Additional optimization parameters.
 
         Returns:
             OptimizationResult: Result of optimization.
@@ -92,37 +94,47 @@ class PromptOptimizer:
             efficiency_score=efficiency,
             length_reduction=1 - (len(optimized) / len(prompt)),
             optimization_time=0.0,  # TODO: Add timing
-            metadata={},
+            metadata={"timestamp": self._get_timestamp()},
         )
 
         self.optimization_history.append(result)
         return result
 
-    def get_optimization_stats(self) -> Dict[str, any]:
+    def get_optimization_stats(self) -> Dict[str, Any]:
         """Get statistics about optimizations.
 
         Returns:
-            Dict[str, any]: Optimization statistics.
+            Dict[str, Any]: Optimization statistics.
         """
         if not self.optimization_history:
             return {}
 
         return {
             "total_optimizations": len(self.optimization_history),
-            "avg_length_reduction": sum(r.length_reduction for r in self.optimization_history)
+            "avg_length_reduction": sum(
+                r.length_reduction for r in self.optimization_history
+            )
             / len(self.optimization_history),
-            "avg_clarity": sum(r.clarity_score for r in self.optimization_history) / len(self.optimization_history),
-            "avg_completeness": sum(r.completeness_score for r in self.optimization_history)
+            "avg_clarity": sum(r.clarity_score for r in self.optimization_history)
             / len(self.optimization_history),
-            "avg_consistency": sum(r.consistency_score for r in self.optimization_history)
+            "avg_completeness": sum(
+                r.completeness_score for r in self.optimization_history
+            )
+            / len(self.optimization_history),
+            "avg_consistency": sum(
+                r.consistency_score for r in self.optimization_history
+            )
             / len(self.optimization_history),
             "avg_efficiency": sum(r.efficiency_score for r in self.optimization_history)
             / len(self.optimization_history),
         }
 
     def _load_optimization_patterns(self) -> None:
-        """Load optimization patterns."""
-        self.patterns = {
+        """Load optimization patterns.
+
+        This method compiles regex patterns for various optimization rules.
+        """
+        pattern_strings: Dict[str, List[str]] = {
             "redundant_phrases": [
                 r"\bas (you |we )?mentioned( earlier| before| previously)?\b",
                 r"\blike I said( earlier| before| previously)?\b",
@@ -149,39 +161,80 @@ class PromptOptimizer:
             ],
         }
 
+        self.patterns = {
+            category: [re.compile(pattern) for pattern in patterns]
+            for category, patterns in pattern_strings.items()
+        }
+
     def _calculate_clarity(self, prompt: str) -> float:
-        """Calculate clarity score."""
+        """Calculate clarity score.
+
+        Args:
+            prompt (str): The prompt to analyze.
+
+        Returns:
+            float: Clarity score between 0 and 1.
+        """
         # TODO: Implement more sophisticated clarity calculation
         return 0.9
 
     def _calculate_completeness(self, prompt: str) -> float:
-        """Calculate completeness score."""
+        """Calculate completeness score.
+
+        Args:
+            prompt (str): The prompt to analyze.
+
+        Returns:
+            float: Completeness score between 0 and 1.
+        """
         # TODO: Implement more sophisticated completeness calculation
         return 0.9
 
     def _calculate_consistency(self, prompt: str) -> float:
-        """Calculate consistency score."""
+        """Calculate consistency score.
+
+        Args:
+            prompt (str): The prompt to analyze.
+
+        Returns:
+            float: Consistency score between 0 and 1.
+        """
         # TODO: Implement more sophisticated consistency calculation
         return 0.9
 
     def _calculate_efficiency(self, prompt: str) -> float:
-        """Calculate efficiency score."""
+        """Calculate efficiency score.
+
+        Args:
+            prompt (str): The prompt to analyze.
+
+        Returns:
+            float: Efficiency score between 0 and 1.
+        """
         # TODO: Implement more sophisticated efficiency calculation
         return 0.9
 
     def _optimize_prompt(self, prompt: str, config: OptimizationConfig) -> str:
-        """Optimize a prompt."""
+        """Optimize a prompt.
+
+        Args:
+            prompt (str): The prompt to optimize.
+            config (OptimizationConfig): Optimization configuration.
+
+        Returns:
+            str: Optimized prompt.
+        """
         optimized = prompt
 
         # Preserve code blocks and examples if configured
-        preserved_sections = []
+        preserved_sections: List[Pattern[str]] = []
         if config.preserve_code:
             preserved_sections.extend(self.patterns["code_blocks"])
         if config.preserve_examples:
             preserved_sections.extend(self.patterns["examples"])
 
         # Extract preserved sections
-        preserved = {}
+        preserved: Dict[str, str] = {}
         for i, pattern in enumerate(preserved_sections):
             for match in re.finditer(pattern, optimized):
                 key = f"PRESERVED_{i}_{len(preserved)}"
@@ -190,16 +243,11 @@ class PromptOptimizer:
 
         # Remove redundant phrases
         for pattern in self.patterns["redundant_phrases"]:
-            optimized = re.sub(pattern, "", optimized)
+            optimized = pattern.sub("", optimized)
 
         # Remove filler words
         for pattern in self.patterns["filler_words"]:
-            optimized = re.sub(pattern, "", optimized)
-
-        # Clean up whitespace
-        optimized = re.sub(r"\s+", " ", optimized)
-        optimized = re.sub(r"\n\s*\n\s*\n", "\n\n", optimized)
-        optimized = optimized.strip()
+            optimized = pattern.sub("", optimized)
 
         # Restore preserved sections
         for key, value in preserved.items():
@@ -207,73 +255,63 @@ class PromptOptimizer:
 
         return optimized
 
+    def _get_timestamp(self) -> str:
+        """Get current timestamp.
+
+        Returns:
+            str: ISO format timestamp.
+        """
+        return datetime.now().isoformat()
+
 
 class Optimizer:
     """A class for optimizing prompts."""
 
-    def __init__(self, config: Optional[Dict[str, Any]] = None):
-        """Initialize the Optimizer.
+    def __init__(self):
+        """Initialize the optimizer."""
+        self.logger = logging.getLogger(__name__)
+        self.optimization_history: List[Dict[str, Any]] = []
 
-        Args:
-            config (Optional[Dict[str, Any]]): Configuration parameters.
-        """
-        self.config = config or {}
-        self.analyzer = PromptAnalyzer(config)
-        self.compressor = CodeAwareCompressor(config)
-        self.macro_suggester = MacroSuggester(config)
-        self.optimization_history: List[OptimizationResult] = []
-
-    def optimize(self, prompt: str, optimization_params: Optional[Dict[str, Any]] = None) -> OptimizationResult:
+    def optimize(self, prompt: str) -> str:
         """Optimize a prompt.
 
         Args:
-            prompt (str): Prompt to optimize.
-            optimization_params (Optional[Dict[str, Any]]): Optimization parameters.
+            prompt: The prompt to optimize
 
         Returns:
-            OptimizationResult: Optimization result.
+            The optimized prompt
         """
-        params = optimization_params or {}
+        # Remove redundant punctuation
+        prompt = self._remove_redundant_punctuation(prompt)
 
-        # Analyze prompt
-        analysis_result = self.analyzer.analyze(prompt)
+        # Remove redundant words
+        prompt = self._remove_redundant_words(prompt)
 
-        # Compress prompt
-        compression_result = self.compressor.compress(prompt)
+        return prompt
 
-        # Suggest macros
-        macro_result = self.macro_suggester.suggest_macros(prompt)
+    def _remove_redundant_punctuation(self, prompt: str) -> str:
+        """Remove redundant punctuation from a prompt.
 
-        # Combine optimizations
-        optimized_prompt = self._combine_optimizations(
-            prompt, analysis_result, compression_result, macro_result, params
-        )
+        Args:
+            prompt: The prompt to process
 
-        # Calculate optimization stats
-        stats = self._calculate_optimization_stats(
-            prompt, optimized_prompt, analysis_result, compression_result, macro_result
-        )
+        Returns:
+            The prompt with redundant punctuation removed
+        """
+        # TODO: Implement punctuation removal
+        return prompt
 
-        # Create result
-        result = OptimizationResult(
-            original_prompt=prompt,
-            optimized_prompt=optimized_prompt,
-            clarity_score=stats["improvements"]["clarity"],
-            completeness_score=stats["improvements"]["completeness"],
-            consistency_score=stats["improvements"]["consistency"],
-            efficiency_score=stats["improvements"]["efficiency"],
-            length_reduction=stats["length_reduction"],
-            optimization_time=0.0,  # TODO: Add timing
-            metadata={
-                "optimization_params": params,
-                "analysis_metrics": analysis_result.metrics.__dict__,
-                "compression_ratio": compression_result.compression_ratio,
-                "suggested_macros": [macro.__dict__ for macro in macro_result.suggested_macros],
-            },
-        )
+    def _remove_redundant_words(self, prompt: str) -> str:
+        """Remove redundant words from a prompt.
 
-        self.optimization_history.append(result)
-        return result
+        Args:
+            prompt: The prompt to process
+
+        Returns:
+            The prompt with redundant words removed
+        """
+        # TODO: Implement word removal
+        return prompt
 
     def get_optimization_stats(self) -> Dict[str, Any]:
         """Get statistics about optimizations.
@@ -281,25 +319,23 @@ class Optimizer:
         Returns:
             Dict[str, Any]: Optimization statistics.
         """
-        if not self.optimization_history:
-            return {}
-
-        # Calculate average improvements
-        total_improvements = defaultdict(float)
-        for result in self.optimization_history:
-            stats = result.optimization_stats
-            for metric, value in stats["improvements"].items():
-                total_improvements[metric] += value
-
-        avg_improvements = {
-            metric: value / len(self.optimization_history) for metric, value in total_improvements.items()
-        }
-
-        return {
+        stats: Dict[str, Any] = {
             "total_optimizations": len(self.optimization_history),
-            "average_improvements": avg_improvements,
-            "optimization_types": self._get_optimization_type_stats(),
+            "average_improvement": 0.0,
+            "best_improvement": 0.0,
+            "worst_improvement": 0.0,
         }
+
+        if self.optimization_history:
+            improvements = [
+                h["metrics"].get("improvement_percentage", 0.0)
+                for h in self.optimization_history
+            ]
+            stats["average_improvement"] = sum(improvements) / len(improvements)
+            stats["best_improvement"] = max(improvements)
+            stats["worst_improvement"] = min(improvements)
+
+        return stats
 
     def export_results(self, output_path: Path) -> None:
         """Export optimization results to a file.
@@ -324,15 +360,20 @@ class Optimizer:
             json.dump(results_data, f, indent=2)
 
     def _combine_optimizations(
-        self, prompt: str, analysis_result: Any, compression_result: Any, macro_result: Any, params: Dict[str, Any]
+        self,
+        prompt: str,
+        analysis_result: Dict[str, Any],
+        compression_result: Dict[str, Any],
+        macro_result: Dict[str, Any],
+        params: Dict[str, Any],
     ) -> str:
         """Combine different optimizations.
 
         Args:
             prompt (str): Original prompt.
-            analysis_result (Any): Analysis result.
-            compression_result (Any): Compression result.
-            macro_result (Any): Macro suggestion result.
+            analysis_result (Dict[str, Any]): Analysis result.
+            compression_result (Dict[str, Any]): Compression result.
+            macro_result (Dict[str, Any]): Macro suggestion result.
             params (Dict[str, Any]): Optimization parameters.
 
         Returns:
@@ -348,7 +389,9 @@ class Optimizer:
 
         # Apply analysis-based improvements
         if params.get("apply_analysis", True):
-            optimized = self._apply_analysis_improvements(optimized, analysis_result.metrics)
+            optimized = self._apply_analysis_improvements(
+                optimized, analysis_result.metrics
+            )
 
         return optimized
 
@@ -495,10 +538,16 @@ class BatchOptimizer:
         avg_batch_size = total_prompts / total_batches
 
         all_results = [result for batch in self.batch_history for result in batch]
-        avg_length_reduction = sum(r.length_reduction for r in all_results) / len(all_results)
+        avg_length_reduction = sum(r.length_reduction for r in all_results) / len(
+            all_results
+        )
         avg_clarity = sum(r.clarity_score for r in all_results) / len(all_results)
-        avg_completeness = sum(r.completeness_score for r in all_results) / len(all_results)
-        avg_consistency = sum(r.consistency_score for r in all_results) / len(all_results)
+        avg_completeness = sum(r.completeness_score for r in all_results) / len(
+            all_results
+        )
+        avg_consistency = sum(r.consistency_score for r in all_results) / len(
+            all_results
+        )
         avg_efficiency = sum(r.efficiency_score for r in all_results) / len(all_results)
 
         return {

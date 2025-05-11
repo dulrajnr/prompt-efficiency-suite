@@ -60,10 +60,15 @@ async def translate_prompt(request: TranslateRequest) -> TranslateResponse:
     """
     try:
         translator = ModelTranslator()
-        translated = translator.translate(request.prompt, request.source_model, request.target_model, request.options)
+        translated = translator.translate(
+            request.prompt, request.source_model, request.target_model, request.options
+        )
         return TranslateResponse(
             translated_prompt=translated,
-            metadata={"source_model": request.source_model, "target_model": request.target_model},
+            metadata={
+                "source_model": request.source_model,
+                "target_model": request.target_model,
+            },
         )
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
@@ -100,7 +105,11 @@ async def get_compatible_models() -> Dict[str, Any]:
         "model_capabilities": {
             "gpt-4": {
                 "max_tokens": 8192,
-                "strengths": ["complex reasoning", "detailed analysis", "creative tasks"],
+                "strengths": [
+                    "complex reasoning",
+                    "detailed analysis",
+                    "creative tasks",
+                ],
                 "limitations": ["cost", "speed"],
             },
             "gpt-3.5-turbo": {
@@ -129,7 +138,9 @@ async def check_model_compatibility(request: TranslateRequest) -> ModelCompatibi
     """
     try:
         translator = ModelTranslator()
-        compatibility = translator.check_compatibility(request.prompt, request.source_model, request.target_model)
+        compatibility = translator.check_compatibility(
+            request.prompt, request.source_model, request.target_model
+        )
         return ModelCompatibility(
             source_model=request.source_model,
             target_model=request.target_model,

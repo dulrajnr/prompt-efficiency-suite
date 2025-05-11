@@ -1,9 +1,13 @@
+from fastapi import FastAPI
 from fastapi.testclient import TestClient
 
 from prompt_efficiency_suite.api.optimizer_api import router
 from prompt_efficiency_suite.model_translator import ModelType
 
-client = TestClient(router)
+app = FastAPI()
+app.include_router(router)
+
+client = TestClient(app)
 
 
 def test_optimize_prompt():
@@ -118,9 +122,16 @@ def test_optimization_metadata():
         json={
             "prompt": "Test prompt",
             "test_cases": [
-                {"name": "Test Case 1", "prompt": "Test prompt", "metadata": {"key": "value", "number": 42}}
+                {
+                    "name": "Test Case 1",
+                    "prompt": "Test prompt",
+                    "metadata": {"key": "value", "number": 42},
+                }
             ],
-            "config": {"target_model": "gpt-4", "metadata": {"key": "value", "number": 42}},
+            "config": {
+                "target_model": "gpt-4",
+                "metadata": {"key": "value", "number": 42},
+            },
         },
     )
 
@@ -157,8 +168,16 @@ def test_optimization_with_multiple_test_cases():
         json={
             "prompt": "Test prompt",
             "test_cases": [
-                {"name": "Test Case 1", "prompt": "Test prompt 1", "expected_response": "Response 1"},
-                {"name": "Test Case 2", "prompt": "Test prompt 2", "expected_response": "Response 2"},
+                {
+                    "name": "Test Case 1",
+                    "prompt": "Test prompt 1",
+                    "expected_response": "Response 1",
+                },
+                {
+                    "name": "Test Case 2",
+                    "prompt": "Test prompt 2",
+                    "expected_response": "Response 2",
+                },
             ],
             "config": {"target_model": "gpt-4"},
         },
@@ -213,7 +232,9 @@ def test_optimize_endpoint():
 
 def test_optimize_endpoint_invalid_model():
     """Test the /optimize endpoint with invalid model."""
-    response = client.post("/optimize", json={"prompt": "Test prompt", "model": "invalid-model"})
+    response = client.post(
+        "/optimize", json={"prompt": "Test prompt", "model": "invalid-model"}
+    )
 
     assert response.status_code == 400
     assert "Invalid model type" in response.json()["detail"]
@@ -221,7 +242,9 @@ def test_optimize_endpoint_invalid_model():
 
 def test_optimize_endpoint_default_config():
     """Test the /optimize endpoint with default config."""
-    response = client.post("/optimize", json={"prompt": "Test prompt", "model": "gpt-4"})
+    response = client.post(
+        "/optimize", json={"prompt": "Test prompt", "model": "gpt-4"}
+    )
 
     assert response.status_code == 200
     data = response.json()
@@ -266,7 +289,10 @@ def test_optimize_endpoint_quality_preservation():
     Instruction: Please help me with this task.
     """
 
-    response = client.post("/optimize", json={"prompt": prompt, "model": "gpt-4", "config": {"min_quality_score": 0.9}})
+    response = client.post(
+        "/optimize",
+        json={"prompt": prompt, "model": "gpt-4", "config": {"min_quality_score": 0.9}},
+    )
 
     assert response.status_code == 200
     data = response.json()
@@ -282,7 +308,12 @@ def test_optimize_endpoint_structure_preservation():
     """
 
     response = client.post(
-        "/optimize", json={"prompt": prompt, "model": "gpt-4", "config": {"preserve_structure": True}}
+        "/optimize",
+        json={
+            "prompt": prompt,
+            "model": "gpt-4",
+            "config": {"preserve_structure": True},
+        },
     )
 
     assert response.status_code == 200

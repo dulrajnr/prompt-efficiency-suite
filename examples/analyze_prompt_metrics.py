@@ -20,7 +20,9 @@ def analyze_prompt_metrics():
     print("\nPrompt:")
     print(prompt1)
 
-    analysis1 = analyzer.analyze_prompt(prompt=prompt1, metrics=["clarity", "specificity", "completeness"])
+    analysis1 = analyzer.analyze_prompt(
+        prompt=prompt1, metrics=["clarity", "specificity", "completeness"]
+    )
 
     print("\nAnalysis:")
     print(f"Clarity Score: {analysis1['clarity_score']}")
@@ -41,7 +43,9 @@ def analyze_prompt_metrics():
     print("\nPrompt:")
     print(prompt2)
 
-    analysis2 = analyzer.analyze_prompt(prompt=prompt2, metrics=["structure", "organization", "coherence"])
+    analysis2 = analyzer.analyze_prompt(
+        prompt=prompt2, metrics=["structure", "organization", "coherence"]
+    )
 
     print("\nAnalysis:")
     print(f"Structure Score: {analysis2['structure_score']}")
@@ -62,7 +66,9 @@ def analyze_prompt_metrics():
     print("\nPrompt:")
     print(prompt3)
 
-    analysis3 = analyzer.analyze_prompt(prompt=prompt3, metrics=["complexity", "technical_depth", "scope"])
+    analysis3 = analyzer.analyze_prompt(
+        prompt=prompt3, metrics=["complexity", "technical_depth", "scope"]
+    )
 
     print("\nAnalysis:")
     print(f"Complexity Score: {analysis3['complexity_score']}")
@@ -83,7 +89,9 @@ def analyze_prompt_metrics():
     print("\nPrompt:")
     print(prompt4)
 
-    analysis4 = analyzer.analyze_prompt(prompt=prompt4, metrics=["effectiveness", "impact", "measurability"])
+    analysis4 = analyzer.analyze_prompt(
+        prompt=prompt4, metrics=["effectiveness", "impact", "measurability"]
+    )
 
     print("\nAnalysis:")
     print(f"Effectiveness Score: {analysis4['effectiveness_score']}")

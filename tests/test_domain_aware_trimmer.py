@@ -8,7 +8,10 @@ from pathlib import Path
 
 import pytest
 
-from prompt_efficiency_suite.domain_aware_trimmer import DomainAwareTrimmer, TrimmingResult
+from prompt_efficiency_suite.domain_aware_trimmer import (
+    DomainAwareTrimmer,
+    TrimmingResult,
+)
 
 
 @pytest.fixture
@@ -56,7 +59,11 @@ def test_add_domain_terms(trimmer):
 
 def test_set_tokenization_rules(trimmer):
     """Test setting tokenization rules."""
-    rules = {"preserve_pos": ["NOUN", "VERB"], "min_length": 3, "remove_stop_words": True}
+    rules = {
+        "preserve_pos": ["NOUN", "VERB"],
+        "min_length": 3,
+        "remove_stop_words": True,
+    }
     trimmer.set_tokenization_rules("api", rules)
     assert "api" in trimmer.tokenization_rules
     assert trimmer.tokenization_rules["api"] == rules
@@ -74,7 +81,9 @@ def test_trim_text(trimmer, temp_domain_file):
     assert result.original_tokens > 0
     assert result.trimmed_tokens > 0
     assert result.compression_ratio <= 1.0
-    assert all(term in result.preserved_terms for term in ["API", "request", "response"])
+    assert all(
+        term in result.preserved_terms for term in ["API", "request", "response"]
+    )
 
 
 def test_trim_with_patterns(trimmer, temp_domain_file):
@@ -92,7 +101,9 @@ def test_trim_with_patterns(trimmer, temp_domain_file):
 def test_trim_with_custom_rules(trimmer, temp_domain_file):
     """Test trimming with custom tokenization rules."""
     trimmer.load_domain("api", temp_domain_file)
-    trimmer.set_tokenization_rules("api", {"preserve_pos": ["NOUN"], "min_length": 4, "remove_stop_words": True})
+    trimmer.set_tokenization_rules(
+        "api", {"preserve_pos": ["NOUN"], "min_length": 4, "remove_stop_words": True}
+    )
 
     text = "The API endpoint should handle the request properly"
     result = trimmer.trim(text, "api")

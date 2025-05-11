@@ -43,7 +43,9 @@ class TrimResponse(BaseModel):
 async def trim_prompt(request: TrimRequest):
     try:
         tokens_before = trimmer.get_token_count(request.prompt)
-        trimmed_prompt = trimmer.trim_prompt(request.prompt, request.domain, request.min_importance)
+        trimmed_prompt = trimmer.trim_prompt(
+            request.prompt, request.domain, request.min_importance
+        )
         tokens_after = trimmer.get_token_count(trimmed_prompt)
 
         return TrimResponse(

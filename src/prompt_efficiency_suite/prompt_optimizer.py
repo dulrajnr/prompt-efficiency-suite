@@ -1,13 +1,18 @@
-"""
-Prompt Optimizer module for optimizing individual prompts.
-"""
+"""Prompt Optimizer - A module for optimizing prompts to improve their performance."""
 
 import json
+import logging
 import re
 from collections import defaultdict
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Union
+from typing import Any, Dict, List, Optional
+
+from .optimizer import Optimizer
+from .prompt_analyzer import PromptAnalyzer
+from .tester import Tester
+
+logger = logging.getLogger(__name__)
 
 
 @dataclass
@@ -21,19 +26,29 @@ class OptimizationResult:
 
 
 class PromptOptimizer:
-    """A class for optimizing individual prompts."""
+    """A class for optimizing prompts to improve their performance.
 
-    def __init__(self, config: Optional[Dict[str, Any]] = None):
-        """Initialize the PromptOptimizer.
+    This class provides methods for analyzing, optimizing, and testing prompts
+    to improve their efficiency while maintaining effectiveness. It includes
+    functionality for:
+    - Analyzing prompt structure and content
+    - Optimizing prompt length and complexity
+    - Testing prompt performance
+    - Tracking optimization metrics
+    """
 
-        Args:
-            config (Optional[Dict[str, Any]]): Configuration parameters.
-        """
-        self.config = config or {}
+    def __init__(self) -> None:
+        """Initialize the prompt optimizer."""
+        self.analyzer = PromptAnalyzer()
+        self.optimizer = Optimizer()
+        self.tester = Tester()
         self.optimization_history: List[OptimizationResult] = []
         self.patterns = self._load_optimization_patterns()
+        self.improvement_metrics: Dict[str, float] = {}
 
-    def optimize(self, prompt: str, optimization_params: Optional[Dict[str, Any]] = None) -> OptimizationResult:
+    def optimize(
+        self, prompt: str, optimization_params: Optional[Dict[str, Any]] = None
+    ) -> OptimizationResult:
         """Optimize a single prompt.
 
         Args:
@@ -61,7 +76,10 @@ class PromptOptimizer:
             improvement_metrics=improvement_metrics,
             token_reduction=token_reduction,
             execution_time=1.0,  # Placeholder value
-            metadata={"optimization_params": params, "techniques_applied": list(self.patterns.keys())},
+            metadata={
+                "optimization_params": params,
+                "techniques_applied": list(self.patterns.keys()),
+            },
         )
 
         self.optimization_history.append(result)
@@ -89,7 +107,10 @@ class PromptOptimizer:
             "total_prompts": total_prompts,
             "average_token_reduction": total_reduction / total_prompts,
             "average_execution_time": total_time / total_prompts,
-            "average_improvements": {metric: total / total_prompts for metric, total in improvement_metrics.items()},
+            "average_improvements": {
+                metric: total / total_prompts
+                for metric, total in improvement_metrics.items()
+            },
         }
 
     def export_results(self, output_path: Path) -> None:
@@ -125,7 +146,9 @@ class PromptOptimizer:
             "remove_leading_whitespace": re.compile(r"^[ \t]+", re.MULTILINE),
         }
 
-    def _apply_optimization_techniques(self, prompt: str, params: Dict[str, Any]) -> str:
+    def _apply_optimization_techniques(
+        self, prompt: str, params: Dict[str, Any]
+    ) -> str:
         """Apply optimization techniques to the prompt.
 
         Args:
@@ -151,7 +174,9 @@ class PromptOptimizer:
 
         return optimized.strip()
 
-    def _calculate_improvement_metrics(self, original: str, optimized: str) -> Dict[str, float]:
+    def _calculate_improvement_metrics(
+        self, original: str, optimized: str
+    ) -> Dict[str, float]:
         """Calculate improvement metrics.
 
         Args:
@@ -165,10 +190,20 @@ class PromptOptimizer:
         optimized_tokens = len(optimized.strip().split())
 
         return {
-            "token_reduction_ratio": (original_tokens - optimized_tokens) / original_tokens
-            if original_tokens > 0
-            else 0.0,
-            "length_reduction_ratio": (len(original) - len(optimized)) / len(original) if len(original) > 0 else 0.0,
+            "token_reduction_ratio": (
+                (original_tokens - optimized_tokens) / original_tokens
+                if original_tokens > 0
+                else 0.0
+            ),
+            "length_reduction_ratio": (
+                (len(original) - len(optimized)) / len(original)
+                if len(original) > 0
+                else 0.0
+            ),
             "clarity_score": 0.8,  # Placeholder value
             "efficiency_score": 0.9,  # Placeholder value
         }
+
+    def get_improvement_metrics(self) -> Dict[str, float]:
+        """Get metrics about the optimization improvements."""
+        return self.improvement_metrics

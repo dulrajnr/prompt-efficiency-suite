@@ -1,14 +1,12 @@
-"""
-Cost Estimator module for estimating prompt costs.
-"""
+"""Cost Estimator - A module for estimating prompt costs."""
 
 import json
 import logging
-import re
 from collections import defaultdict
 from dataclasses import dataclass, field
+from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Union
+from typing import Any, Dict, List, Optional
 
 logger = logging.getLogger(__name__)
 
@@ -27,15 +25,69 @@ class CostEstimate:
 class CostEstimator:
     """A class for estimating prompt costs."""
 
-    def __init__(self, config: Optional[Dict[str, Any]] = None):
-        """Initialize the CostEstimator.
-
-        Args:
-            config (Optional[Dict[str, Any]]): Configuration parameters.
-        """
-        self.config = config or {}
+    def __init__(self):
+        """Initialize the cost estimator."""
+        self.logger = logging.getLogger(__name__)
         self.estimation_history: List[CostEstimate] = []
         self.model_rates = self._load_model_rates()
+
+    def estimate(self, prompt: str, model: str = "gpt-4") -> Dict[str, Any]:
+        """Estimate the cost of a prompt.
+
+        Args:
+            prompt: The prompt to estimate
+            model: The model to use for estimation
+
+        Returns:
+            Dictionary containing cost estimation
+        """
+        # Count tokens
+        token_count = self._count_tokens(prompt)
+
+        # Get model rates
+        rates = self._get_model_rates(model)
+
+        # Calculate cost
+        cost = token_count * rates["price_per_token"]
+
+        return {
+            "token_count": token_count,
+            "model": model,
+            "cost": cost,
+            "rates": rates,
+        }
+
+    def _count_tokens(self, text: str) -> int:
+        """Count the number of tokens in text.
+
+        Args:
+            text: The text to count tokens in
+
+        Returns:
+            Number of tokens
+        """
+        # TODO: Implement proper token counting
+        return len(text.split())
+
+    def _get_model_rates(self, model: str) -> Dict[str, float]:
+        """Get the rates for a model.
+
+        Args:
+            model: The model to get rates for
+
+        Returns:
+            Dictionary containing model rates
+        """
+        rates = {
+            "gpt-4": {"price_per_token": 0.03, "max_tokens": 8192, "min_tokens": 1},
+            "gpt-3.5-turbo": {
+                "price_per_token": 0.002,
+                "max_tokens": 4096,
+                "min_tokens": 1,
+            },
+        }
+
+        return rates.get(model, rates["gpt-4"])
 
     def estimate_cost(self, prompt: str, model_name: str = "gpt-3.5-turbo") -> float:
         """Estimate cost for a prompt.
@@ -82,7 +134,7 @@ class CostEstimator:
         total_tokens = sum(e.token_count for e in self.estimation_history)
 
         # Calculate model usage distribution
-        model_usage = defaultdict(int)
+        model_usage: Dict[str, int] = defaultdict(int)
         for estimate in self.estimation_history:
             model_usage[estimate.model_name] += 1
 
@@ -133,6 +185,4 @@ class CostEstimator:
 
     def _get_timestamp(self) -> str:
         """Get current timestamp."""
-        from datetime import datetime
-
         return datetime.now().isoformat()

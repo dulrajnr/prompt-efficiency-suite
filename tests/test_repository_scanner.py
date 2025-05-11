@@ -2,7 +2,11 @@ from pathlib import Path
 
 import pytest
 
-from prompt_efficiency_suite.repository_scanner import FileAnalysis, RepositoryAnalysis, RepositoryScanner
+from prompt_efficiency_suite.repository_scanner import (
+    FileAnalysis,
+    RepositoryAnalysis,
+    RepositoryScanner,
+)
 
 
 @pytest.fixture
@@ -187,7 +191,9 @@ def test_exclude_patterns(scanner, sample_repo):
     analysis = scanner.scan_repository(str(sample_repo))
 
     # Verify excluded file is not in analysis
-    assert str(sample_repo / "__pycache__" / "module1.pyc") not in analysis.file_analyses
+    assert (
+        str(sample_repo / "__pycache__" / "module1.pyc") not in analysis.file_analyses
+    )
 
 
 def test_complexity_calculation(scanner, sample_repo):

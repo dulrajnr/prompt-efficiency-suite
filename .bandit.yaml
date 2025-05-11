@@ -1,0 +1,44 @@
+### Bandit config file generated for prompt-efficiency-suite
+
+# Skip test files and virtual environments
+exclude_dirs: ['tests', 'venv', '.env', '.venv', 'build', 'dist']
+
+# Define which severity level to fail on
+skips: []
+
+### Controls for scan scope
+
+# Confidence level for skipping tests
+confidence_level: HIGH
+
+# Severity level for skipping tests
+severity_level: LOW
+
+### Specific test settings
+
+# B101: Test for use of assert
+assert_used:
+    skips: ['*_test.py', 'test_*.py']
+
+# B104-B107: Hardcoded passwords and secrets
+hardcoded_password_string:
+    skips: ['test_*.py']  # Skip in test files
+
+# B108: Insecure usage of temp file/directory
+tmp_directory:
+    skips: ['test_*.py']  # Skip in test files
+
+# B301-B324: Blacklisted imports
+blacklist_imports:
+    bad_import_sets:
+        - pickle:
+            imports: ['pickle', 'cPickle']
+            level: HIGH
+        - subprocess:
+            imports: ['subprocess']
+            message: "Consider using 'subprocess.run' with 'shell=False'"
+            level: LOW
+
+# B506: Test for use of yaml.load
+yaml_load:
+    check_yaml_load: true

@@ -27,7 +27,9 @@ class ReleaseVerifier:
         """Check Python version compatibility."""
         issues = []
         if self.python_version < self.required_python:
-            issues.append(f"Python version {self.python_version} is below required minimum {self.required_python}")
+            issues.append(
+                f"Python version {self.python_version} is below required minimum {self.required_python}"
+            )
         return issues
 
     def check_installation(self) -> List[str]:
@@ -79,7 +81,9 @@ class ReleaseVerifier:
         issues = []
         try:
             # Run unit tests
-            result = subprocess.run(["python", "-m", "pytest", "tests/"], capture_output=True, text=True)
+            result = subprocess.run(
+                ["python", "-m", "pytest", "tests/"], capture_output=True, text=True
+            )
             if result.returncode != 0:
                 issues.append("Unit tests failed")
                 issues.append(result.stdout)
@@ -97,7 +101,9 @@ class ReleaseVerifier:
                 issues.append(result.stderr)
 
             # Run end-to-end tests
-            result = subprocess.run(["python", "-m", "pytest", "tests/e2e/"], capture_output=True, text=True)
+            result = subprocess.run(
+                ["python", "-m", "pytest", "tests/e2e/"], capture_output=True, text=True
+            )
             if result.returncode != 0:
                 issues.append("End-to-end tests failed")
                 issues.append(result.stdout)

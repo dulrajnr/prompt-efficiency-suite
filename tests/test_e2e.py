@@ -8,7 +8,11 @@ from pathlib import Path
 
 import pytest
 
-from prompt_efficiency_suite import AdaptiveBudgeting, CICDIntegration, DomainAwareTrimmer
+from prompt_efficiency_suite import (
+    AdaptiveBudgeting,
+    CICDIntegration,
+    DomainAwareTrimmer,
+)
 
 
 class TestEndToEnd:

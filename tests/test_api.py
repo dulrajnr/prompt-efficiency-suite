@@ -36,7 +36,12 @@ def auth_headers(token):
 @pytest.fixture
 def sample_domain_dict():
     """Create a sample domain dictionary."""
-    return {"terms": ["test", "domain"], "compound_terms": [], "preserve_patterns": [], "remove_patterns": []}
+    return {
+        "terms": ["test", "domain"],
+        "compound_terms": [],
+        "preserve_patterns": [],
+        "remove_patterns": [],
+    }
 
 
 def test_login(client):
@@ -64,7 +69,11 @@ def test_trim_text(client, auth_headers, sample_domain_dict):
     response = client.post(
         "/trim",
         headers=auth_headers,
-        json={"text": "This is a test text with some domain terms.", "domain": domain_path, "preserve_ratio": 0.8},
+        json={
+            "text": "This is a test text with some domain terms.",
+            "domain": domain_path,
+            "preserve_ratio": 0.8,
+        },
     )
     assert response.status_code == 200
     data = response.json()
@@ -91,7 +100,9 @@ def test_get_budget_metrics(client, auth_headers):
 
 def test_reset_budget_metrics(client, auth_headers):
     """Test resetting budget metrics."""
-    response = client.post("/budget/metrics/reset", headers=auth_headers, params={"model": "gpt-4"})
+    response = client.post(
+        "/budget/metrics/reset", headers=auth_headers, params={"model": "gpt-4"}
+    )
     assert response.status_code == 200
     data = response.json()
     assert "message" in data
@@ -126,7 +137,9 @@ def test_run_tests(client, auth_headers):
 
 def test_deploy_package(client, auth_headers):
     """Test deploying package."""
-    response = client.post("/cicd/deploy", headers=auth_headers, params={"target": "pypi"})
+    response = client.post(
+        "/cicd/deploy", headers=auth_headers, params={"target": "pypi"}
+    )
     assert response.status_code == 200
     data = response.json()
     assert "status" in data

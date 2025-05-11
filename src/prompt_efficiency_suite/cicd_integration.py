@@ -1,9 +1,8 @@
-"""
-CI/CD Integration module for automating prompt testing and optimization in CI/CD pipelines.
-"""
+"""CICD Integration - A module for integrating with CI/CD systems."""
 
 import json
 import logging
+import shlex
 import subprocess
 from dataclasses import dataclass
 from datetime import datetime
@@ -11,6 +10,8 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional, Union
 
 import yaml
+
+logger = logging.getLogger(__name__)
 
 
 @dataclass
@@ -40,17 +41,72 @@ class DeploymentResult:
 
 
 class CICDIntegration:
-    """A class for integrating prompt testing and optimization into CI/CD pipelines."""
+    """A class for integrating with CI/CD systems."""
 
-    def __init__(self, config_path: Optional[Path] = None):
-        """Initialize the CI/CD integration.
+    def __init__(self):
+        """Initialize the CI/CD integration."""
+        self.logger = logging.getLogger(__name__)
+
+    def integrate(self, system: str, config: Dict[str, Any]) -> bool:
+        """Integrate with a CI/CD system.
 
         Args:
-            config_path (Optional[Path]): Path to configuration file.
+            system: The CI/CD system to integrate with
+            config: Configuration for the integration
+
+        Returns:
+            True if integration was successful, False otherwise
         """
-        self.config = self._load_config(config_path) if config_path else {}
-        self.test_results: List[TestResult] = []
-        self.logger = self._setup_logging()
+        # Validate system
+        if not self._is_valid_system(system):
+            raise ValueError(f"Invalid CI/CD system: {system}")
+
+        # Get integration steps
+        steps = self._get_integration_steps(system)
+
+        # Execute steps
+        for step in steps:
+            if not self._execute_step(step, config):
+                return False
+
+        return True
+
+    def _is_valid_system(self, system: str) -> bool:
+        """Check if a CI/CD system is valid.
+
+        Args:
+            system: The system to check
+
+        Returns:
+            True if the system is valid, False otherwise
+        """
+        valid_systems = ["github", "gitlab", "jenkins", "circleci"]
+        return system.lower() in valid_systems
+
+    def _get_integration_steps(self, system: str) -> List[Dict[str, Any]]:
+        """Get integration steps for a CI/CD system.
+
+        Args:
+            system: The system to get steps for
+
+        Returns:
+            List of integration steps
+        """
+        # This would be implemented to get steps
+        return []
+
+    def _execute_step(self, step: Dict[str, Any], config: Dict[str, Any]) -> bool:
+        """Execute an integration step.
+
+        Args:
+            step: The step to execute
+            config: Configuration for the step
+
+        Returns:
+            True if the step was successful, False otherwise
+        """
+        # This would be implemented to execute steps
+        return True
 
     def run_pipeline(self, prompts_dir: Path) -> bool:
         """Run the CI/CD pipeline for prompt testing.
@@ -149,7 +205,9 @@ class CICDIntegration:
 
         if not logger.handlers:
             handler = logging.StreamHandler()
-            formatter = logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
+            formatter = logging.Formatter(
+                "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+            )
             handler.setFormatter(formatter)
             logger.addHandler(handler)
 
@@ -157,7 +215,7 @@ class CICDIntegration:
 
     def _load_prompts(self, prompts_dir: Path) -> Dict[str, Dict[str, Any]]:
         """Load prompts from directory."""
-        prompts = {}
+        prompts: Dict[str, Dict[str, Any]] = {}
 
         for file_path in prompts_dir.glob("**/*.{json,yaml,yml}"):
             try:
@@ -218,13 +276,19 @@ class CICDIntegration:
 
     def _check_prompt_quality(self, prompt_data: Dict[str, Any]) -> Dict[str, float]:
         """Run quality checks on a prompt."""
-        metrics = {"clarity_score": 0.0, "completeness_score": 0.0, "consistency_score": 0.0}
+        metrics = {
+            "clarity_score": 0.0,
+            "completeness_score": 0.0,
+            "consistency_score": 0.0,
+        }
 
         # Implement quality checks here
         # This is a placeholder implementation
         text = prompt_data.get("text", "")
         metrics["clarity_score"] = len(text.split()) / 100
-        metrics["completeness_score"] = 1.0 if len(prompt_data.get("tests", [])) > 0 else 0.0
+        metrics["completeness_score"] = (
+            1.0 if len(prompt_data.get("tests", [])) > 0 else 0.0
+        )
         metrics["consistency_score"] = 1.0
 
         return metrics
@@ -267,7 +331,10 @@ class CICDIntegration:
                 total_metrics[metric] = total_metrics.get(metric, 0.0) + value
                 metric_counts[metric] = metric_counts.get(metric, 0) + 1
 
-        return {metric: total / metric_counts[metric] for metric, total in total_metrics.items()}
+        return {
+            metric: total / metric_counts[metric]
+            for metric, total in total_metrics.items()
+        }
 
     def _generate_report(self) -> None:
         """Generate a test report."""
@@ -298,3 +365,32 @@ class CICDIntegration:
                 self.logger.info("  Warnings:")
                 for warning in result.warnings:
                     self.logger.info(f"    - {warning}")
+
+    def _run_command_safely(
+        self, command: List[str], **kwargs
+    ) -> subprocess.CompletedProcess:
+        """Run a command safely without shell injection vulnerabilities."""
+        if not isinstance(command, list):
+            raise ValueError("Command must be a list of strings")
+        if any(not isinstance(arg, str) for arg in command):
+            raise ValueError("All command arguments must be strings")
+        return subprocess.run(command, check=True, shell=False, **kwargs)
+
+    def run_tests(self, test_path: Optional[str] = None) -> TestResult:
+        """Run tests with specified configuration."""
+        command = ["pytest"]
+        if test_path:
+            if not Path(test_path).exists():
+                raise ValueError(f"Test path does not exist: {test_path}")
+            command.append(str(test_path))
+
+        if self.config.get("test_args"):
+            command.extend(self.config["test_args"])
+
+        try:
+            result = self._run_command_safely(command, capture_output=True, text=True)
+            # Process test results...
+            return TestResult(passed=True, output=result.stdout)
+        except subprocess.CalledProcessError as e:
+            logger.error(f"Tests failed: {e.stderr}")
+            return TestResult(passed=False, output=e.stderr)

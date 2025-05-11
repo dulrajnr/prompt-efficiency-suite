@@ -1,16 +1,13 @@
-"""
-Multimodal Compressor module for compressing prompts with multiple modalities.
-"""
+"""Multimodal Compressor - A module for compressing multimodal prompts while preserving media content."""
 
 import base64
-import hashlib
 import json
 import logging
 import re
 from collections import defaultdict
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Set, Tuple, Union
+from typing import Any, Dict, List, Optional, Tuple
 
 logger = logging.getLogger(__name__)
 
@@ -52,7 +49,9 @@ class MultimodalCompressor:
         self.media_patterns = self._load_media_patterns()
         self.compression_history: List[CompressionResult] = []
 
-    def compress(self, text: str, compression_params: Optional[Dict[str, Any]] = None) -> CompressionResult:
+    def compress(
+        self, text: str, compression_params: Optional[Dict[str, Any]] = None
+    ) -> CompressionResult:
         """Compress a multimodal prompt.
 
         Args:
@@ -71,7 +70,9 @@ class MultimodalCompressor:
         text_with_placeholders = text
         for i, (media_text, media_info) in enumerate(media_elements):
             placeholder = f"MEDIA_{i}"
-            text_with_placeholders = text_with_placeholders.replace(media_text, placeholder)
+            text_with_placeholders = text_with_placeholders.replace(
+                media_text, placeholder
+            )
 
         # Compress non-media text
         compressed_text = self._compress_text(text_with_placeholders)
@@ -107,10 +108,13 @@ class MultimodalCompressor:
             return {}
 
         total_compressions = len(self.compression_history)
-        avg_ratio = sum(r.compression_ratio for r in self.compression_history) / total_compressions
+        avg_ratio = (
+            sum(r.compression_ratio for r in self.compression_history)
+            / total_compressions
+        )
 
         # Calculate media type distribution
-        media_types = defaultdict(int)
+        media_types: Dict[str, int] = defaultdict(int)
         for result in self.compression_history:
             for media in result.preserved_media:
                 media_types[media.media_type] += 1
@@ -119,13 +123,19 @@ class MultimodalCompressor:
             "total_compressions": total_compressions,
             "average_compression_ratio": avg_ratio,
             "media_type_distribution": dict(media_types),
-            "total_media_preserved": sum(len(r.preserved_media) for r in self.compression_history),
+            "total_media_preserved": sum(
+                len(r.preserved_media) for r in self.compression_history
+            ),
         }
 
     def _load_media_patterns(self) -> Dict[str, Dict[str, Any]]:
         """Load media pattern configurations."""
         return {
-            "image": {"pattern": r"!\[([^\]]*)\]\(([^)]+)\)", "description": "Markdown image", "type": "image"},
+            "image": {
+                "pattern": r"!\[([^\]]*)\]\(([^)]+)\)",
+                "description": "Markdown image",
+                "type": "image",
+            },
             "base64_image": {
                 "pattern": r"data:image/[^;]+;base64,([a-zA-Z0-9+/=]+)",
                 "description": "Base64 encoded image",
@@ -151,25 +161,32 @@ class MultimodalCompressor:
             matches = re.finditer(pattern_info["pattern"], text)
             for match in matches:
                 media_text = match.group(0)
-                media_info = self._get_media_info(media_text, pattern_info["type"], pattern_name)
+                media_info = self._get_media_info(
+                    media_text, pattern_info["type"], pattern_name
+                )
                 media_elements.append((media_text, media_info))
 
         return media_elements
 
-    def _get_media_info(self, media_text: str, media_type: str, pattern_name: str) -> MediaInfo:
+    def _get_media_info(
+        self, media_text: str, media_type: str, pattern_name: str
+    ) -> MediaInfo:
         """Get information about a media element."""
         info = MediaInfo(media_type=media_type, format="unknown", size=len(media_text))
 
         if pattern_name == "base64_image":
             # Extract base64 data
-            match = re.search(r"data:image/([^;]+);base64,([a-zA-Z0-9+/=]+)", media_text)
+            match = re.search(
+                r"data:image/([^;]+);base64,([a-zA-Z0-9+/=]+)", media_text
+            )
             if match:
                 info.format = match.group(1)
                 try:
                     decoded = base64.b64decode(match.group(2))
                     info.size = len(decoded)
-                except:
-                    pass
+                except base64.binascii.Error as e:
+                    logger.warning(f"Failed to decode base64 image data: {e}")
+                    info.size = 0  # Set size to 0 for invalid data
         elif media_type == "image":
             # Extract image URL and try to get format
             match = re.search(r"\.(png|jpg|jpeg|gif|webp)$", media_text.lower())
@@ -185,7 +202,14 @@ class MultimodalCompressor:
         text = text.strip()
 
         # Remove common filler words
-        filler_words = [r"\bvery\b", r"\breally\b", r"\bquite\b", r"\bjust\b", r"\bsimply\b", r"\bbasically\b"]
+        filler_words = [
+            r"\bvery\b",
+            r"\breally\b",
+            r"\bquite\b",
+            r"\bjust\b",
+            r"\bsimply\b",
+            r"\bbasically\b",
+        ]
         for word in filler_words:
             text = re.sub(word, "", text, flags=re.IGNORECASE)
 
@@ -228,3 +252,17 @@ class MultimodalCompressor:
 
         with open(output_path, "w", encoding="utf-8") as f:
             json.dump(history_data, f, indent=2)
+
+    def _process_media(self, media_info: Dict[str, Any]) -> Dict[str, Any]:
+        """Process media content for compression.
+
+        Args:
+            media_info: Dictionary containing media information
+
+        Returns:
+            Processed media information
+        """
+        for _media_info in self.media_processors:
+            # Process media content
+            pass
+        return media_info

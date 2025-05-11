@@ -1,6 +1,4 @@
-"""
-Repository Scanner - A module for scanning repositories for prompts and analyzing their usage.
-"""
+"""Repository Scanner - A module for scanning repositories for prompts."""
 
 import fnmatch
 import json
@@ -8,175 +6,168 @@ import logging
 import os
 import re
 from collections import defaultdict
-from concurrent.futures import ThreadPoolExecutor, as_completed
+from concurrent.futures import Future, ThreadPoolExecutor, as_completed
 from dataclasses import dataclass, field
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Set, Tuple, Union
+from typing import Any, Dict, List, Optional, Pattern, Set, TypedDict, Union
 
 logger = logging.getLogger(__name__)
 
 
-@dataclass
 class FileAnalysis:
-    """Analysis result for a single file."""
+    """A class for analyzing a file."""
 
-    file_path: Path
-    prompts_found: List[Dict[str, Any]]
-    prompt_types: Set[str]
-    line_count: int
-    prompt_count: int
-    metadata: Dict[str, Any] = field(default_factory=dict)
+    def __init__(self, path: str, prompts: List[Dict[str, Any]]):
+        """Initialize file analysis.
+
+        Args:
+            path: Path to the file
+            prompts: List of prompts found in the file
+        """
+        self.path = path
+        self.prompts = prompts
 
 
-@dataclass
 class RepositoryAnalysis:
-    """Analysis result for an entire repository."""
+    """A class for analyzing a repository."""
 
-    repository_path: Path
-    file_analyses: List[FileAnalysis]
-    total_files: int
-    total_prompts: int
-    prompt_type_distribution: Dict[str, int]
-    metadata: Dict[str, Any] = field(default_factory=dict)
+    def __init__(self, files: List[FileAnalysis]):
+        """Initialize repository analysis.
+
+        Args:
+            files: List of analyzed files
+        """
+        self.files = files
 
 
-@dataclass
 class ScanResult:
-    """Result of repository scan."""
+    """A class for storing scan results."""
 
-    repository_path: Path
-    found_prompts: List[Dict[str, Any]]
-    file_stats: Dict[str, Any]
-    metadata: Dict[str, Any]
+    def __init__(self, analysis: RepositoryAnalysis):
+        """Initialize scan result.
+
+        Args:
+            analysis: Repository analysis
+        """
+        self.analysis = analysis
 
 
-@dataclass
 class PromptLocation:
-    """Data class for storing prompt location information."""
+    """A class for storing prompt location information."""
 
-    file_path: str
-    line_number: int
-    context: str
-    prompt_text: str
-    language: str
+    def __init__(self, file: str, line: int, column: int):
+        """Initialize prompt location.
+
+        Args:
+            file: Path to the file
+            line: Line number
+            column: Column number
+        """
+        self.file = file
+        self.line = line
+        self.column = column
+
+
+class PromptPattern(TypedDict):
+    """Configuration for a prompt pattern."""
+
+    pattern: str
+    description: str
 
 
 class RepositoryScanner:
-    """Scans code repositories for prompts."""
+    """A class for scanning repositories for prompts."""
 
-    def __init__(self, max_workers: int = 4):
-        """Initialize the repository scanner.
+    def __init__(self) -> None:
+        self.scan_history: List[ScanResult] = []
 
-        Args:
-            max_workers: Maximum number of parallel workers
-        """
-        self.max_workers = max_workers
-        self.executor = ThreadPoolExecutor(max_workers=max_workers)
+    def scan_repository(
+        self, repo_path: Path, options: Optional[Dict[str, Any]] = None
+    ) -> ScanResult:
+        """Scan a repository for prompts and analyze them."""
+        options = options or {}
+        prompt_locations: List[PromptLocation] = []
+        file_analyses: List[FileAnalysis] = []
 
-        # Common prompt patterns
-        self.prompt_patterns = {
-            "python": [
-                r'prompt\s*=\s*["\'](.*?)["\']',
-                r'prompt_text\s*=\s*["\'](.*?)["\']',
-                r'PROMPT\s*=\s*["\'](.*?)["\']',
-            ],
-            "javascript": [
-                r'prompt\s*=\s*["\'](.*?)["\']',
-                r'promptText\s*=\s*["\'](.*?)["\']',
-                r'PROMPT\s*=\s*["\'](.*?)["\']',
-            ],
-            "typescript": [
-                r'prompt\s*=\s*["\'](.*?)["\']',
-                r'promptText\s*=\s*["\'](.*?)["\']',
-                r'PROMPT\s*=\s*["\'](.*?)["\']',
-            ],
-            "java": [
-                r'String\s+prompt\s*=\s*["\'](.*?)["\']',
-                r'String\s+promptText\s*=\s*["\'](.*?)["\']',
-                r'String\s+PROMPT\s*=\s*["\'](.*?)["\']',
-            ],
-            "kotlin": [
-                r'val\s+prompt\s*=\s*["\'](.*?)["\']',
-                r'val\s+promptText\s*=\s*["\'](.*?)["\']',
-                r'val\s+PROMPT\s*=\s*["\'](.*?)["\']',
-            ],
-        }
+        with ThreadPoolExecutor(max_workers=options.get("max_workers", 4)) as executor:
+            futures = []
+            for file_path in repo_path.rglob("*"):
+                if file_path.is_file():
+                    futures.append(
+                        executor.submit(self._analyze_file, file_path, options)
+                    )
 
-        # File extensions for each language
-        self.language_extensions = {
-            "python": [".py"],
-            "javascript": [".js"],
-            "typescript": [".ts", ".tsx"],
-            "java": [".java"],
-            "kotlin": [".kt"],
-        }
+            for future in futures:
+                result = future.result()
+                if isinstance(result, list):
+                    prompt_locations.extend(result)
+                elif isinstance(result, dict):
+                    file_analyses.append(FileAnalysis(**result))
 
-    def scan_repository(self, repo_path: str) -> List[PromptLocation]:
-        """Scan a repository for prompts.
+        analysis = RepositoryAnalysis(
+            total_files=len(file_analyses),
+            total_prompts=len(prompt_locations),
+            file_analyses=file_analyses,
+        )
 
-        Args:
-            repo_path: Path to the repository
+        scan_result = ScanResult(
+            repository_analysis=analysis,
+            prompt_locations=prompt_locations,
+            metadata=options,
+        )
 
-        Returns:
-            List of found prompt locations
-        """
-        repo_path = Path(repo_path)
-        if not repo_path.exists():
-            raise ValueError(f"Repository path does not exist: {repo_path}")
+        self.scan_history.append(scan_result)
+        return scan_result
 
-        # Find all relevant files
-        files_to_scan = []
-        for language, extensions in self.language_extensions.items():
-            for ext in extensions:
-                files_to_scan.extend(repo_path.rglob(f"*{ext}"))
+    def _analyze_file(
+        self, file_path: Path, options: Dict[str, Any]
+    ) -> Union[List[PromptLocation], Dict[str, Any]]:
+        """Analyze a single file for prompts."""
+        # Placeholder implementation
+        return []
 
-        # Scan files in parallel
-        futures = []
-        for file_path in files_to_scan:
-            futures.append(self.executor.submit(self._scan_file, str(file_path)))
+    def get_scan_history(self) -> List[ScanResult]:
+        """Get the history of all scans."""
+        return self.scan_history
 
-        # Collect results
-        prompt_locations = []
-        for future in futures:
-            prompt_locations.extend(future.result())
-
-        return prompt_locations
-
-    def _scan_file(self, file_path: str) -> List[PromptLocation]:
+    def _scan_file(
+        self, file_path: Path, params: Optional[Dict[str, Any]] = None
+    ) -> Union[List[PromptLocation], Dict[str, Any]]:
         """Scan a single file for prompts.
 
         Args:
-            file_path: Path to the file to scan
+            file_path (Path): Path to the file to scan.
+            params (Optional[Dict[str, Any]]): Optional parameters for scanning.
 
         Returns:
-            List of prompt locations found in the file
+            Union[List[PromptLocation], Dict[str, Any]]: List of prompt locations or scan result.
         """
-        prompt_locations = []
+        prompt_locations: List[PromptLocation] = []
 
         # Determine language from file extension
-        language = self._get_language_from_file(file_path)
+        language: Optional[str] = self._get_language_from_file(str(file_path))
         if not language:
-            return prompt_locations
+            return prompt_locations if params is None else {"prompts": [], "stats": {}}
 
         try:
             with open(file_path, "r", encoding="utf-8") as f:
-                content = f.read()
-                lines = content.splitlines()
+                content: str = f.read()
+                lines: List[str] = content.splitlines()
 
                 # Check each pattern for the language
                 for pattern in self.prompt_patterns[language]:
                     for i, line in enumerate(lines, 1):
-                        matches = re.finditer(pattern, line)
+                        matches = pattern.finditer(line)
                         for match in matches:
                             # Get some context around the prompt
-                            start = max(0, i - 2)
-                            end = min(len(lines), i + 2)
-                            context = "\n".join(lines[start:end])
+                            start: int = max(0, i - 2)
+                            end: int = min(len(lines), i + 2)
+                            context: str = "\n".join(lines[start:end])
 
                             prompt_locations.append(
                                 PromptLocation(
-                                    file_path=file_path,
+                                    file_path=str(file_path),
                                     line_number=i,
                                     context=context,
                                     prompt_text=match.group(1),
@@ -184,119 +175,65 @@ class RepositoryScanner:
                                 )
                             )
         except Exception as e:
-            print(f"Error scanning file {file_path}: {str(e)}")
+            logger.error(f"Error scanning file {file_path}: {str(e)}")
 
-        return prompt_locations
+        if params is None:
+            return prompt_locations
+        else:
+            return {
+                "prompts": [loc.__dict__ for loc in prompt_locations],
+                "stats": {
+                    "total_prompts": len(prompt_locations),
+                    "language": language,
+                    "line_count": len(lines),
+                },
+            }
 
     def _get_language_from_file(self, file_path: str) -> Optional[str]:
         """Get the programming language from a file path.
 
         Args:
-            file_path: Path to the file
+            file_path (str): Path to the file.
 
         Returns:
-            Language name if recognized, None otherwise
+            Optional[str]: Language name if recognized, None otherwise.
         """
-        ext = os.path.splitext(file_path)[1].lower()
+        ext: str = os.path.splitext(file_path)[1].lower()
         for language, extensions in self.language_extensions.items():
             if ext in extensions:
                 return language
         return None
 
-    def get_scan_stats(self, prompt_locations: List[PromptLocation]) -> Dict[str, Union[int, Dict[str, int]]]:
+    def get_scan_stats(
+        self, prompt_locations: Optional[List[PromptLocation]] = None
+    ) -> Dict[str, Any]:
         """Get statistics about the scan results.
 
         Args:
-            prompt_locations: List of prompt locations found
+            prompt_locations (Optional[List[PromptLocation]]): List of prompt locations to analyze.
 
         Returns:
-            Dictionary containing scan statistics
+            Dict[str, Any]: Statistics about the scan results.
         """
-        if not prompt_locations:
-            return {}
+        if prompt_locations is None:
+            # Return basic stats
+            return {
+                "total_files_scanned": len(self._get_files_to_scan(Path.cwd(), {})),
+                "timestamp": self._get_timestamp(),
+            }
 
-        # Count prompts by language
-        language_counts = {}
-        for location in prompt_locations:
-            language_counts[location.language] = language_counts.get(location.language, 0) + 1
-
-        return {
+        # Calculate statistics from prompt locations
+        stats: Dict[str, Any] = {
             "total_prompts": len(prompt_locations),
-            "prompts_by_language": language_counts,
-            "unique_files": len(set(loc.file_path for loc in prompt_locations)),
+            "languages": defaultdict(int),
+            "files": defaultdict(int),
         }
 
-    def scan_repository(
-        self, repository_path: Union[str, Path], scan_params: Optional[Dict[str, Any]] = None
-    ) -> ScanResult:
-        """Scan a repository for prompts.
+        for loc in prompt_locations:
+            stats["languages"][loc.language] += 1
+            stats["files"][loc.file_path] += 1
 
-        Args:
-            repository_path (Union[str, Path]): Path to repository.
-            scan_params (Optional[Dict[str, Any]]): Scan parameters.
-
-        Returns:
-            ScanResult: Scan result.
-        """
-        params = scan_params or {}
-        repo_path = Path(repository_path)
-
-        # Get files to scan
-        files_to_scan = self._get_files_to_scan(repo_path, params)
-
-        # Scan files for prompts
-        found_prompts = []
-        file_stats = {"total_files": len(files_to_scan), "scanned_files": 0, "files_with_prompts": 0}
-
-        with ThreadPoolExecutor(max_workers=params.get("max_workers", 4)) as executor:
-            futures = [executor.submit(self._scan_file, file_path, params) for file_path in files_to_scan]
-
-            for future in as_completed(futures):
-                try:
-                    file_result = future.result()
-                    if file_result["prompts"]:
-                        found_prompts.extend(file_result["prompts"])
-                        file_stats["files_with_prompts"] += 1
-                    file_stats["scanned_files"] += 1
-                except Exception as e:
-                    logger.error(f"Error scanning file: {e}")
-
-        # Create result
-        result = ScanResult(
-            repository_path=repo_path,
-            found_prompts=found_prompts,
-            file_stats=file_stats,
-            metadata={"scan_params": params, "scan_timestamp": self._get_timestamp()},
-        )
-
-        self.scan_history.append(result)
-        return result
-
-    def get_scan_stats(self) -> Dict[str, Any]:
-        """Get statistics about scans.
-
-        Returns:
-            Dict[str, Any]: Scan statistics.
-        """
-        if not self.scan_history:
-            return {}
-
-        # Calculate total stats
-        total_files = sum(result.file_stats["total_files"] for result in self.scan_history)
-        total_prompts = sum(len(result.found_prompts) for result in self.scan_history)
-
-        # Calculate prompt type distribution
-        prompt_types = defaultdict(int)
-        for result in self.scan_history:
-            for prompt in result.found_prompts:
-                prompt_types[prompt["type"]] += 1
-
-        return {
-            "total_scans": len(self.scan_history),
-            "total_files_scanned": total_files,
-            "total_prompts_found": total_prompts,
-            "prompt_type_distribution": dict(prompt_types),
-        }
+        return stats
 
     def export_results(self, output_path: Path) -> None:
         """Export scan results to a file.
@@ -304,55 +241,21 @@ class RepositoryScanner:
         Args:
             output_path (Path): Path to save results.
         """
-        results_data = {
-            "statistics": self.get_scan_stats(),
-            "results": [
-                {
-                    "repository_path": str(result.repository_path),
-                    "found_prompts": result.found_prompts,
-                    "file_stats": result.file_stats,
-                    "metadata": result.metadata,
-                }
-                for result in self.scan_history
-            ],
+        results: Dict[str, Any] = {
+            "scan_stats": self.get_scan_stats([]),
+            "metadata": {"timestamp": self._get_timestamp()},
         }
 
         with open(output_path, "w", encoding="utf-8") as f:
-            json.dump(results_data, f, indent=2)
+            json.dump(results, f, indent=2)
 
-    def _load_prompt_patterns(self) -> Dict[str, Dict[str, Any]]:
-        """Load prompt patterns.
+    def _get_timestamp(self) -> str:
+        """Get current timestamp.
 
         Returns:
-            Dict[str, Dict[str, Any]]: Prompt patterns.
+            str: ISO format timestamp.
         """
-        return {
-            "openai": {
-                "pattern": r"(?:system|user|assistant):\s*([^\n]+)",
-                "type": "openai",
-                "description": "OpenAI chat format",
-            },
-            "anthropic": {
-                "pattern": r"(?:Human|Assistant):\s*([^\n]+)",
-                "type": "anthropic",
-                "description": "Anthropic chat format",
-            },
-            "cohere": {
-                "pattern": r"(?:User|Assistant):\s*([^\n]+)",
-                "type": "cohere",
-                "description": "Cohere chat format",
-            },
-            "generic": {
-                "pattern": r"(?:prompt|instruction|query):\s*([^\n]+)",
-                "type": "generic",
-                "description": "Generic prompt format",
-            },
-            "code": {
-                "pattern": r"```(?:python|javascript|typescript)\n(.*?)\n```",
-                "type": "code",
-                "description": "Code block",
-            },
-        }
+        return datetime.now().isoformat()
 
     def _get_files_to_scan(self, repo_path: Path, params: Dict[str, Any]) -> List[Path]:
         """Get files to scan.
@@ -371,7 +274,11 @@ class RepositoryScanner:
 
         for root, dirs, files in os.walk(repo_path):
             # Skip excluded directories
-            dirs[:] = [d for d in dirs if not any(fnmatch.fnmatch(d, pattern) for pattern in exclude_patterns)]
+            dirs[:] = [
+                d
+                for d in dirs
+                if not any(fnmatch.fnmatch(d, pattern) for pattern in exclude_patterns)
+            ]
 
             # Add matching files
             for file in files:
@@ -379,44 +286,3 @@ class RepositoryScanner:
                     files_to_scan.append(Path(root) / file)
 
         return files_to_scan
-
-    def _scan_file(self, file_path: Path, params: Dict[str, Any]) -> Dict[str, Any]:
-        """Scan a file for prompts.
-
-        Args:
-            file_path (Path): File to scan.
-            params (Dict[str, Any]): Scan parameters.
-
-        Returns:
-            Dict[str, Any]: Scan result.
-        """
-        try:
-            with open(file_path, "r", encoding="utf-8") as f:
-                content = f.read()
-
-            prompts = []
-
-            # Check each pattern
-            for pattern_name, pattern_info in self.prompt_patterns.items():
-                matches = re.finditer(pattern_info["pattern"], content, re.MULTILINE | re.DOTALL)
-
-                for match in matches:
-                    prompts.append(
-                        {
-                            "type": pattern_info["type"],
-                            "content": match.group(1).strip(),
-                            "line_number": content[: match.start()].count("\n") + 1,
-                            "file_path": str(file_path),
-                            "pattern": pattern_name,
-                        }
-                    )
-
-            return {"file_path": str(file_path), "prompts": prompts}
-
-        except Exception as e:
-            logger.error(f"Error scanning file {file_path}: {e}")
-            return {"file_path": str(file_path), "prompts": []}
-
-    def _get_timestamp(self) -> str:
-        """Get current timestamp."""
-        return datetime.now().isoformat()

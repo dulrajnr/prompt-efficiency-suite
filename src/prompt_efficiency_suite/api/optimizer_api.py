@@ -66,7 +66,9 @@ async def optimize_prompt(request: OptimizeRequest) -> OptimizeResponse:
     try:
         optimizer = PromptOptimizer()
         result = optimizer.optimize(
-            request.prompt, optimization_targets=request.optimization_targets, options=request.options
+            request.prompt,
+            optimization_targets=request.optimization_targets,
+            options=request.options,
         )
         return OptimizeResponse(
             optimized_prompt=result.optimized_prompt,
@@ -79,7 +81,9 @@ async def optimize_prompt(request: OptimizeRequest) -> OptimizeResponse:
 
 
 @router.post("/optimize/batch", response_model=BatchOptimizeResponse)
-async def optimize_prompts_batch(request: BatchOptimizeRequest) -> BatchOptimizeResponse:
+async def optimize_prompts_batch(
+    request: BatchOptimizeRequest,
+) -> BatchOptimizeResponse:
     """Optimize multiple prompts in batch.
 
     Args:
@@ -96,7 +100,9 @@ async def optimize_prompts_batch(request: BatchOptimizeRequest) -> BatchOptimize
 
         for prompt in request.prompts:
             result = optimizer.optimize(
-                prompt, optimization_targets=request.optimization_targets, options=request.options
+                prompt,
+                optimization_targets=request.optimization_targets,
+                options=request.options,
             )
             results.append(
                 OptimizeResponse(
@@ -113,9 +119,13 @@ async def optimize_prompts_batch(request: BatchOptimizeRequest) -> BatchOptimize
         summary = {
             "total_prompts": len(request.prompts),
             "total_improvements": total_improvements,
-            "average_improvements": total_improvements / len(request.prompts) if request.prompts else 0,
+            "average_improvements": (
+                total_improvements / len(request.prompts) if request.prompts else 0
+            ),
             "total_token_reduction": total_token_reduction,
-            "average_token_reduction": total_token_reduction / len(request.prompts) if request.prompts else 0,
+            "average_token_reduction": (
+                total_token_reduction / len(request.prompts) if request.prompts else 0
+            ),
         }
 
         return BatchOptimizeResponse(results=results, summary=summary)

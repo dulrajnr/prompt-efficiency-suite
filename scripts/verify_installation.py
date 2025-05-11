@@ -42,7 +42,9 @@ class InstallationVerifier:
             import prompt_efficiency_suite
 
             version = pkg_resources.get_distribution("prompt-efficiency-suite").version
-            self.checks["core"].append({"name": "Core Package", "status": "success", "version": version})
+            self.checks["core"].append(
+                {"name": "Core Package", "status": "success", "version": version}
+            )
             return True
         except ImportError:
             self.results["errors"].append("Core package not installed correctly.")
@@ -70,7 +72,9 @@ class InstallationVerifier:
             {
                 "name": "VS Code Extension",
                 "status": "success" if extension_found else "warning",
-                "message": "Extension found" if extension_found else "Extension not found",
+                "message": (
+                    "Extension found" if extension_found else "Extension not found"
+                ),
             }
         )
         return extension_found
@@ -85,7 +89,9 @@ class InstallationVerifier:
             plugin_path = os.path.expanduser("~/.config/JetBrains")
 
         if not os.path.exists(plugin_path):
-            self.results["warnings"].append("JetBrains configuration directory not found.")
+            self.results["warnings"].append(
+                "JetBrains configuration directory not found."
+            )
             return False
 
         # Check for our plugin
@@ -118,7 +124,9 @@ class InstallationVerifier:
         for package in required_packages:
             try:
                 version = pkg_resources.get_distribution(package).version
-                self.checks["dependencies"].append({"name": package, "status": "success", "version": version})
+                self.checks["dependencies"].append(
+                    {"name": package, "status": "success", "version": version}
+                )
             except pkg_resources.DistributionNotFound:
                 self.results["errors"].append(f"Required package {package} not found.")
                 return False
@@ -142,7 +150,9 @@ class InstallationVerifier:
             missing_keys = [key for key in required_keys if key not in config]
 
             if missing_keys:
-                self.results["errors"].append(f"Missing required configuration keys: {', '.join(missing_keys)}")
+                self.results["errors"].append(
+                    f"Missing required configuration keys: {', '.join(missing_keys)}"
+                )
                 return False
 
             self.checks["configuration"].append(
@@ -187,7 +197,11 @@ class InstallationVerifier:
             if checks:
                 print(f"\n{category.upper()} CHECKS:")
                 for check in checks:
-                    status = "✓" if check["status"] == "success" else "⚠" if check["status"] == "warning" else "✗"
+                    status = (
+                        "✓"
+                        if check["status"] == "success"
+                        else "⚠" if check["status"] == "warning" else "✗"
+                    )
                     print(f"{status} {check['name']}")
                     if "version" in check:
                         print(f"   Version: {check['version']}")

@@ -1,14 +1,12 @@
-"""
-Token Counter module for counting tokens in prompts.
-"""
+"""Token Counter - A module for counting tokens in prompts."""
 
 import json
 import logging
-import re
 from collections import defaultdict
 from dataclasses import dataclass, field
+from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Union
+from typing import Any, Dict, List, Optional
 
 logger = logging.getLogger(__name__)
 
@@ -24,16 +22,41 @@ class TokenCount:
 
 
 class TokenCounter:
-    """A class for counting tokens in text."""
+    """A class for counting tokens in prompts."""
 
-    def __init__(self, config: Optional[Dict[str, Any]] = None):
-        """Initialize the TokenCounter.
+    def __init__(self):
+        """Initialize the token counter."""
+        self.logger = logging.getLogger(__name__)
+
+    def count(self, prompt: str) -> int:
+        """Count tokens in a prompt.
 
         Args:
-            config (Optional[Dict[str, Any]]): Configuration parameters.
+            prompt: The prompt to count tokens in
+
+        Returns:
+            Number of tokens
         """
-        self.config = config or {}
-        self.count_history: List[TokenCount] = []
+        # TODO: Implement token counting
+        return len(prompt.split())
+
+    def count_with_model(self, prompt: str, model: str = "gpt-4") -> Dict[str, Any]:
+        """Count tokens in a prompt using a specific model.
+
+        Args:
+            prompt: The prompt to count tokens in
+            model: The model to use for token counting
+
+        Returns:
+            Dictionary containing token count and model info
+        """
+        # TODO: Implement model-specific token counting
+        return {
+            "token_count": self.count(prompt),
+            "model": model,
+            "encoding": "cl100k_base",
+            "max_tokens": 8192,
+        }
 
     def count_tokens(self, text: str) -> int:
         """Count tokens in text.
@@ -49,7 +72,7 @@ class TokenCounter:
         token_count = len(tokens)
 
         # Calculate token distribution
-        distribution = defaultdict(int)
+        distribution: Dict[str, int] = defaultdict(int)
         for token in tokens:
             distribution[token] += 1
 
@@ -57,7 +80,10 @@ class TokenCounter:
             text=text,
             total_tokens=token_count,
             token_distribution=dict(distribution),
-            metadata={"tokenization_method": "whitespace", "timestamp": self._get_timestamp()},
+            metadata={
+                "tokenization_method": "whitespace",
+                "timestamp": self._get_timestamp(),
+            },
         )
 
         self.count_history.append(result)
@@ -76,7 +102,7 @@ class TokenCounter:
         avg_tokens = sum(r.total_tokens for r in self.count_history) / total_counts
 
         # Calculate token frequency distribution
-        token_freq = defaultdict(int)
+        token_freq: Dict[str, int] = defaultdict(int)
         for result in self.count_history:
             for token, count in result.token_distribution.items():
                 token_freq[token] += count
@@ -85,7 +111,9 @@ class TokenCounter:
             "total_counts": total_counts,
             "average_tokens": avg_tokens,
             "unique_tokens": len(token_freq),
-            "most_common_tokens": sorted(token_freq.items(), key=lambda x: x[1], reverse=True)[:10],
+            "most_common_tokens": sorted(
+                token_freq.items(), key=lambda x: x[1], reverse=True
+            )[:10],
         }
 
     def export_count_history(self, output_path: Path) -> None:
@@ -111,7 +139,9 @@ class TokenCounter:
             json.dump(history_data, f, indent=2)
 
     def _get_timestamp(self) -> str:
-        """Get current timestamp."""
-        from datetime import datetime
+        """Get current timestamp.
 
+        Returns:
+            str: ISO format timestamp.
+        """
         return datetime.now().isoformat()

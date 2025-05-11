@@ -12,7 +12,7 @@ class CompressionResult(BaseModel):
     compressed_tokens: int
     compression_ratio: float
     compressed_text: str
-    metadata: Dict[str, Union[str, int, float]]
+    metadata: Dict[str, Union[str, int, float, bool, None]]
 
 
 class BaseCompressor(ABC):
@@ -21,20 +21,24 @@ class BaseCompressor(ABC):
     def __init__(self, model_name: str = "gpt-3.5-turbo"):
         """Initialize the compressor with a specific model."""
         self.model_name = model_name
-        self.encoding = tiktoken.encoding_for_model(model_name)
+        self.encoding: tiktoken.Encoding = tiktoken.encoding_for_model(model_name)
 
     def count_tokens(self, text: str) -> int:
         """Count the number of tokens in a text."""
         return len(self.encoding.encode(text))
 
-    def calculate_compression_ratio(self, original_tokens: int, compressed_tokens: int) -> float:
+    def calculate_compression_ratio(
+        self, original_tokens: int, compressed_tokens: int
+    ) -> float:
         """Calculate the compression ratio."""
         if original_tokens == 0:
             return 0.0
         return (original_tokens - compressed_tokens) / original_tokens
 
     @abstractmethod
-    async def compress(self, text: str, target_ratio: Optional[float] = None) -> CompressionResult:
+    async def compress(
+        self, text: str, target_ratio: Optional[float] = None
+    ) -> CompressionResult:
         """Compress the input text.
 
         Args:
@@ -47,7 +51,9 @@ class BaseCompressor(ABC):
         pass
 
     @abstractmethod
-    async def batch_compress(self, texts: List[str], target_ratio: Optional[float] = None) -> List[CompressionResult]:
+    async def batch_compress(
+        self, texts: List[str], target_ratio: Optional[float] = None
+    ) -> List[CompressionResult]:
         """Compress multiple texts in batch.
 
         Args:

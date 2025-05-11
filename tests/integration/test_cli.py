@@ -27,8 +27,12 @@ def temp_repo(tmp_path):
     """Create a temporary repository with sample prompts."""
     # Create sample files
     (tmp_path / "prompts").mkdir()
-    (tmp_path / "prompts" / "example1.txt").write_text("Write a function that calculates the Fibonacci sequence.")
-    (tmp_path / "prompts" / "example2.txt").write_text("Create a REST API endpoint for user authentication.")
+    (tmp_path / "prompts" / "example1.txt").write_text(
+        "Write a function that calculates the Fibonacci sequence."
+    )
+    (tmp_path / "prompts" / "example2.txt").write_text(
+        "Create a REST API endpoint for user authentication."
+    )
     return tmp_path
 
 
@@ -52,7 +56,15 @@ def test_suggest_command(runner, sample_prompt):
 def test_trim_command(runner, sample_prompt):
     """Test the trim command."""
     result = runner.invoke(
-        cli, ["trim", sample_prompt, "--preserve-ratio", "0.8", "--domain-terms", "function,Fibonacci"]
+        cli,
+        [
+            "trim",
+            sample_prompt,
+            "--preserve-ratio",
+            "0.8",
+            "--domain-terms",
+            "function,Fibonacci",
+        ],
     )
     assert result.exit_code == 0
     assert "Original Prompt" in result.output
@@ -61,7 +73,9 @@ def test_trim_command(runner, sample_prompt):
 
 def test_compress_code_command(runner, sample_prompt):
     """Test the compress_code command."""
-    result = runner.invoke(cli, ["compress-code", sample_prompt, "--language", "python"])
+    result = runner.invoke(
+        cli, ["compress-code", sample_prompt, "--language", "python"]
+    )
     assert result.exit_code == 0
     assert "Original Prompt" in result.output
     assert "Compressed Prompt" in result.output
@@ -97,7 +111,9 @@ def test_macro_commands(runner):
 
 def test_estimate_cost_command(runner, sample_prompt):
     """Test the estimate_cost command."""
-    result = runner.invoke(cli, ["estimate-cost", sample_prompt, "--model", "gpt-4", "--currency", "USD"])
+    result = runner.invoke(
+        cli, ["estimate-cost", sample_prompt, "--model", "gpt-4", "--currency", "USD"]
+    )
     assert result.exit_code == 0
     assert "Cost Estimation Results" in result.output
     assert "Input Tokens" in result.output
@@ -128,7 +144,15 @@ def test_scan_repository_command(runner, temp_repo):
 def test_translate_model_command(runner, sample_prompt):
     """Test the translate_model command."""
     result = runner.invoke(
-        cli, ["translate-model", sample_prompt, "--source-model", "gpt-4", "--target-model", "gpt-3.5-turbo"]
+        cli,
+        [
+            "translate-model",
+            sample_prompt,
+            "--source-model",
+            "gpt-4",
+            "--target-model",
+            "gpt-3.5-turbo",
+        ],
     )
     assert result.exit_code == 0
     assert "Original Prompt" in result.output
@@ -138,7 +162,12 @@ def test_translate_model_command(runner, sample_prompt):
 def test_check_budget_command(runner, temp_repo):
     """Test the check_budget command."""
     result = runner.invoke(
-        cli, ["check-budget", str(temp_repo / "prompts" / "example1.txt"), str(temp_repo / "prompts" / "example2.txt")]
+        cli,
+        [
+            "check-budget",
+            str(temp_repo / "prompts" / "example1.txt"),
+            str(temp_repo / "prompts" / "example2.txt"),
+        ],
     )
     assert result.exit_code == 0
     assert "Budget Check Results" in result.output
@@ -150,7 +179,14 @@ def test_generate_report_command(runner, temp_repo):
     """Test the generate_report command."""
     result = runner.invoke(
         cli,
-        ["generate-report", str(temp_repo / "prompts" / "example1.txt"), "--output", "report.html", "--format", "html"],
+        [
+            "generate-report",
+            str(temp_repo / "prompts" / "example1.txt"),
+            "--output",
+            "report.html",
+            "--format",
+            "html",
+        ],
     )
     assert result.exit_code == 0
     assert "Report generated" in result.output

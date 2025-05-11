@@ -1,26 +1,46 @@
-import re
-from typing import Dict, List, Optional, Union
+"""Macro Manager - A module for managing prompt macros."""
 
-from pydantic import BaseModel
+import json
+import logging
+from typing import Any, Dict, List, Optional
+
+logger = logging.getLogger(__name__)
 
 
-class MacroDefinition(BaseModel):
-    """Model for storing macro definitions."""
+class MacroDefinition:
+    """A class representing a macro definition."""
 
-    name: str
-    template: str
-    description: str
-    parameters: List[str]
-    metadata: Dict[str, Union[str, int, float]] = {}
+    def __init__(
+        self,
+        name: str,
+        template: str,
+        description: str = "",
+        parameters: Optional[Dict[str, Any]] = None,
+        metadata: Optional[Dict[str, Any]] = None,
+    ):
+        """Initialize a macro definition.
+
+        Args:
+            name: The name of the macro
+            template: The template string for the macro
+            description: Optional description of the macro
+            parameters: Optional dictionary of parameter definitions
+            metadata: Optional dictionary of metadata
+        """
+        self.name = name
+        self.template = template
+        self.description = description
+        self.parameters = parameters or {}
+        self.metadata = metadata or {}
 
 
 class MacroManager:
-    """Manages prompt macros and templates."""
+    """A class for managing prompt macros."""
 
     def __init__(self):
         """Initialize the macro manager."""
+        self.logger = logging.getLogger(__name__)
         self.macros: Dict[str, MacroDefinition] = {}
-        self.macro_pattern = re.compile(r"\{\{([^}]+)\}\}")
 
     def register_macro(self, macro: MacroDefinition) -> None:
         """Register a new macro.
@@ -58,6 +78,47 @@ class MacroManager:
         """
         return list(self.macros.values())
 
+    def expand(self, prompt: str) -> str:
+        """Expand macros in a prompt.
+
+        Args:
+            prompt: The prompt to expand macros in
+
+        Returns:
+            Prompt with macros expanded
+        """
+        # Get macros
+        macros = self._get_macros()
+
+        # Expand macros
+        expanded = prompt
+        for macro in macros:
+            expanded = self._expand_macro(expanded, macro)
+
+        return expanded
+
+    def _get_macros(self) -> List[Dict[str, Any]]:
+        """Get a list of macros.
+
+        Returns:
+            List of macros
+        """
+        # This would be implemented to get macros
+        return []
+
+    def _expand_macro(self, prompt: str, macro: Dict[str, Any]) -> str:
+        """Expand a macro in a prompt.
+
+        Args:
+            prompt: The prompt to expand the macro in
+            macro: The macro to expand
+
+        Returns:
+            Prompt with macro expanded
+        """
+        # This would be implemented to expand macros
+        return prompt
+
     def expand_macro(self, name: str, parameters: Dict[str, str]) -> Optional[str]:
         """Expand a macro with the given parameters.
 
@@ -89,32 +150,27 @@ class MacroManager:
             print(f"Error expanding macro {name}: {str(e)}")
             return None
 
-    def find_macros_in_text(self, text: str) -> List[str]:
-        """Find all macro references in a text.
+    def find_macros(self, text: str) -> List[str]:
+        """Find all macros used in a text.
 
         Args:
-            text: The text to search for macro references
+            text: The text to search for macros
 
         Returns:
             List of macro names found in the text
         """
-        matches = self.macro_pattern.findall(text)
-        return [match.strip() for match in matches]
+        # This method needs to be implemented
+        return []
 
     def expand_text(self, text: str, parameters: Dict[str, Dict[str, str]]) -> str:
-        """Expand all macros in a text.
+        """Expand macros in text using provided parameters.
 
         Args:
-            text: The text containing macro references
-            parameters: Dictionary mapping macro names to their parameter values
+            text: The text containing macros
+            parameters: Dictionary of macro parameters
 
         Returns:
-            The text with all macros expanded
+            Text with macros expanded
         """
-        expanded = text
-        for macro_name in self.find_macros_in_text(text):
-            if macro_name in parameters:
-                expanded_macro = self.expand_macro(macro_name, parameters[macro_name])
-                if expanded_macro:
-                    expanded = expanded.replace(f"{{{{{macro_name}}}}}", expanded_macro)
-        return expanded
+        # This method needs to be implemented
+        return text

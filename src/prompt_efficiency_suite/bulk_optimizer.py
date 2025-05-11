@@ -29,10 +29,13 @@ class BulkOptimizer:
         self.analyzer = analyzer
         self.metrics_tracker = metrics_tracker
         self.max_workers = max_workers
-        self.executor = ThreadPoolExecutor(max_workers=max_workers)
+        self.executor: ThreadPoolExecutor = ThreadPoolExecutor(max_workers=max_workers)
 
     async def optimize_batch(
-        self, prompts: List[str], target_ratio: Optional[float] = None, min_quality_score: float = 0.7
+        self,
+        prompts: List[str],
+        target_ratio: Optional[float] = None,
+        min_quality_score: float = 0.7,
     ) -> List[Dict[str, Union[CompressionResult, PromptAnalysis]]]:
         """Optimize a batch of prompts.
 
@@ -45,9 +48,11 @@ class BulkOptimizer:
             List of dictionaries containing compression and analysis results
         """
         # Process prompts in parallel
-        tasks = []
+        tasks: List[asyncio.Task] = []
         for prompt in prompts:
-            task = asyncio.create_task(self._optimize_single(prompt, target_ratio, min_quality_score))
+            task = asyncio.create_task(
+                self._optimize_single(prompt, target_ratio, min_quality_score)
+            )
             tasks.append(task)
 
         results = await asyncio.gather(*tasks)
@@ -77,16 +82,23 @@ class BulkOptimizer:
             metrics = EfficiencyMetrics(
                 prompt_id=hash(prompt),
                 token_count=compression_result.compressed_tokens,
-                cost=compression_result.compressed_tokens * 0.0001,  # Example cost calculation
+                cost=compression_result.compressed_tokens
+                * 0.0001,  # Example cost calculation
                 latency=0.0,  # Would be measured in real implementation
-                success_rate=1.0 if analysis.quality_score >= min_quality_score else 0.0,
+                success_rate=(
+                    1.0 if analysis.quality_score >= min_quality_score else 0.0
+                ),
                 quality_score=analysis.quality_score,
             )
             self.metrics_tracker.add_metrics(metrics)
 
             # Return results if quality threshold is met
             if analysis.quality_score >= min_quality_score:
-                return {"compression": compression_result, "analysis": analysis, "metrics": metrics}
+                return {
+                    "compression": compression_result,
+                    "analysis": analysis,
+                    "metrics": metrics,
+                }
             return None
 
         except Exception as e:

@@ -3,7 +3,11 @@
 
 def test_imports():
     """Test that all required classes can be imported."""
-    from prompt_efficiency_suite import AdaptiveBudgeting, CICDIntegration, DomainAwareTrimmer
+    from prompt_efficiency_suite import (
+        AdaptiveBudgeting,
+        CICDIntegration,
+        DomainAwareTrimmer,
+    )
 
     # Create instances to verify the classes work
     domain_aware_trimmer = DomainAwareTrimmer()

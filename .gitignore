@@ -9,3 +9,4 @@ ENV/
 htmlcov/
 .DS_Store
 vscode-extension/.vscode-test/
+venv311/

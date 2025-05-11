@@ -39,7 +39,9 @@ async def orchestrate_prompts(request: OrchestrateRequest) -> OrchestrateRespons
     try:
         orchestrator = PromptOrchestrator()
         result = orchestrator.orchestrate(
-            request.prompts, orchestration_type=request.orchestration_type, options=request.options
+            request.prompts,
+            orchestration_type=request.orchestration_type,
+            options=request.options,
         )
         return OrchestrateResponse(
             orchestrated_prompts=result.orchestrated_prompts,

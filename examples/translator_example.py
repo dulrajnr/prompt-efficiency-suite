@@ -1,5 +1,8 @@
 from prompt_efficiency_suite.translator.model_types import ModelType
-from prompt_efficiency_suite.translator.translator import PromptComponents, PromptTranslator
+from prompt_efficiency_suite.translator.translator import (
+    PromptComponents,
+    PromptTranslator,
+)
 
 
 def print_translation_result(result):
@@ -23,7 +26,9 @@ def print_translation_result(result):
         print("\nOptimization:")
         for improvement in result.optimization_result.improvements:
             print(f"  - {improvement}")
-        print(f"  - Token savings: {result.optimization_result.estimated_token_savings}")
+        print(
+            f"  - Token savings: {result.optimization_result.estimated_token_savings}"
+        )
 
     print(f"\nEstimated cost: ${result.estimated_cost:.4f}")
 
@@ -48,7 +53,9 @@ def main():
     """
 
     # Translate from GPT-4 to Claude
-    result = translator.translate(gpt_prompt, ModelType.GPT4, ModelType.CLAUDE, optimize=True)
+    result = translator.translate(
+        gpt_prompt, ModelType.GPT4, ModelType.CLAUDE, optimize=True
+    )
     print("=== GPT-4 to Claude Translation ===")
     print_translation_result(result)
 
@@ -68,15 +75,21 @@ def main():
     )
 
     # Translate from Claude to GPT-3.5
-    result = translator.translate(components, ModelType.CLAUDE, ModelType.GPT35, optimize=True)
+    result = translator.translate(
+        components, ModelType.CLAUDE, ModelType.GPT35, optimize=True
+    )
     print("\n=== Claude to GPT-3.5 Translation ===")
     print_translation_result(result)
 
     # Example 3: Invalid prompt (missing instruction)
-    invalid_components = PromptComponents(system_message="You are a helpful assistant.", context="This is a test.")
+    invalid_components = PromptComponents(
+        system_message="You are a helpful assistant.", context="This is a test."
+    )
 
     # Try to translate invalid prompt
-    result = translator.translate(invalid_components, ModelType.GPT4, ModelType.CLAUDE, optimize=True)
+    result = translator.translate(
+        invalid_components, ModelType.GPT4, ModelType.CLAUDE, optimize=True
+    )
     print("\n=== Invalid Prompt Translation ===")
     print_translation_result(result)
 

@@ -33,12 +33,18 @@ def cli():
 
 
 @cli.command()
-@click.option("--domain", required=True, help="Domain for trimming (e.g., legal, medical)")
+@click.option(
+    "--domain", required=True, help="Domain for trimming (e.g., legal, medical)"
+)
 @click.option("--input", required=True, help="Input file path")
 @click.option("--output", required=True, help="Output file path")
-@click.option("--min-importance", default=0.7, help="Minimum importance score for tokens")
+@click.option(
+    "--min-importance", default=0.7, help="Minimum importance score for tokens"
+)
 @click.option("--config", help="Path to config file")
-def trim(domain: str, input: str, output: str, min_importance: float, config: Optional[str]):
+def trim(
+    domain: str, input: str, output: str, min_importance: float, config: Optional[str]
+):
     """Trim a prompt while preserving important domain-specific terms."""
     config_data = load_config(config)
     dictionary_path = config_data.get("paths", {}).get("dictionary_path", "data/dicts")
@@ -66,7 +72,9 @@ def trim(domain: str, input: str, output: str, min_importance: float, config: Op
 
         click.echo(f"Tokens before: {tokens_before}")
         click.echo(f"Tokens after: {tokens_after}")
-        click.echo(f"Reduction: {((tokens_before - tokens_after) / tokens_before) * 100:.2f}%")
+        click.echo(
+            f"Reduction: {((tokens_before - tokens_after) / tokens_before) * 100:.2f}%"
+        )
 
     except ValueError as e:
         click.echo(f"Error: {str(e)}", err=True)

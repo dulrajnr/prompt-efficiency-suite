@@ -1,16 +1,14 @@
-"""
-Tester module for testing prompts and their optimizations.
-"""
+"""Tester - A module for testing prompt performance and effectiveness."""
 
 import json
 import logging
-import random
+import secrets
 import time
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from dataclasses import dataclass
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple, Union
+from typing import Any, Dict, Generator, List, Optional, Tuple
 
 logger = logging.getLogger(__name__)
 
@@ -25,16 +23,18 @@ class TestCase:
     metadata: Optional[Dict[str, Any]] = None
 
 
-@dataclass
 class TestResult:
-    """Result of a test case."""
+    """A class for storing test results."""
 
-    test_case: TestCase
-    actual_output: Optional[str] = None
-    success: bool = False
-    execution_time: float = 0.0
-    error: Optional[str] = None
-    metadata: Optional[Dict[str, Any]] = None
+    def __init__(self, prompt: str, result: Dict[str, Any]):
+        """Initialize test result.
+
+        Args:
+            prompt: The prompt that was tested
+            result: The test result
+        """
+        self.prompt = prompt
+        self.result = result
 
 
 @dataclass
@@ -49,43 +49,29 @@ class TestSuite:
 class PromptTester:
     """A class for testing prompts and their optimizations."""
 
-    def __init__(self, config: Optional[Dict[str, Any]] = None):
+    def __init__(self, config: Optional[Dict[str, Any]] = None) -> None:
         """Initialize the PromptTester.
 
         Args:
             config (Optional[Dict[str, Any]]): Configuration parameters.
         """
         self.config = config or {}
-        self.test_history: List[Tuple[TestSuite, List[TestResult]]] = []
+        self.test_history: List[TestResult] = []
 
-    def run_test_suite(self, test_suite: TestSuite, test_params: Optional[Dict[str, Any]] = None) -> List[TestResult]:
-        """Run a test suite.
-
-        Args:
-            test_suite (TestSuite): Test suite to run.
-            test_params (Optional[Dict[str, Any]]): Test parameters.
-
-        Returns:
-            List[TestResult]: Test results.
-        """
-        params = test_params or {}
-        results = []
-
-        with ThreadPoolExecutor(max_workers=params.get("max_workers", 4)) as executor:
-            futures = [executor.submit(self._run_test_case, test_case, params) for test_case in test_suite.test_cases]
-
-            for future in as_completed(futures):
-                try:
-                    result = future.result()
-                    results.append(result)
-                except Exception as e:
-                    logger.error(f"Error running test case: {e}")
-
-        self.test_history.append((test_suite, results))
+    def run_test_suite(self, test_suite: TestSuite) -> List[TestResult]:
+        """Run a suite of tests and return results."""
+        results: List[TestResult] = []
+        for test_case in test_suite.test_cases:
+            result = self._run_test_case(test_case)
+            results.append(result)
+            self.test_history.append(result)
         return results
 
     def create_test_suite(
-        self, name: str, test_cases: List[Dict[str, Any]], metadata: Optional[Dict[str, Any]] = None
+        self,
+        name: str,
+        test_cases: List[Dict[str, Any]],
+        metadata: Optional[Dict[str, Any]] = None,
     ) -> TestSuite:
         """Create a test suite from test cases.
 
@@ -122,7 +108,11 @@ class PromptTester:
         with open(file_path, "r", encoding="utf-8") as f:
             data = json.load(f)
 
-        return self.create_test_suite(name=data["name"], test_cases=data["test_cases"], metadata=data.get("metadata"))
+        return self.create_test_suite(
+            name=data["name"],
+            test_cases=data["test_cases"],
+            metadata=data.get("metadata"),
+        )
 
     def save_test_suite(self, test_suite: TestSuite, file_path: Path) -> None:
         """Save a test suite to a file.
@@ -157,15 +147,16 @@ class PromptTester:
         if not self.test_history:
             return {}
 
-        total_tests = sum(len(results) for _, results in self.test_history)
-        successful_tests = sum(sum(1 for result in results if result.success) for _, results in self.test_history)
+        total_tests = len(self.test_history)
+        successful_tests = sum(1 for r in self.test_history if r.success)
 
         # Calculate average execution time
-        execution_times = [result.execution_time for _, results in self.test_history for result in results]
-        avg_execution_time = sum(execution_times) / len(execution_times) if execution_times else 0
+        execution_times: List[float] = [r.latency for r in self.test_history]
+        avg_execution_time = (
+            sum(execution_times) / len(execution_times) if execution_times else 0
+        )
 
         return {
-            "total_test_suites": len(self.test_history),
             "total_tests": total_tests,
             "successful_tests": successful_tests,
             "success_rate": successful_tests / total_tests if total_tests > 0 else 0,
@@ -182,68 +173,63 @@ class PromptTester:
             "statistics": self.get_test_stats(),
             "results": [
                 {
-                    "test_suite": {"name": suite.name, "metadata": suite.metadata},
-                    "test_results": [
-                        {
-                            "test_case": {
-                                "prompt": result.test_case.prompt,
-                                "expected_output": result.test_case.expected_output,
-                                "context": result.test_case.context,
-                                "metadata": result.test_case.metadata,
-                            },
-                            "actual_output": result.actual_output,
-                            "success": result.success,
-                            "execution_time": result.execution_time,
-                            "error": result.error,
-                            "metadata": result.metadata,
-                        }
-                        for result in results
-                    ],
+                    "test_case": {
+                        "prompt": result.prompt,
+                        "expected_output": result.expected_output,
+                        "context": result.context,
+                        "metadata": result.metadata,
+                    },
+                    "actual_output": result.response,
+                    "success": result.success,
+                    "execution_time": result.latency,
+                    "error": result.error,
+                    "metadata": result.metadata,
                 }
-                for suite, results in self.test_history
+                for result in self.test_history
             ],
         }
 
         with open(output_path, "w", encoding="utf-8") as f:
             json.dump(results_data, f, indent=2)
 
-    def _run_test_case(self, test_case: TestCase, params: Dict[str, Any]) -> TestResult:
-        """Run a test case.
-
-        Args:
-            test_case (TestCase): Test case to run.
-            params (Dict[str, Any]): Test parameters.
-
-        Returns:
-            TestResult: Test result.
-        """
+    def _run_test_case(self, test_case: TestCase) -> TestResult:
+        """Run a single test case and return the result."""
         start_time = time.time()
         error = None
-        actual_output = None
+        response = None
+        token_count = 0
 
         try:
             # Simulate model response
-            actual_output = self._simulate_model_response(test_case.prompt, test_case.context, params)
+            response = self._simulate_model_response(
+                test_case.prompt, test_case.context, self.config
+            )
+            token_count = len(response.split())
 
             # Check if output matches expected
-            success = test_case.expected_output is None or actual_output == test_case.expected_output
+            success = (
+                test_case.expected_output is None
+                or response == test_case.expected_output
+            )
 
         except Exception as e:
             error = str(e)
             success = False
 
-        execution_time = time.time() - start_time
+        latency = time.time() - start_time
 
         return TestResult(
-            test_case=test_case,
-            actual_output=actual_output,
+            prompt=test_case.prompt,
+            response=response,
+            latency=latency,
+            token_count=token_count,
             success=success,
-            execution_time=execution_time,
             error=error,
-            metadata={"timestamp": datetime.now().isoformat()},
         )
 
-    def _simulate_model_response(self, prompt: str, context: Optional[Dict[str, Any]], params: Dict[str, Any]) -> str:
+    def _simulate_model_response(
+        self, prompt: str, context: Optional[Dict[str, Any]], params: Dict[str, Any]
+    ) -> str:
         """Simulate a model response.
 
         Args:
@@ -255,7 +241,33 @@ class PromptTester:
             str: Simulated response.
         """
         # Simulate processing delay
-        time.sleep(random.uniform(0.1, 0.5))
+        time.sleep(self._secure_random_float(0.1, 0.5))
 
         # For testing purposes, return a simple response
         return f"Response to: {prompt[:50]}..."
+
+    def _secure_random_float(self, min_val: float, max_val: float) -> float:
+        """Generate a secure random float between min_val and max_val."""
+        range_size = int(
+            (max_val - min_val) * 1000
+        )  # Convert to milliseconds for precision
+        random_ms = secrets.randbelow(range_size)
+        return min_val + (random_ms / 1000)
+
+    def get_test_results(self) -> Generator[TestResult, None, None]:
+        """Get all test results as a generator."""
+        for result in self.test_history:
+            yield result
+
+    def get_success_rate(self) -> float:
+        """Calculate the success rate of all tests."""
+        if not self.test_history:
+            return 0.0
+        successful = sum(1 for r in self.test_history if r.success)
+        return successful / len(self.test_history)
+
+    def get_average_latency(self) -> float:
+        """Calculate the average latency of all tests."""
+        if not self.test_history:
+            return 0.0
+        return sum(r.latency for r in self.test_history) / len(self.test_history)
